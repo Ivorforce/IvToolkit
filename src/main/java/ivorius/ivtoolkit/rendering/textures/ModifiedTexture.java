@@ -16,7 +16,6 @@
 
 package ivorius.ivtoolkit.rendering.textures;
 
-import ivorius.yegamolchattels.client.rendering.TileEntityRendererStatue;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.resources.IResourceManager;
@@ -54,7 +53,5 @@ public class ModifiedTexture extends AbstractTexture
         BufferedImage modified = IvTextureCreator.applyEffect(image, imageEffect);
 
         TextureUtil.uploadTextureImageAllocate(this.getGlTextureId(), modified, false, false);
-
-//        TileEntityRendererStatue.saveCachedTexture(modified, resourceLocation.toString());
     }
 }
