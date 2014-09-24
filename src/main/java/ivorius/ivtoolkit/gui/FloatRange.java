@@ -1,8 +1,7 @@
 /*
- *  Copyright (c) 2014, Lukas Tenbrink.
- *  * http://lukas.axxim.net
+ * Copyright (c) Lukas Tenbrink, 2014.
+ * View the license file at https://github.com/Ivorforce/IvToolkit/blob/master/LICENSE for the full license.
  */
-
 package ivorius.ivtoolkit.gui;
 
 /**
