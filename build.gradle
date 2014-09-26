@@ -61,3 +61,57 @@ processResources
 //        exclude 'mcmod.info'
     }
 }
+
+uploadArchives {
+    if (System.getenv("mavenUrl") != null) {
+        repositories {
+            logger.info('Publishing to files server')
+
+            mavenDeployer {
+
+                repository(url: System.getenv("mavenUrl")) {
+                    authentication(userName: System.getenv("mavenUser"), password: System.getenv("mavenPassword"))
+                }
+
+                pom {
+                    groupId = project.group
+                    version = project.version
+                    artifactId = project.archivesBaseName
+                    project {
+                        name project.archivesBaseName
+                        packaging 'jar'
+                        description 'Shared functionality for Ivorius\' mods'
+                        url 'https://github.com/Ivorforce/IvToolkit'
+
+                        scm {
+                            url 'scm:git:git@github.com:Ivorforce/IvToolkit.git'
+                            connection 'scm:git:git@github.com:Ivorforce/IvToolkit.git'
+                            developerConnection 'scm:git:git@github.com:Ivorforce/IvToolkit.git'
+                        }
+
+                        issueManagement {
+                            system 'github'
+                            url 'https://github.com/Ivorforce/IvToolkit/issues'
+                        }
+
+                        licenses {
+                            license {
+                                name 'Apache 2.0'
+                                url 'http://www.apache.org/licenses/LICENSE-2.0.html'
+                                distribution 'repo'
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id 'Ivorius'
+                                name 'Ivorius'
+                                roles { role 'developer' }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
