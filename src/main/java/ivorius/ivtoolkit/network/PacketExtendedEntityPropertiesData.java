@@ -45,7 +45,7 @@ public class PacketExtendedEntityPropertiesData implements IMessage
         this.payload = payload;
     }
 
-    public static PacketExtendedEntityPropertiesData packetEntityData(Entity entity, String eepKey, String context)
+    public static PacketExtendedEntityPropertiesData packetEntityData(Entity entity, String eepKey, String context, Object... params)
     {
         IExtendedEntityProperties eep = entity.getExtendedProperties(eepKey);
 
@@ -53,7 +53,7 @@ public class PacketExtendedEntityPropertiesData implements IMessage
             throw new IllegalArgumentException("IExtendedEntityProperties must implement IExtendedEntityPropertiesUpdateData to send update packets!");
 
         ByteBuf buf = Unpooled.buffer();
-        ((PartialUpdateHandler) eep).writeUpdateData(buf, context);
+        ((PartialUpdateHandler) eep).writeUpdateData(buf, context, params);
 
         return new PacketExtendedEntityPropertiesData(entity.getEntityId(), context, eepKey, buf);
     }

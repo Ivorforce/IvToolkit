@@ -23,8 +23,8 @@ import net.minecraft.inventory.Container;
 import net.minecraft.network.NetHandlerPlayServer;
 
 /**
-* Created by lukas on 02.07.14.
-*/
+ * Created by lukas on 02.07.14.
+ */
 public class PacketGuiActionHandler implements IMessageHandler<PacketGuiAction, IMessage>
 {
     @Override

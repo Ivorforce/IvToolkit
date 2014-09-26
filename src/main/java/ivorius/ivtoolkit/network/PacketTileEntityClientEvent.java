@@ -46,10 +46,10 @@ public class PacketTileEntityClientEvent implements IMessage
         this.payload = payload;
     }
 
-    public static <UTileEntity extends TileEntity & PartialUpdateHandler> PacketTileEntityClientEvent packetEntityData(UTileEntity entity, String context)
+    public static <ETileEntity extends TileEntity & ClientEventHandler> PacketTileEntityClientEvent packetEntityData(ETileEntity entity, String context, Object... params)
     {
         ByteBuf buf = Unpooled.buffer();
-        entity.writeUpdateData(buf, context);
+        entity.assembleClientEvent(buf, context, params);
         return new PacketTileEntityClientEvent(entity.getWorldObj().provider.dimensionId, entity.xCoord, entity.yCoord, entity.zCoord, context, buf);
     }
 

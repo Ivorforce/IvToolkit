@@ -42,10 +42,10 @@ public class PacketEntityData implements IMessage
         this.payload = payload;
     }
 
-    public static <UEntity extends Entity & PartialUpdateHandler> PacketEntityData packetEntityData(UEntity entity, String context)
+    public static <UEntity extends Entity & PartialUpdateHandler> PacketEntityData packetEntityData(UEntity entity, String context, Object... params)
     {
         ByteBuf buf = Unpooled.buffer();
-        entity.writeUpdateData(buf, context);
+        entity.writeUpdateData(buf, context, params);
         return new PacketEntityData(entity.getEntityId(), context, buf);
     }
 

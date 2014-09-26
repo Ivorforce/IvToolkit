@@ -44,10 +44,10 @@ public class PacketTileEntityData implements IMessage
         this.payload = payload;
     }
 
-    public static <UTileEntity extends TileEntity & PartialUpdateHandler> PacketTileEntityData packetEntityData(UTileEntity entity, String context)
+    public static <UTileEntity extends TileEntity & PartialUpdateHandler> PacketTileEntityData packetEntityData(UTileEntity entity, String context, Object... params)
     {
         ByteBuf buf = Unpooled.buffer();
-        entity.writeUpdateData(buf, context);
+        entity.writeUpdateData(buf, context, params);
         return new PacketTileEntityData(entity.xCoord, entity.yCoord, entity.zCoord, context, buf);
     }
 

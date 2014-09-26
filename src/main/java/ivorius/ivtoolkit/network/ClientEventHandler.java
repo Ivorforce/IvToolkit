@@ -17,26 +17,27 @@
 package ivorius.ivtoolkit.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayerMP;
 
 /**
  * A interface for some object types that need extra information to be communicated
- * between the server and client when their values are updated.
+ * between the client and server on client input.
  */
-public interface PartialUpdateHandler
+public interface ClientEventHandler
 {
     /**
-     * Called on the server when constructing the update packet.
+     * Called on the client when constructing the event packet.
      * Data should be added to the provided stream.
      *
      * @param buffer The packet data stream
      */
-    void writeUpdateData(ByteBuf buffer, String context, Object... params);
+    void assembleClientEvent(ByteBuf buffer, String context, Object... params);
 
     /**
-     * Called on the client when it receives an update packet.
+     * Called on the server when it receives an update packet.
      * Data should be read out of the stream in the same way as it was written.
      *
      * @param buffer The packet data stream
      */
-    void readUpdateData(ByteBuf buffer, String context);
+    void onClientEvent(ByteBuf buffer, String context, EntityPlayerMP player);
 }
