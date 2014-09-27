@@ -19,7 +19,10 @@ package ivorius.ivtoolkit.tools;
 import ivorius.ivtoolkit.blocks.BlockArea;
 import ivorius.ivtoolkit.blocks.BlockCoord;
 import ivorius.ivtoolkit.blocks.IvBlockCollection;
+import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
+import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityHanging;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -72,17 +75,7 @@ public class IvWorldData
 
         if (captureEntities)
         {
-            entities = world.getEntitiesWithinAABBExcludingEntity(null, blockArea.asAxisAlignedBB());
-            Iterator<Entity> entityIterator = entities.iterator();
-            while (entityIterator.hasNext())
-            {
-                Entity entity = entityIterator.next();
-
-                if (entity instanceof EntityPlayer)
-                {
-                    entityIterator.remove();
-                }
-            }
+            entities = world.getEntitiesWithinAABBExcludingEntity(null, blockArea.asAxisAlignedBB(), new EntitySelectorSaveable());
         }
         else
         {
@@ -130,13 +123,10 @@ public class IvWorldData
         for (TileEntity tileEntity : tileEntities)
         {
             NBTTagCompound teCompound = new NBTTagCompound();
-            tileEntity.xCoord -= referenceCoord.x;
-            tileEntity.yCoord -= referenceCoord.y;
-            tileEntity.zCoord -= referenceCoord.z;
+
+            moveTileEntityForGeneration(tileEntity, referenceCoord.invert());
             tileEntity.writeToNBT(teCompound);
-            tileEntity.xCoord += referenceCoord.x;
-            tileEntity.yCoord += referenceCoord.y;
-            tileEntity.zCoord += referenceCoord.z;
+            moveTileEntityForGeneration(tileEntity, referenceCoord);
 
             recursivelyInjectIDFixTags(teCompound);
             teList.appendTag(teCompound);
@@ -147,13 +137,10 @@ public class IvWorldData
         for (Entity entity : entities)
         {
             NBTTagCompound entityCompound = new NBTTagCompound();
-            entity.posX -= referenceCoord.x;
-            entity.posY -= referenceCoord.y;
-            entity.posZ -= referenceCoord.z;
+
+            moveEntityForGeneration(entity, referenceCoord.invert());
             entity.writeToNBTOptional(entityCompound);
-            entity.posX += referenceCoord.x;
-            entity.posY += referenceCoord.y;
-            entity.posZ += referenceCoord.z;
+            moveEntityForGeneration(entity, referenceCoord);
 
             recursivelyInjectIDFixTags(entityCompound);
             entityList.appendTag(entityCompound);
@@ -161,6 +148,49 @@ public class IvWorldData
         compound.setTag("entities", entityList);
 
         return compound;
+    }
+
+    public static void moveTileEntityForGeneration(TileEntity tileEntity, BlockCoord coord)
+    {
+        tileEntity.xCoord += coord.x;
+        tileEntity.yCoord += coord.y;
+        tileEntity.zCoord += coord.z;
+    }
+
+    public static void setTileEntityPosForGeneration(TileEntity tileEntity, BlockCoord coord)
+    {
+        moveTileEntityForGeneration(tileEntity, coord.subtract(new BlockCoord(tileEntity)));
+    }
+
+    public static void moveEntityForGeneration(Entity entity, BlockCoord coord)
+    {
+        entity.setPosition(entity.posX + coord.x, entity.posY + coord.y, entity.posZ + coord.z);
+
+        if (entity instanceof EntityHanging)
+        {
+            EntityHanging entityHanging = (EntityHanging) entity;
+            entityHanging.field_146063_b += coord.x;
+            entityHanging.field_146064_c += coord.y;
+            entityHanging.field_146062_d += coord.z;
+            entityHanging.setDirection(entityHanging.hangingDirection);
+        }
+    }
+
+    public static void transformEntityPosForGeneration(Entity entity, AxisAlignedTransform2D transform, int[] size)
+    {
+        double[] newEntityPos = transform.apply(new double[]{entity.posX, entity.posY, entity.posZ}, size);
+        entity.setPosition(newEntityPos[0], newEntityPos[1], newEntityPos[2]);
+
+        if (entity instanceof EntityHanging)
+        {
+            EntityHanging entityHanging = (EntityHanging) entity;
+            BlockCoord hangingCoord = new BlockCoord(entityHanging.field_146063_b, entityHanging.field_146064_c, entityHanging.field_146062_d);
+            BlockCoord newHangingCoord = transform.apply(hangingCoord, size);
+            entityHanging.field_146063_b = newHangingCoord.x;
+            entityHanging.field_146064_c = newHangingCoord.y;
+            entityHanging.field_146062_d = newHangingCoord.z;
+            entityHanging.setDirection(entityHanging.hangingDirection);
+        }
     }
 
     public static void recursivelyInjectIDFixTags(NBTTagCompound compound)
@@ -306,6 +336,15 @@ public class IvWorldData
                     }
                 }
             }
+        }
+    }
+
+    public static class EntitySelectorSaveable implements IEntitySelector
+    {
+        @Override
+        public boolean isEntityApplicable(Entity entity)
+        {
+            return !(entity instanceof EntityPlayer);
         }
     }
 }
