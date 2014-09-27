@@ -1,0 +1,16 @@
+[
+{
+  "modid": "ivtoolkit",
+  "name": "IvToolkit",
+  "description": "Framework with various functionalities, but no ingame influence.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "http://www.minecraftforum.net/topic/563257-152",
+  "updateUrl": "",
+  "authors": ["Ivorius"],
+  "credits": "Ivorius: Development",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
