@@ -52,6 +52,13 @@ processResources
     }
 }
 
+runClient {
+    jvmArgs '-Dfml.coreMods.load=ivorius.ivtoolkit.IvToolkitLoadingPlugin'
+}
+runServer {
+    jvmArgs '-Dfml.coreMods.load=ivorius.ivtoolkit.IvToolkitLoadingPlugin'
+}
+
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
