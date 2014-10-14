@@ -154,9 +154,14 @@ public class IvWorldData
 
     public static void moveTileEntityForGeneration(TileEntity tileEntity, BlockCoord coord)
     {
-        tileEntity.xCoord += coord.x;
-        tileEntity.yCoord += coord.y;
-        tileEntity.zCoord += coord.z;
+        if (tileEntity instanceof Movable)
+            ((Movable) tileEntity).move(coord.x, coord.y, coord.z);
+        else
+        {
+            tileEntity.xCoord += coord.x;
+            tileEntity.yCoord += coord.y;
+            tileEntity.zCoord += coord.z;
+        }
     }
 
     public static void setTileEntityPosForGeneration(TileEntity tileEntity, BlockCoord coord)
@@ -164,34 +169,52 @@ public class IvWorldData
         moveTileEntityForGeneration(tileEntity, coord.subtract(new BlockCoord(tileEntity)));
     }
 
+    public static void transformTileEntityPosForGeneration(TileEntity tileEntity, AxisAlignedTransform2D transform, int[] size)
+    {
+        if (tileEntity instanceof Transformable)
+            ((Transformable) tileEntity).transform(transform.getRotation(), transform.isMirrorX(), size);
+        else
+            setTileEntityPosForGeneration(tileEntity, transform.apply(new BlockCoord(tileEntity), size));
+    }
+
     public static void moveEntityForGeneration(Entity entity, BlockCoord coord)
     {
-        entity.setPosition(entity.posX + coord.x, entity.posY + coord.y, entity.posZ + coord.z);
-
-        if (entity instanceof EntityHanging)
+        if (entity instanceof Movable)
+            ((Movable) entity).move(coord.x, coord.y, coord.z);
+        else
         {
-            EntityHanging entityHanging = (EntityHanging) entity;
-            entityHanging.field_146063_b += coord.x;
-            entityHanging.field_146064_c += coord.y;
-            entityHanging.field_146062_d += coord.z;
-            entityHanging.setDirection(entityHanging.hangingDirection);
+            entity.setPosition(entity.posX + coord.x, entity.posY + coord.y, entity.posZ + coord.z);
+
+            if (entity instanceof EntityHanging)
+            {
+                EntityHanging entityHanging = (EntityHanging) entity;
+                entityHanging.field_146063_b += coord.x;
+                entityHanging.field_146064_c += coord.y;
+                entityHanging.field_146062_d += coord.z;
+                entityHanging.setDirection(entityHanging.hangingDirection);
+            }
         }
     }
 
     public static void transformEntityPosForGeneration(Entity entity, AxisAlignedTransform2D transform, int[] size)
     {
-        double[] newEntityPos = transform.apply(new double[]{entity.posX, entity.posY, entity.posZ}, size);
-        entity.setPosition(newEntityPos[0], newEntityPos[1], newEntityPos[2]);
-
-        if (entity instanceof EntityHanging)
+        if (entity instanceof Transformable)
+            ((Transformable) entity).transform(transform.getRotation(), transform.isMirrorX(), size);
+        else
         {
-            EntityHanging entityHanging = (EntityHanging) entity;
-            BlockCoord hangingCoord = new BlockCoord(entityHanging.field_146063_b, entityHanging.field_146064_c, entityHanging.field_146062_d);
-            BlockCoord newHangingCoord = transform.apply(hangingCoord, size);
-            entityHanging.field_146063_b = newHangingCoord.x;
-            entityHanging.field_146064_c = newHangingCoord.y;
-            entityHanging.field_146062_d = newHangingCoord.z;
-            entityHanging.setDirection(entityHanging.hangingDirection);
+            double[] newEntityPos = transform.apply(new double[]{entity.posX, entity.posY, entity.posZ}, size);
+            entity.setPosition(newEntityPos[0], newEntityPos[1], newEntityPos[2]);
+
+            if (entity instanceof EntityHanging)
+            {
+                EntityHanging entityHanging = (EntityHanging) entity;
+                BlockCoord hangingCoord = new BlockCoord(entityHanging.field_146063_b, entityHanging.field_146064_c, entityHanging.field_146062_d);
+                BlockCoord newHangingCoord = transform.apply(hangingCoord, size);
+                entityHanging.field_146063_b = newHangingCoord.x;
+                entityHanging.field_146064_c = newHangingCoord.y;
+                entityHanging.field_146062_d = newHangingCoord.z;
+                entityHanging.setDirection(entityHanging.hangingDirection);
+            }
         }
     }
 
