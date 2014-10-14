@@ -20,6 +20,7 @@ import cpw.mods.fml.common.network.FMLOutboundHandler;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import io.netty.channel.Channel;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
@@ -109,5 +110,25 @@ public class IvNetworkHelperServer
         }
 
         return playersWatching;
+    }
+
+    public static void sendEEPUpdatePacketToPlayer(Entity entity, String eepKey, String context, SimpleNetworkWrapper network, EntityPlayer player, Object... params)
+    {
+        if (!(player instanceof EntityPlayerMP))
+            throw new UnsupportedOperationException();
+
+        network.sendTo(PacketExtendedEntityPropertiesData.packetEntityData(entity, eepKey, context, params), (EntityPlayerMP) player);
+    }
+
+    public static void sendEEPUpdatePacket(Entity entity, String eepKey, String context, SimpleNetworkWrapper network, Object... params)
+    {
+        if (entity.worldObj.isRemote)
+            throw new UnsupportedOperationException();
+
+        for (EntityPlayer player : ((WorldServer) entity.worldObj).getEntityTracker().getTrackingPlayers(entity))
+            sendEEPUpdatePacketToPlayer(entity, eepKey, context, network, player, params);
+
+        if (entity instanceof EntityPlayer) // Players don't 'track' themselves
+            sendEEPUpdatePacketToPlayer(entity, eepKey, context, network, (EntityPlayer) entity, params);
     }
 }
