@@ -18,6 +18,7 @@ package ivorius.ivtoolkit.items;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -86,6 +87,9 @@ public class IvItemRendererModel implements IItemRenderer
         GL11.glRotatef(rotation[0], 1.0f, 0.0f, 0.0f);
         GL11.glRotatef(rotation[1], 0.0f, 1.0f, 0.0f);
         GL11.glRotatef(rotation[2], 0.0f, 0.0f, 1.0f);
+
+        GL11.glEnable(GL11.GL_BLEND);
+        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 
         Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
         model.render(item);
