@@ -16,15 +16,59 @@
 
 package ivorius.ivtoolkit.maze;
 
+import ivorius.ivtoolkit.blocks.BlockCoord;
+import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
 import net.minecraft.util.WeightedRandom;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Stack;
+import java.util.*;
 
 public class MazeGenerator
 {
+    public static void generateStartPathsForEnclosedMaze(Maze maze, Iterable<MazePath> startPoints, Iterable<MazeRoom> blockedRooms, AxisAlignedTransform2D transform)
+    {
+        int[] mazeSizeInRooms = new int[maze.dimensions.length];
+        for (int i = 0; i < mazeSizeInRooms.length; i++)
+            mazeSizeInRooms[i] = (maze.dimensions[i] - 1) / 2;
+
+        for (MazePath path : maze.allPaths())
+        {
+            if (maze.isPathPointingOutside(path))
+                maze.set(Maze.WALL, path);
+        }
+
+        for (MazeRoom blockedRoom : blockedRooms)
+        {
+            blockedRoom = rotatedRoom(blockedRoom, transform, mazeSizeInRooms);
+
+            maze.set(Maze.WALL, blockedRoom);
+            for (int dim = 0; dim < maze.dimensions.length; dim++)
+            {
+                maze.set(Maze.WALL, new MazePath(blockedRoom, dim, true));
+                maze.set(Maze.WALL, new MazePath(blockedRoom, dim, false));
+            }
+        }
+
+        for (MazePath startPoint : startPoints)
+            maze.set(Maze.ROOM, rotatedPath(startPoint, transform, mazeSizeInRooms));
+    }
+
+    public static MazePath randomEmptyPathInMaze(Random rand, Maze maze, Collection<Integer> applicableDimensions)
+    {
+        List<MazePath> paths = new ArrayList<>(maze.allPaths());
+        for (Iterator<MazePath> iterator = paths.iterator(); iterator.hasNext(); )
+        {
+            MazePath path = iterator.next();
+            if (maze.get(path) != Maze.NULL || !applicableDimensions.contains(path.pathDimension))
+                iterator.remove();
+        }
+
+        if (paths.size() > 0)
+            return paths.get(rand.nextInt(paths.size()));
+
+        return null;
+    }
+
+    @Deprecated
     public static MazeRoom randomRoomInMaze(Random rand, Maze maze, int... distanceFromOutside)
     {
         int[] position = new int[maze.dimensions.length];
@@ -36,6 +80,7 @@ public class MazeGenerator
         return new MazeRoom(position);
     }
 
+    @Deprecated
     public static MazePath randomPathInMaze(Random rand, Maze maze, int... distanceFromOutside)
     {
         List<WeightedIndex> dimensionWeights = new ArrayList<>();
@@ -132,6 +177,7 @@ public class MazeGenerator
         }
     }
 
+    @Deprecated
     public static void addRandomPaths(Maze maze, int paths, Random rand)
     {
         for (int i = 0; i < maze.dimensions.length; i++)
@@ -150,6 +196,7 @@ public class MazeGenerator
         }
     }
 
+    @Deprecated
     public static void generateStartPathsForEnclosedMaze(Maze maze, MazePath... startPoints)
     {
         for (MazePath path : maze.allPaths())
@@ -164,5 +211,22 @@ public class MazeGenerator
         {
             maze.set(Maze.ROOM, startPoint);
         }
+    }
+
+    public static MazeRoom rotatedRoom(MazeRoom room, AxisAlignedTransform2D transform, int[] size)
+    {
+        int[] roomPosition = room.coordinates;
+        BlockCoord transformedRoom = transform.apply(new BlockCoord(roomPosition[0], roomPosition[1], roomPosition[2]), size);
+        return new MazeRoom(transformedRoom.x, transformedRoom.y, transformedRoom.z);
+    }
+
+    public static MazePath rotatedPath(MazePath path, AxisAlignedTransform2D transform, int[] size)
+    {
+        int[] sourceCoords = path.getSourceRoom().coordinates;
+        int[] destCoords = path.getDestinationRoom().coordinates;
+        BlockCoord transformedSource = transform.apply(new BlockCoord(sourceCoords[0], sourceCoords[1], sourceCoords[2]), size);
+        BlockCoord transformedDest = transform.apply(new BlockCoord(destCoords[0], destCoords[1], destCoords[2]), size);
+
+        return MazePath.pathFromSourceAndDest(new MazeRoom(transformedSource.x, transformedSource.y, transformedSource.z), new MazeRoom(transformedDest.x, transformedDest.y, transformedDest.z));
     }
 }
