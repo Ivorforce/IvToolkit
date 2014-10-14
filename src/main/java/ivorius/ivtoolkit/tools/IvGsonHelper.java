@@ -54,4 +54,15 @@ public class IvGsonHelper
 
         return null;
     }
+
+    public static <E extends Enum> E enumForNameIgnoreCase(String serializedName, E[] values)
+    {
+        for (E anEnum : values)
+        {
+            if (IvGsonHelper.serializedName(anEnum).equalsIgnoreCase(serializedName))
+                return anEnum;
+        }
+
+        return null;
+    }
 }
