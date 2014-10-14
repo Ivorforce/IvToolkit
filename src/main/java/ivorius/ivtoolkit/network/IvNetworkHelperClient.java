@@ -24,7 +24,13 @@ import net.minecraft.tileentity.TileEntity;
  */
 public class IvNetworkHelperClient
 {
+    @Deprecated
     public static <ETileEntity extends TileEntity & ClientEventHandler> void sendTileEntityUpdatePacket(ETileEntity tileEntity, String context, SimpleNetworkWrapper network, Object... params)
+    {
+        sendTileEntityEventPacket(tileEntity, context, network, params);
+    }
+
+    public static <ETileEntity extends TileEntity & ClientEventHandler> void sendTileEntityEventPacket(ETileEntity tileEntity, String context, SimpleNetworkWrapper network, Object... params)
     {
         if (!(tileEntity.getWorldObj().isRemote))
             throw new UnsupportedOperationException();
