@@ -85,6 +85,8 @@ public class IvWorldData
 
     public IvWorldData(NBTTagCompound compound, World world, MCRegistry registry)
     {
+        compound = (NBTTagCompound) compound.copy(); // Copy since ID fix tags are being removed when being applied
+
         blockCollection = new IvBlockCollection(compound.getCompoundTag("blockCollection"), registry);
 
         NBTTagList teList = compound.getTagList("tileEntities", Constants.NBT.TAG_COMPOUND);
