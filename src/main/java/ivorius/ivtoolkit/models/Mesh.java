@@ -18,7 +18,7 @@
 
 package ivorius.ivtoolkit.models;
 
-import models.data.*;
+import ivorius.ivtoolkit.models.data.*;
 
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;

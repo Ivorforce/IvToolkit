@@ -18,7 +18,7 @@
 
 package ivorius.ivtoolkit.models;
 
-import models.data.Disposable;
+import ivorius.ivtoolkit.models.data.Disposable;
 
 import java.util.ArrayList;
 import java.util.List;

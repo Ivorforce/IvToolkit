@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * Instances of this class specify the vertex attributes of a mesh. VertexAttributes are used by {@link models.Mesh} instances to define
+ * Instances of this class specify the vertex attributes of a mesh. VertexAttributes are used by {@link ivorius.ivtoolkit.models.Mesh} instances to define
  * its vertex structure. Vertex attributes have an order. The order is specified by the order they are added to this class.
  *
  * @author mzechner

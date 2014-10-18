@@ -18,7 +18,7 @@
 
 package ivorius.ivtoolkit.models.data;
 
-import models.utils.BufferUtils;
+import ivorius.ivtoolkit.models.utils.BufferUtils;
 import net.minecraft.client.renderer.GLAllocation;
 
 import java.nio.ByteBuffer;

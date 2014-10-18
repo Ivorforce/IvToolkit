@@ -18,9 +18,9 @@
 
 package ivorius.ivtoolkit.models.attributes;
 
-import models.Attribute;
-import models.textures.Texture;
-import models.textures.TextureSub;
+import ivorius.ivtoolkit.models.Attribute;
+import ivorius.ivtoolkit.models.textures.Texture;
+import ivorius.ivtoolkit.models.textures.TextureSub;
 
 public class TextureAttribute extends Attribute
 {

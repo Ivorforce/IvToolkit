@@ -57,7 +57,7 @@ public abstract class Attribute
     }
 
     /**
-     * Use {@link models.Attribute#register(String)} instead
+     * Use {@link ivorius.ivtoolkit.models.Attribute#register(String)} instead
      */
     protected final static long register(final String alias)
     {

@@ -237,7 +237,7 @@ public class Attributes implements Iterable<Attribute>, Comparator<Attribute>
     }
 
     /**
-     * See {@link #same(models.Attributes, boolean)}
+     * See {@link #same(ivorius.ivtoolkit.models.Attributes, boolean)}
      *
      * @return True if this collection contains the same attributes (but not values) as the other.
      */

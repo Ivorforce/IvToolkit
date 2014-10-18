@@ -18,16 +18,16 @@
 
 package ivorius.ivtoolkit.models;
 
-import models.attributes.BlendingAttribute;
-import models.attributes.ColorAttribute;
-import models.attributes.TextureAttribute;
-import models.data.IndexData;
-import models.data.VertexAttribute;
-import models.data.VertexAttributes;
-import models.data.VertexData;
-import models.textures.Texture;
-import models.utils.MathUtils;
-import models.utils.MatrixMathUtils;
+import ivorius.ivtoolkit.models.attributes.BlendingAttribute;
+import ivorius.ivtoolkit.models.attributes.ColorAttribute;
+import ivorius.ivtoolkit.models.attributes.TextureAttribute;
+import ivorius.ivtoolkit.models.data.IndexData;
+import ivorius.ivtoolkit.models.data.VertexAttribute;
+import ivorius.ivtoolkit.models.data.VertexAttributes;
+import ivorius.ivtoolkit.models.data.VertexData;
+import ivorius.ivtoolkit.models.textures.Texture;
+import ivorius.ivtoolkit.models.utils.MathUtils;
+import ivorius.ivtoolkit.models.utils.MatrixMathUtils;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
 import org.lwjgl.opengl.GL11;

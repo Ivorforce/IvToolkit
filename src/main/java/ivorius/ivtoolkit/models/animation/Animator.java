@@ -18,8 +18,8 @@
 
 package ivorius.ivtoolkit.models.animation;
 
-import models.Animation;
-import models.NodeAnimation;
+import ivorius.ivtoolkit.models.Animation;
+import ivorius.ivtoolkit.models.NodeAnimation;
 
 import java.util.ArrayList;
 import java.util.List;

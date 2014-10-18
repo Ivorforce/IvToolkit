@@ -18,7 +18,7 @@
 
 package ivorius.ivtoolkit.models.data;
 
-import models.data.VertexAttributes.Usage;
+import ivorius.ivtoolkit.models.data.VertexAttributes.Usage;
 import org.lwjgl.opengl.GL11;
 
 public final class VertexAttribute

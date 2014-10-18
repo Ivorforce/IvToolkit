@@ -18,8 +18,8 @@
 
 package ivorius.ivtoolkit.models.loaders;
 
-import models.Model;
-import models.textures.TextureProvider;
+import ivorius.ivtoolkit.models.Model;
+import ivorius.ivtoolkit.models.textures.TextureProvider;
 
 import java.io.Reader;
 

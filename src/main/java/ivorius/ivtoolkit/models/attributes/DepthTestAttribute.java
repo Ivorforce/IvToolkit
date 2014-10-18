@@ -18,7 +18,7 @@
 
 package ivorius.ivtoolkit.models.attributes;
 
-import models.Attribute;
+import ivorius.ivtoolkit.models.Attribute;
 import org.lwjgl.opengl.GL11;
 
 public class DepthTestAttribute extends Attribute

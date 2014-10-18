@@ -18,7 +18,7 @@
 
 package ivorius.ivtoolkit.models.textures;
 
-import models.utils.MathUtils;
+import ivorius.ivtoolkit.models.utils.MathUtils;
 
 /**
  * Defines a rectangular area of a texture. The coordinate system used has its origin in the upper left corner with the x-axis

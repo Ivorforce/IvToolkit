@@ -39,7 +39,7 @@ public class MinecraftTextureProvider implements TextureProvider
         return new Texture(new ResourceLocation(basePath + textureName));
     }
 
-    public static class Texture implements models.textures.Texture
+    public static class Texture implements ivorius.ivtoolkit.models.textures.Texture
     {
         private ResourceLocation resourceLocation;
 

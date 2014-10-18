@@ -538,7 +538,7 @@ public class ArrayMap<K, V> implements Iterable<Entry<K, V>>
 
     /**
      * Returns an iterator for the entries in the map. Remove is supported. Note that the same iterator instance is returned each
-     * time this method is called. Use the {@link models.utils.ArrayMap.Entries} constructor for nested or multithreaded iteration.
+     * time this method is called. Use the {@link ivorius.ivtoolkit.models.utils.ArrayMap.Entries} constructor for nested or multithreaded iteration.
      */
     public Entries<K, V> entries()
     {
@@ -562,7 +562,7 @@ public class ArrayMap<K, V> implements Iterable<Entry<K, V>>
 
     /**
      * Returns an iterator for the values in the map. Remove is supported. Note that the same iterator instance is returned each
-     * time this method is called. Use the {@link models.utils.ArrayMap.Entries} constructor for nested or multithreaded iteration.
+     * time this method is called. Use the {@link ivorius.ivtoolkit.models.utils.ArrayMap.Entries} constructor for nested or multithreaded iteration.
      */
     public Values<V> values()
     {
@@ -586,7 +586,7 @@ public class ArrayMap<K, V> implements Iterable<Entry<K, V>>
 
     /**
      * Returns an iterator for the keys in the map. Remove is supported. Note that the same iterator instance is returned each time
-     * this method is called. Use the {@link models.utils.ArrayMap.Entries} constructor for nested or multithreaded iteration.
+     * this method is called. Use the {@link ivorius.ivtoolkit.models.utils.ArrayMap.Entries} constructor for nested or multithreaded iteration.
      */
     public Keys<K> keys()
     {

@@ -18,9 +18,9 @@
 
 package ivorius.ivtoolkit.models.animation;
 
-import models.Node;
-import models.NodeAnimation;
-import models.NodeKeyframe;
+import ivorius.ivtoolkit.models.Node;
+import ivorius.ivtoolkit.models.NodeAnimation;
+import ivorius.ivtoolkit.models.NodeKeyframe;
 import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector3f;
 

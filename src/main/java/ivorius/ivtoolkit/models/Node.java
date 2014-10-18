@@ -18,7 +18,7 @@
 
 package ivorius.ivtoolkit.models;
 
-import models.utils.MatrixMathUtils;
+import ivorius.ivtoolkit.models.utils.MatrixMathUtils;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector3f;

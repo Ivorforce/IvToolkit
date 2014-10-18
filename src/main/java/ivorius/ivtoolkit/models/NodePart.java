@@ -18,7 +18,7 @@
 
 package ivorius.ivtoolkit.models;
 
-import models.utils.ArrayMap;
+import ivorius.ivtoolkit.models.utils.ArrayMap;
 import org.lwjgl.util.vector.Matrix4f;
 
 /**
