@@ -121,7 +121,7 @@ public class IvShaderInstance
             OpenGlHelper.func_153169_a(shader, shaderCodeBuf);
             OpenGlHelper.func_153170_c(shader);
 
-            if (OpenGlHelper.func_153157_c(shader, IvOpenGLHelper.GL_VALIDATE_STATUS) == GL11.GL_FALSE)
+            if (OpenGlHelper.func_153157_c(shader, OpenGlHelper.field_153208_p) == GL11.GL_FALSE)
             {
                 throw new RuntimeException("Error creating shader: " + OpenGlHelper.func_153166_e(shader, Integer.MAX_VALUE));
             }
