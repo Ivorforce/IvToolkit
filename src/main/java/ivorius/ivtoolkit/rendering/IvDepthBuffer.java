@@ -19,10 +19,10 @@ package ivorius.ivtoolkit.rendering;
 import net.minecraft.client.renderer.OpenGlHelper;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.ARBMultitexture;
+import org.lwjgl.util.glu.GLU;
 
 import java.nio.ByteBuffer;
 
-import static org.lwjgl.opengl.EXTFramebufferObject.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL14.*;
@@ -60,16 +60,16 @@ public class IvDepthBuffer
         {
             depthTextureIndex = genDefaultDepthTexture(textureWidth, textureHeight);
 
-            depthFB = glGenFramebuffersEXT();
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, depthFB);
+            depthFB = OpenGlHelper.func_153165_e();
+            OpenGlHelper.func_153171_g(OpenGlHelper.field_153198_e, depthFB);
 
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, depthTextureIndex, 0);
+            OpenGlHelper.func_153188_a(OpenGlHelper.field_153198_e, OpenGlHelper.field_153201_h, GL_TEXTURE_2D, depthTextureIndex, 0);
 
             glDrawBuffer(GL_NONE);
             glReadBuffer(GL_NONE);
 
-            int status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-            if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+            int status = OpenGlHelper.func_153167_i(OpenGlHelper.field_153198_e);
+            if (status != OpenGlHelper.field_153202_i)
             {
                 logger.error("Depth FBO failed setting up! (" + getFramebufferStatusString(status) + ")");
             }
@@ -111,7 +111,7 @@ public class IvDepthBuffer
         }
         if (depthFB > 0)
         {
-            glDeleteFramebuffersEXT(depthFB);
+            OpenGlHelper.func_153174_h(depthFB);
             depthFB = 0;
         }
     }
@@ -131,7 +131,7 @@ public class IvDepthBuffer
         if (isAllocated())
         {
             bindTextureForDestination();
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, depthFB);
+            OpenGlHelper.func_153171_g(OpenGlHelper.field_153198_e, depthFB);
             glDrawBuffer(GL_NONE);
             glReadBuffer(GL_NONE);
         }
@@ -141,13 +141,13 @@ public class IvDepthBuffer
     {
         if (isAllocated())
         {
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+            OpenGlHelper.func_153171_g(OpenGlHelper.field_153198_e, 0);
             glDrawBuffer(GL_BACK);
             glReadBuffer(GL_BACK);
 
             if (parentFB > 0) // Binds buffers itself? Anyway, calling the draw and read buffer functions causes invalid operation
             {
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, parentFB);
+                OpenGlHelper.func_153171_g(OpenGlHelper.field_153198_e, parentFB);
             }
         }
     }
@@ -221,45 +221,6 @@ public class IvDepthBuffer
 
     public static String getFramebufferStatusString(int code)
     {
-        String statusString;
-
-        if (code == GL_FRAMEBUFFER_COMPLETE_EXT)
-        {
-            statusString = "GL_FRAMEBUFFER_COMPLETE_EXT";
-        }
-        else if (code == GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT)
-        {
-            statusString = "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT";
-        }
-        else if (code == GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT)
-        {
-            statusString = "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT";
-        }
-        else if (code == GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT)
-        {
-            statusString = "GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT";
-        }
-        else if (code == GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT)
-        {
-            statusString = "GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT";
-        }
-        else if (code == GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT)
-        {
-            statusString = "GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT";
-        }
-        else if (code == GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT)
-        {
-            statusString = "GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT";
-        }
-        else if (code == GL_FRAMEBUFFER_UNSUPPORTED_EXT)
-        {
-            statusString = "GL_FRAMEBUFFER_UNSUPPORTED_EXT";
-        }
-        else
-        {
-            statusString = "Unknown";
-        }
-
-        return code + ": " + statusString;
+        return code + ": " + GLU.gluErrorString(code);
     }
 }

@@ -21,7 +21,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.nio.ByteBuffer;
 
-import static org.lwjgl.opengl.EXTFramebufferObject.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class IvOpenGLTexturePingPong
@@ -67,21 +66,21 @@ public class IvOpenGLTexturePingPong
         }
         else if (OpenGlHelper.framebufferSupported && useFramebuffer)
         {
-            pingPongFB = glGenFramebuffersEXT();
+            pingPongFB = OpenGlHelper.func_153165_e();
 
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, pingPongFB);
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, cacheTextures[0], 0);
-            glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT1_EXT, GL_TEXTURE_2D, cacheTextures[1], 0);
+            OpenGlHelper.func_153171_g(OpenGlHelper.field_153198_e, pingPongFB);
+            OpenGlHelper.func_153188_a(OpenGlHelper.field_153198_e, OpenGlHelper.field_153200_g, GL_TEXTURE_2D, cacheTextures[0], 0);
+            OpenGlHelper.func_153188_a(OpenGlHelper.field_153198_e, OpenGlHelper.field_153200_g + 1, GL_TEXTURE_2D, cacheTextures[1], 0);
 
-            int status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-            if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+            int status = OpenGlHelper.func_153167_i(OpenGlHelper.field_153198_e);
+            if (status != OpenGlHelper.field_153202_i)
             {
                 logger.error("PingPong FBO failed setting up! (" + IvDepthBuffer.getFramebufferStatusString(status) + ")");
 
                 fboFailed = true;
             }
 
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, parentFrameBuffer);
+            OpenGlHelper.func_153171_g(OpenGlHelper.field_153198_e, parentFrameBuffer);
 
             setup = true;
         }
@@ -155,7 +154,7 @@ public class IvOpenGLTexturePingPong
 
                 glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, screenWidth, screenHeight, 0);
 
-                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, pingPongFB);
+                OpenGlHelper.func_153171_g(OpenGlHelper.field_153198_e, pingPongFB);
                 glPushAttrib(GL_VIEWPORT_BIT | GL_COLOR_BUFFER_BIT);
 
                 setupCacheTextureForTick = true;
@@ -166,7 +165,7 @@ public class IvOpenGLTexturePingPong
                 bindCurrentTexture();
             }
 
-            glDrawBuffer(activeBuffer == 1 ? GL_COLOR_ATTACHMENT0_EXT : GL_COLOR_ATTACHMENT1_EXT);
+            glDrawBuffer(activeBuffer == 1 ? OpenGlHelper.field_153200_g : OpenGlHelper.field_153200_g);
 //            glReadBuffer(activeBuffer == 0 ? GL_COLOR_ATTACHMENT0_EXT : GL_COLOR_ATTACHMENT1_EXT);
 
             glViewport(0, 0, screenWidth, screenHeight);
@@ -193,7 +192,7 @@ public class IvOpenGLTexturePingPong
 //            glDrawBuffer(GL_BACK);
 //            glReadBuffer(GL_BACK);
             glPopAttrib();
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, parentFrameBuffer);
+            OpenGlHelper.func_153171_g(OpenGlHelper.field_153198_e, parentFrameBuffer);
 
             activeBuffer = 1 - activeBuffer;
 
@@ -216,7 +215,7 @@ public class IvOpenGLTexturePingPong
 
         if (pingPongFB > 0)
         {
-            glDeleteFramebuffersEXT(pingPongFB);
+            OpenGlHelper.func_153174_h(pingPongFB);
             pingPongFB = 0;
         }
 
