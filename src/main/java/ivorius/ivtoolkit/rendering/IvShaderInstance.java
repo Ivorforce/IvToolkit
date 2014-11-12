@@ -16,6 +16,7 @@
 
 package ivorius.ivtoolkit.rendering;
 
+import net.minecraft.client.renderer.OpenGlHelper;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.*;
@@ -24,6 +25,7 @@ import org.lwjgl.util.vector.Matrix2f;
 import org.lwjgl.util.vector.Matrix3f;
 import org.lwjgl.util.vector.Matrix4f;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
@@ -34,7 +36,6 @@ public class IvShaderInstance
     public Logger logger;
 
     private int shaderID = 0;
-    private int vertShader, fragShader = 0;
 
     private boolean shaderActive = false;
 
@@ -43,16 +44,6 @@ public class IvShaderInstance
     public int getShaderID()
     {
         return shaderID;
-    }
-
-    public int getVertShader()
-    {
-        return vertShader;
-    }
-
-    public int getFragShader()
-    {
-        return fragShader;
     }
 
     public IvShaderInstance(Logger logger)
@@ -72,17 +63,16 @@ public class IvShaderInstance
     {
         deleteShader();
 
+        int vertShader = -1;
+        int fragShader = -1;
+
         try
         {
             if (vertexShaderCode != null)
-            {
-                vertShader = createShader(vertexShaderCode, ARBVertexShader.GL_VERTEX_SHADER_ARB);
-            }
+                vertShader = createShader(vertexShaderCode, OpenGlHelper.field_153209_q);
 
             if (fragmentShaderCode != null)
-            {
-                fragShader = createShader(fragmentShaderCode, ARBFragmentShader.GL_FRAGMENT_SHADER_ARB);
-            }
+                fragShader = createShader(fragmentShaderCode, OpenGlHelper.field_153210_r);
         }
         catch (Exception exc)
         {
@@ -90,31 +80,27 @@ public class IvShaderInstance
             return;
         }
 
-        shaderID = ARBShaderObjects.glCreateProgramObjectARB();
+        shaderID = OpenGlHelper.func_153183_d();
 
         if (vertShader > 0)
         {
-            ARBShaderObjects.glAttachObjectARB(shaderID, vertShader);
+            OpenGlHelper.func_153178_b(shaderID, vertShader);
+            OpenGlHelper.func_153180_a(vertShader);
         }
 
         if (fragShader > 0)
         {
-            ARBShaderObjects.glAttachObjectARB(shaderID, fragShader);
+            OpenGlHelper.func_153178_b(shaderID, fragShader);
+            OpenGlHelper.func_153180_a(fragShader);
         }
 
-        ARBShaderObjects.glLinkProgramARB(shaderID);
-        if (ARBShaderObjects.glGetObjectParameteriARB(shaderID, ARBShaderObjects.GL_OBJECT_LINK_STATUS_ARB) == GL11.GL_FALSE)
-        {
-            logger.error(getLogInfo(shaderID));
-            return;
-        }
+        OpenGlHelper.func_153179_f(shaderID);
+        if (OpenGlHelper.func_153175_a(shaderID, OpenGlHelper.field_153207_o) == GL11.GL_FALSE)
+            logger.error(OpenGlHelper.func_153166_e(shaderID, Integer.MAX_VALUE));
 
-        ARBShaderObjects.glValidateProgramARB(shaderID);
-        if (ARBShaderObjects.glGetObjectParameteriARB(shaderID, ARBShaderObjects.GL_OBJECT_VALIDATE_STATUS_ARB) == GL11.GL_FALSE)
-        {
-            logger.error(getLogInfo(shaderID));
-            return;
-        }
+        IvOpenGLHelper.glValidateProgram(shaderID);
+        if (OpenGlHelper.func_153175_a(shaderID, IvOpenGLHelper.GL_VALIDATE_STATUS) == GL11.GL_FALSE)
+            logger.error(OpenGlHelper.func_153166_e(shaderID, Integer.MAX_VALUE));
     }
 
     private int createShader(String shaderCode, int shaderType) throws Exception
@@ -122,27 +108,32 @@ public class IvShaderInstance
         int shader = 0;
         try
         {
-            shader = ARBShaderObjects.glCreateShaderObjectARB(shaderType);
+            shader = OpenGlHelper.func_153195_b(shaderType);
 
             if (shader == 0)
-            {
                 return 0;
-            }
 
-            ARBShaderObjects.glShaderSourceARB(shader, shaderCode);
-            ARBShaderObjects.glCompileShaderARB(shader);
+            byte[] shaderCodeBytes = shaderCode.getBytes();
+            ByteBuffer shaderCodeBuf = BufferUtils.createByteBuffer(shaderCodeBytes.length);
+            shaderCodeBuf.put(shaderCodeBytes);
+            shaderCodeBuf.position(0);
 
-            if (ARBShaderObjects.glGetObjectParameteriARB(shader, ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB) == GL11.GL_FALSE)
+            OpenGlHelper.func_153169_a(shader, shaderCodeBuf);
+            OpenGlHelper.func_153170_c(shader);
+
+            if (OpenGlHelper.func_153157_c(shader, IvOpenGLHelper.GL_VALIDATE_STATUS) == GL11.GL_FALSE)
             {
-                throw new RuntimeException("Error creating shader: " + getLogInfo(shader));
+                throw new RuntimeException("Error creating shader: " + OpenGlHelper.func_153166_e(shader, Integer.MAX_VALUE));
             }
 
             return shader;
         }
         catch (Exception exc)
         {
-            ARBShaderObjects.glDeleteObjectARB(shader);
-            throw exc;
+            if (shader != 0)
+                OpenGlHelper.func_153180_a(shader);
+
+            throw new RuntimeException(exc);
         }
     }
 
@@ -154,7 +145,7 @@ public class IvShaderInstance
         }
 
         shaderActive = true;
-        ARBShaderObjects.glUseProgramObjectARB(shaderID);
+        OpenGlHelper.func_153161_d(shaderID);
 
         return true;
     }
@@ -166,7 +157,7 @@ public class IvShaderInstance
             return;
         }
 
-        ARBShaderObjects.glUseProgramObjectARB(0);
+        OpenGlHelper.func_153161_d(0);
         shaderActive = false;
     }
 
@@ -191,25 +182,22 @@ public class IvShaderInstance
         intBuffer.put(ints);
         intBuffer.position(0);
 
-        if (typeLength == 1)
+        switch (typeLength)
         {
-            ARBShaderObjects.glUniform1ARB(getUniformLocation(key), intBuffer);
-        }
-        else if (typeLength == 2)
-        {
-            ARBShaderObjects.glUniform2ARB(getUniformLocation(key), intBuffer);
-        }
-        else if (typeLength == 3)
-        {
-            ARBShaderObjects.glUniform3ARB(getUniformLocation(key), intBuffer);
-        }
-        else if (typeLength == 4)
-        {
-            ARBShaderObjects.glUniform4ARB(getUniformLocation(key), intBuffer);
-        }
-        else
-        {
-            throw new IllegalArgumentException();
+            case 1:
+                OpenGlHelper.func_153181_a(getUniformLocation(key), intBuffer);
+                break;
+            case 2:
+                OpenGlHelper.func_153182_b(getUniformLocation(key), intBuffer);
+                break;
+            case 3:
+                OpenGlHelper.func_153192_c(getUniformLocation(key), intBuffer);
+                break;
+            case 4:
+                OpenGlHelper.func_153162_d(getUniformLocation(key), intBuffer);
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
 
         return true;
@@ -231,25 +219,22 @@ public class IvShaderInstance
         floatBuffer.put(floats);
         floatBuffer.position(0);
 
-        if (typeLength == 1)
+        switch (typeLength)
         {
-            ARBShaderObjects.glUniform1ARB(getUniformLocation(key), floatBuffer);
-        }
-        else if (typeLength == 2)
-        {
-            ARBShaderObjects.glUniform2ARB(getUniformLocation(key), floatBuffer);
-        }
-        else if (typeLength == 3)
-        {
-            ARBShaderObjects.glUniform3ARB(getUniformLocation(key), floatBuffer);
-        }
-        else if (typeLength == 4)
-        {
-            ARBShaderObjects.glUniform4ARB(getUniformLocation(key), floatBuffer);
-        }
-        else
-        {
-            throw new IllegalArgumentException();
+            case 1:
+                OpenGlHelper.func_153168_a(getUniformLocation(key), floatBuffer);
+                break;
+            case 2:
+                OpenGlHelper.func_153177_b(getUniformLocation(key), floatBuffer);
+                break;
+            case 3:
+                OpenGlHelper.func_153191_c(getUniformLocation(key), floatBuffer);
+                break;
+            case 4:
+                OpenGlHelper.func_153159_d(getUniformLocation(key), floatBuffer);
+                break;
+            default:
+                throw new IllegalArgumentException();
         }
 
         return true;
@@ -264,21 +249,13 @@ public class IvShaderInstance
 
         int width;
         if (matrix instanceof Matrix2f)
-        {
             width = 2;
-        }
         else if (matrix instanceof Matrix3f)
-        {
             width = 3;
-        }
         else if (matrix instanceof Matrix4f)
-        {
             width = 4;
-        }
         else
-        {
             throw new IllegalArgumentException();
-        }
 
         FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(width * width);
         matrix.store(floatBuffer);
@@ -287,13 +264,13 @@ public class IvShaderInstance
         switch (width)
         {
             case 2:
-                ARBShaderObjects.glUniformMatrix2ARB(getUniformLocation(key), false, floatBuffer);
+                OpenGlHelper.func_153173_a(getUniformLocation(key), false, floatBuffer);
                 break;
             case 3:
-                ARBShaderObjects.glUniformMatrix3ARB(getUniformLocation(key), false, floatBuffer);
+                OpenGlHelper.func_153189_b(getUniformLocation(key), false, floatBuffer);
                 break;
             default:
-                ARBShaderObjects.glUniformMatrix4ARB(getUniformLocation(key), false, floatBuffer);
+                OpenGlHelper.func_153160_c(getUniformLocation(key), false, floatBuffer);
                 break;
         }
 
@@ -303,47 +280,22 @@ public class IvShaderInstance
     public Integer getUniformLocation(String key)
     {
         if (shaderID <= 0)
-        {
             return 0;
-        }
 
         if (!uniformLocations.containsKey(key))
-        {
-            uniformLocations.put(key, ARBShaderObjects.glGetUniformLocationARB(shaderID, key));
-        }
+            uniformLocations.put(key, OpenGlHelper.func_153194_a(shaderID, key));
 
         return uniformLocations.get(key);
-    }
-
-    private String getLogInfo(int obj)
-    {
-        return ARBShaderObjects.glGetInfoLogARB(obj, ARBShaderObjects.glGetObjectParameteriARB(obj, ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB));
     }
 
     public void deleteShader()
     {
         if (shaderActive)
-        {
             stopUsingShader();
-        }
-
-        if (fragShader > 0)
-        {
-            ARBShaderObjects.glDetachObjectARB(shaderID, fragShader);
-            ARBShaderObjects.glDeleteObjectARB(fragShader);
-            fragShader = 0;
-        }
-
-        if (vertShader > 0)
-        {
-            ARBShaderObjects.glDetachObjectARB(shaderID, vertShader);
-            ARBShaderObjects.glDeleteObjectARB(vertShader);
-            vertShader = 0;
-        }
 
         if (shaderID > 0)
         {
-            ARBShaderObjects.glDeleteObjectARB(shaderID);
+            OpenGlHelper.func_153187_e(shaderID);
             shaderID = 0;
         }
 
@@ -352,11 +304,10 @@ public class IvShaderInstance
 
     public static void outputShaderInfo(Logger logger)
     {
-        ContextCapabilities cap = GLContext.getCapabilities();
         String renderer = GL11.glGetString(GL11.GL_RENDERER);
         String vendor = GL11.glGetString(GL11.GL_VENDOR);
         String version = GL11.glGetString(GL11.GL_VERSION);
-        boolean fboSupported = cap.GL_EXT_framebuffer_object;
+        boolean fboSupported = OpenGlHelper.framebufferSupported;
 
         String majorVersion;
         String minorVersion;
@@ -386,7 +337,7 @@ public class IvShaderInstance
         printAlignedInfo("Vendor", vendor, logger);
         printAlignedInfo("Renderer", renderer, logger);
         printAlignedInfo("Version", version, logger);
-        printAlignedInfo("Versions", getGLVersions(cap), logger);
+        printAlignedInfo("Versions", getGLVersions(GLContext.getCapabilities()), logger);
         printAlignedInfo("Version Range", String.format("%s - %s", minorVersion, majorVersion), logger);
         printAlignedInfo("GLSL Version", glslVersion, logger);
         printAlignedInfo("Frame buffer object", fboSupported ? "Supported" : "Unsupported", logger);
@@ -404,25 +355,15 @@ public class IvShaderInstance
         try
         {
             if (cap.OpenGL11)
-            {
                 versions += ":11";
-            }
             if (cap.OpenGL12)
-            {
                 versions += ":12";
-            }
             if (cap.OpenGL13)
-            {
                 versions += ":13";
-            }
             if (cap.OpenGL14)
-            {
                 versions += ":14";
-            }
             if (cap.OpenGL15)
-            {
                 versions += ":15";
-            }
         }
         catch (Throwable throwable)
         {
@@ -432,13 +373,9 @@ public class IvShaderInstance
         try
         {
             if (cap.OpenGL20)
-            {
                 versions += ":20";
-            }
             if (cap.OpenGL21)
-            {
                 versions += ":21";
-            }
         }
         catch (Throwable throwable)
         {
@@ -448,21 +385,13 @@ public class IvShaderInstance
         try
         {
             if (cap.OpenGL30)
-            {
                 versions += ":30";
-            }
             if (cap.OpenGL31)
-            {
                 versions += ":31";
-            }
             if (cap.OpenGL32)
-            {
                 versions += ":32";
-            }
             if (cap.OpenGL33)
-            {
                 versions += ":33";
-            }
         }
         catch (Throwable throwable)
         {
@@ -498,9 +427,7 @@ public class IvShaderInstance
 //        }
 
         if (versions.length() > 0)
-        {
             versions = versions.substring(1);
-        }
 
         return versions;
     }

@@ -16,15 +16,45 @@
 
 package ivorius.ivtoolkit.rendering;
 
+import cpw.mods.fml.relauncher.ReflectionHelper;
+import net.minecraft.client.renderer.OpenGlHelper;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.GLU;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 
 public class IvOpenGLHelper
 {
+    public static int GL_VALIDATE_STATUS = GL20.GL_VALIDATE_STATUS;
+
+    public static void glValidateProgram(int program)
+    {
+        Field useARBField = ReflectionHelper.findField(OpenGlHelper.class, "field_153214_y");
+        useARBField.setAccessible(true);
+        boolean useARB = false;
+
+        try
+        {
+            useARB = useARBField.getBoolean(null);
+        }
+        catch (IllegalAccessException e)
+        {
+            e.printStackTrace();
+        }
+
+        if (useARB)
+            ARBShaderObjects.glValidateProgramARB(program);
+        else
+            GL20.glValidateProgram(program);
+    }
+
     public static int genStandardTexture()
     {
         int textureIndex = glGenTextures();
