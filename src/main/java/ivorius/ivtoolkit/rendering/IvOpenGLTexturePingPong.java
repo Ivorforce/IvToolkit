@@ -165,7 +165,7 @@ public class IvOpenGLTexturePingPong
                 bindCurrentTexture();
             }
 
-            glDrawBuffer(activeBuffer == 1 ? OpenGlHelper.field_153200_g : OpenGlHelper.field_153200_g);
+            glDrawBuffer(activeBuffer == 1 ? OpenGlHelper.field_153200_g : OpenGlHelper.field_153200_g + 1);
 //            glReadBuffer(activeBuffer == 0 ? GL_COLOR_ATTACHMENT0_EXT : GL_COLOR_ATTACHMENT1_EXT);
 
             glViewport(0, 0, screenWidth, screenHeight);
