@@ -96,11 +96,11 @@ public class IvShaderInstance
 
         OpenGlHelper.func_153179_f(shaderID);
         if (OpenGlHelper.func_153175_a(shaderID, OpenGlHelper.field_153207_o) == GL11.GL_FALSE)
-            logger.error(OpenGlHelper.func_153166_e(shaderID, Integer.MAX_VALUE));
+            logger.error(OpenGlHelper.func_153166_e(shaderID, 0x8000));
 
         IvOpenGLHelper.glValidateProgram(shaderID);
         if (OpenGlHelper.func_153175_a(shaderID, IvOpenGLHelper.GL_VALIDATE_STATUS) == GL11.GL_FALSE)
-            logger.error(OpenGlHelper.func_153166_e(shaderID, Integer.MAX_VALUE));
+            logger.error(OpenGlHelper.func_153166_e(shaderID, 0x8000));
     }
 
     private int createShader(String shaderCode, int shaderType) throws Exception
@@ -123,7 +123,7 @@ public class IvShaderInstance
 
             if (OpenGlHelper.func_153157_c(shader, OpenGlHelper.field_153208_p) == GL11.GL_FALSE)
             {
-                throw new RuntimeException("Error creating shader: " + OpenGlHelper.func_153166_e(shader, Integer.MAX_VALUE));
+                throw new RuntimeException("Error creating shader: " + OpenGlHelper.func_153166_e(shader, 0x8000));
             }
 
             return shader;
