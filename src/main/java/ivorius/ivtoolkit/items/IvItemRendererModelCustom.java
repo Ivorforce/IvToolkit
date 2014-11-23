@@ -96,17 +96,45 @@ public class IvItemRendererModelCustom implements IItemRenderer
 
     public static class ItemModelRendererSimple implements ItemModelRenderer
     {
+        /**
+         * The model to be rendered.
+         */
         public IModelCustom model;
+
+        /**
+         * The list of render parts for reference. If null, the model will render all parts, otherwise {@link #additive} will be used.
+         */
+        public String[] renderParts;
+
+        /**
+         * Indicates if the {@link #renderParts} are additive (true) or subtractive (false).
+         */
+        public boolean additive;
 
         public ItemModelRendererSimple(IModelCustom model)
         {
             this.model = model;
         }
 
+        public ItemModelRendererSimple(IModelCustom model, String[] renderParts, boolean additive)
+        {
+            this.model = model;
+            this.renderParts = renderParts;
+            this.additive = additive;
+        }
+
         @Override
         public void render(ItemStack stack)
         {
-            model.renderAll();
+            if (renderParts != null)
+            {
+                if (additive)
+                    model.renderOnly(renderParts);
+                else
+                    model.renderAllExcept(renderParts);
+            }
+            else
+                model.renderAll();
         }
     }
 }
