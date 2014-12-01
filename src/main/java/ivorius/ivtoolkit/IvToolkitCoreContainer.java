@@ -40,7 +40,7 @@ public class IvToolkitCoreContainer extends DummyModContainer
         myMeta.authorList = Arrays.asList("Ivorius");
         myMeta.description = "Uncategorized framework";
         myMeta.modId = "ivtoolkit";
-        myMeta.version = "1.0.1";
+        myMeta.version = "1.0.2";
         myMeta.name = IvToolkitLoadingPlugin.NAME;
         myMeta.url = "http://www.minecraftforum.net/topic/563257-172";
     }
