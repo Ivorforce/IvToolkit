@@ -16,6 +16,8 @@
 
 package ivorius.ivtoolkit.maze;
 
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import ivorius.ivtoolkit.math.IvVecMathHelper;
 import org.apache.logging.log4j.Logger;
 
@@ -26,8 +28,8 @@ import java.util.Map;
 
 public class Maze
 {
-    private static Map<Integer, MazeRoom[]> cachedNeighborRoomsBlueprints = new HashMap<>();
-    private static Map<Integer, MazePath[]> cachedNeighborPathBlueprints = new HashMap<>();
+    private static TIntObjectMap<MazeRoom[]> cachedNeighborRoomsBlueprints = new TIntObjectHashMap<>();
+    private static TIntObjectMap<MazePath[]> cachedNeighborPathBlueprints = new TIntObjectHashMap<>();
 
     public static final byte NULL = 0;
     public static final byte INVALID = 1;
@@ -43,14 +45,12 @@ public class Maze
     public Maze(int... dimensions)
     {
         int fullLength = 1;
-        for (int i = 0; i < dimensions.length; i++)
+        for (int dimension : dimensions)
         {
-            if (dimensions[i] % 2 == 0)
-            {
+            if (dimension % 2 == 0)
                 throw new IllegalArgumentException("Maze must have enclosing walls! (Odd dimension numbers)");
-            }
 
-            fullLength *= dimensions[i];
+            fullLength *= dimension;
         }
 
         this.dimensions = dimensions;
@@ -335,11 +335,10 @@ public class Maze
             MazeRoom[] neighbors = new MazeRoom[neighborPaths.length];
 
             for (int i = 0; i < neighborPaths.length; i++)
-            {
                 neighbors[i] = neighborPaths[i].getDestinationRoom();
-            }
 
             cachedNeighborRoomsBlueprints.put(dimensions, neighbors);
+            return neighbors.clone();
         }
 
         return cachedNeighborRoomsBlueprints.get(dimensions).clone();
@@ -358,6 +357,7 @@ public class Maze
             }
 
             cachedNeighborPathBlueprints.put(dimensions, neighbors);
+            return neighbors;
         }
 
         return cachedNeighborPathBlueprints.get(dimensions);
@@ -369,9 +369,7 @@ public class Maze
         MazePath[] neighbors = new MazePath[blueprints.length];
 
         for (int i = 0; i < blueprints.length; i++)
-        {
             neighbors[i] = new MazePath(blueprints[i].pathDimension, blueprints[i].pathGoesUp, IvVecMathHelper.add(blueprints[i].sourceRoom.coordinates, mazeRoom.coordinates));
-        }
 
         return neighbors;
     }
@@ -383,9 +381,7 @@ public class Maze
             int[] roomCoord = coordinate.getMazeCoordinates();
 
             for (int dim = 0; dim < roomCoord.length; dim++)
-            {
                 roomCoord[dim] = (roomCoord[dim] - 1) / 2;
-            }
 
             return new MazeRoom(roomCoord);
         }
@@ -407,13 +403,9 @@ public class Maze
         for (int dim = 0; dim < roomCoord.length; dim++)
         {
             if (roomCoord[dim] == 0)
-            {
                 goesUp = false;
-            }
             else
-            {
                 roomCoord[dim] = (roomCoord[dim] - 1) / 2;
-            }
         }
 
         return new MazePath(pathDim, goesUp, roomCoord);
@@ -431,9 +423,7 @@ public class Maze
                 MazeRoom room = coordToRoom(new MazeCoordinateDirect(coord));
 
                 if (room != null)
-                {
                     coordinates.add(room);
-                }
             }
 
             cachedRooms = coordinates;
@@ -454,9 +444,7 @@ public class Maze
                 MazePath path = coordToPath(new MazeCoordinateDirect(coord));
 
                 if (path != null)
-                {
                     coordinates.add(path);
-                }
             }
 
             cachedPaths = coordinates;

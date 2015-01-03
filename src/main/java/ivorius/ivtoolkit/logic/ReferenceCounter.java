@@ -16,55 +16,62 @@
 
 package ivorius.ivtoolkit.logic;
 
-import java.util.*;
+import gnu.trove.impl.Constants;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by lukas on 28.07.14.
  */
 public class ReferenceCounter<V>
 {
-    private Map<V, Integer> map;
+    private TObjectIntMap<V> map;
     private Set<V> freeObjects;
 
     public ReferenceCounter()
     {
-        this.map = new HashMap<>();
+        map = new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, 0);
         freeObjects = new HashSet<>();
     }
 
     public int getRetainCount(V object)
     {
-        Integer val = map.get(object);
-        return val != null ? val : 0;
+        return map.get(object);
     }
 
     public boolean hasObject(V object)
     {
-        return getRetainCount(object) > 0;
+        return map.containsKey(object);
     }
 
     public void retain(V object, int retainCount)
     {
-        int newCount = getRetainCount(object) + retainCount;
-        map.put(object, newCount);
+        if (retainCount < 1)
+            throw new RuntimeException("Attempting to retain an object by a negative amount - use release instead.");
+
+        map.adjustOrPutValue(object, retainCount, retainCount);
     }
 
     public boolean release(V object, int releaseCount)
     {
-        int newCount = getRetainCount(object) - releaseCount;
+        if (releaseCount < 1)
+            throw new RuntimeException("Attempting to release an object by a negative amount - use retain instead.");
+
+        int newCount = map.adjustOrPutValue(object, -releaseCount, -releaseCount);
 
         if (newCount < 0)
-            throw new RuntimeException("Trying to release a freed object!");
-
-        if (newCount == 0)
+            throw new RuntimeException("Attempting to release a freed object!");
+        else if (newCount == 0)
         {
             freeObjects.add(object);
             map.remove(object);
         }
         else
-        {
             map.put(object, newCount);
-        }
 
         return newCount > 0;
     }

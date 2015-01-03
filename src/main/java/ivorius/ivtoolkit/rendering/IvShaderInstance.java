@@ -16,6 +16,8 @@
 
 package ivorius.ivtoolkit.rendering;
 
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import net.minecraft.client.renderer.OpenGlHelper;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.BufferUtils;
@@ -39,7 +41,7 @@ public class IvShaderInstance
 
     private boolean shaderActive = false;
 
-    private Map<String, Integer> uniformLocations = new HashMap<>();
+    private TObjectIntMap<String> uniformLocations = new TObjectIntHashMap<>();
 
     public int getShaderID()
     {
