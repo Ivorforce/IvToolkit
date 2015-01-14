@@ -29,6 +29,10 @@ import java.io.IOException;
  */
 public class IvShaderInstanceMC
 {
+    @Deprecated
+    /**
+     * Use IvShaderLoaderMC instead.
+     */
     public static void trySettingUpShader(IvShaderInstance shaderInstance, ResourceLocation vertexShader, ResourceLocation fragmentShader, String utils)
     {
         String vShader = null;
@@ -72,6 +76,7 @@ public class IvShaderInstanceMC
         }
     }
 
+    @Deprecated
     public static String addUtils(String shader, String utils)
     {
         int indexVersion = shader.indexOf("#version");
