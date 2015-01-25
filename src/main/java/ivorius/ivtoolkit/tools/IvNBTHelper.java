@@ -30,6 +30,69 @@ import java.util.Arrays;
  */
 public class IvNBTHelper
 {
+    public static byte readByte(NBTTagCompound compound, String key, byte defaultValue)
+    {
+        return compound != null && compound.hasKey(key, Constants.NBT.TAG_BYTE)
+                ? compound.getByte(key)
+                : defaultValue;
+    }
+
+    public static byte[] readByteArray(NBTTagCompound compound, String key, byte[] defaultValue)
+    {
+        return compound != null && compound.hasKey(key, Constants.NBT.TAG_BYTE_ARRAY)
+                ? compound.getByteArray(key)
+                : defaultValue;
+    }
+
+    public static double readDouble(NBTTagCompound compound, String key, double defaultValue)
+    {
+        return compound != null && compound.hasKey(key, Constants.NBT.TAG_DOUBLE)
+                ? compound.getDouble(key)
+                : defaultValue;
+    }
+
+    public static float readFloat(NBTTagCompound compound, String key, float defaultValue)
+    {
+        return compound != null && compound.hasKey(key, Constants.NBT.TAG_FLOAT)
+                ? compound.getFloat(key)
+                : defaultValue;
+    }
+
+    public static int readInt(NBTTagCompound compound, String key, int defaultValue)
+    {
+        return compound != null && compound.hasKey(key, Constants.NBT.TAG_INT)
+                ? compound.getInteger(key)
+                : defaultValue;
+    }
+
+    public static int[] readIntArray(NBTTagCompound compound, String key, int[] defaultValue)
+    {
+        return compound != null && compound.hasKey(key, Constants.NBT.TAG_INT_ARRAY)
+                ? compound.getIntArray(key)
+                : defaultValue;
+    }
+
+    public static long readLong(NBTTagCompound compound, String key, long defaultValue)
+    {
+        return compound != null && compound.hasKey(key, Constants.NBT.TAG_LONG)
+                ? compound.getLong(key)
+                : defaultValue;
+    }
+
+    public static short readShort(NBTTagCompound compound, String key, short defaultValue)
+    {
+        return compound != null && compound.hasKey(key, Constants.NBT.TAG_SHORT)
+                ? compound.getShort(key)
+                : defaultValue;
+    }
+
+    public static String readString(NBTTagCompound compound, String key, String defaultValue)
+    {
+        return compound != null && compound.hasKey(key, Constants.NBT.TAG_STRING)
+                ? compound.getString(key)
+                : defaultValue;
+    }
+
     public static double[] readDoubleArray(String key, NBTTagCompound compound)
     {
         if (compound.hasKey(key))
