@@ -33,7 +33,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by lukas on 24.05.14.
@@ -68,9 +70,7 @@ public class IvWorldData
 
             TileEntity tileEntity = world.getTileEntity(worldCoord.x, worldCoord.y, worldCoord.z);
             if (tileEntity != null)
-            {
                 tileEntities.add(tileEntity);
-            }
         }
 
         if (captureEntities)
@@ -97,7 +97,8 @@ public class IvWorldData
             recursivelyApplyIDFixTags(teCompound, registry);
             TileEntity tileEntity = TileEntity.createAndLoadEntity(teCompound);
 
-            tileEntities.add(tileEntity);
+            if (tileEntity != null)
+                tileEntities.add(tileEntity);
         }
 
         if (world != null)
@@ -110,7 +111,8 @@ public class IvWorldData
                 recursivelyApplyIDFixTags(entityCompound, registry);
                 Entity entity = EntityList.createEntityFromNBT(entityCompound, world);
 
-                entities.add(entity);
+                if (entity != null)
+                    entities.add(entity);
             }
         }
     }
