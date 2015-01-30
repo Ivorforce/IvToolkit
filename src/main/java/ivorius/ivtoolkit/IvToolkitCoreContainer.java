@@ -30,7 +30,7 @@ import java.util.Arrays;
  */
 public class IvToolkitCoreContainer extends DummyModContainer
 {
-    public static Logger logger = LogManager.getLogger("ivtoolkit");
+    public static Logger logger = LogManager.getLogger(IvToolkitLoadingPlugin.MODID);
 
     public IvToolkitCoreContainer()
     {
@@ -39,8 +39,8 @@ public class IvToolkitCoreContainer extends DummyModContainer
         ModMetadata myMeta = super.getMetadata();
         myMeta.authorList = Arrays.asList("Ivorius");
         myMeta.description = "Uncategorized framework";
-        myMeta.modId = "ivtoolkit";
-        myMeta.version = "1.0.2";
+        myMeta.modId = IvToolkitLoadingPlugin.MODID;
+        myMeta.version = IvToolkitLoadingPlugin.VERSION;
         myMeta.name = IvToolkitLoadingPlugin.NAME;
         myMeta.url = "http://www.minecraftforum.net/topic/563257-172";
     }
