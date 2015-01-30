@@ -16,10 +16,12 @@
 
 package ivorius.ivtoolkit.tools;
 
+import ivorius.ivtoolkit.IvToolkitCoreContainer;
 import ivorius.ivtoolkit.blocks.BlockArea;
 import ivorius.ivtoolkit.blocks.BlockCoord;
 import ivorius.ivtoolkit.blocks.IvBlockCollection;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
+import net.minecraft.block.Block;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityHanging;
@@ -260,17 +262,35 @@ public class IvWorldData
         }
     }
 
+    private static boolean hasPrimitive(NBTTagCompound compound, String key)
+    {
+        return compound.hasKey(key) && compound.getTag(key) instanceof NBTBase.NBTPrimitive;
+    }
+
+    public static void injectTEBlockFixTags(NBTTagCompound compound, String tileEntityID, NBTTagList list, String... keys)
+    {
+        if (tileEntityID.equals(compound.getString("id")))
+        {
+            for (String key : keys)
+                if (hasPrimitive(compound, key))
+                    addBlockTag(compound.getInteger(key), list, key);
+        }
+    }
+
     public static void injectIDFixTags(NBTTagCompound compound)
     {
-        NBTTagList list = null;
+        NBTTagList list = new NBTTagList();
 
-        if (compound.hasKey("id") && compound.hasKey("Count") && compound.hasKey("Damage"))
-        {
-            list = new NBTTagList();
+        // Most likely an ItemStack
+        if (hasPrimitive(compound, "id") && hasPrimitive(compound, "Count") && hasPrimitive(compound, "Damage"))
             addItemTag(compound.getInteger("id"), list, "id");
-        }
 
-        if (list != null)
+        injectTEBlockFixTags(compound, "vanishingTileEntity", list, "BlockID");
+        injectTEBlockFixTags(compound, "fenceGateTileEntity", list, "camoBlock");
+        injectTEBlockFixTags(compound, "mixedBlockTileEntity", list, "block1", "block2");
+        injectTEBlockFixTags(compound, "customDoorTileEntity", list, "frame", "topMaterial", "bottomMaterial");
+
+        if (list.tagCount() > 0)
         {
             compound.setTag(ID_FIX_TAG_KEY, list);
         }
@@ -292,7 +312,27 @@ public class IvWorldData
         }
         else
         {
-            System.out.println("Failed to apply item tag for structure with ID '" + itemID + "'");
+            IvToolkitCoreContainer.logger.warn("Failed to apply item tag for structure with ID '" + itemID + "'");
+        }
+    }
+
+    public static void addBlockTag(int blockID, NBTTagList tagList, String tagDest)
+    {
+        Block block = Block.getBlockById(blockID);
+        if (block != null)
+        {
+            String stringID = Block.blockRegistry.getNameForObject(block);
+
+            NBTTagCompound idCompound = new NBTTagCompound();
+            idCompound.setString("type", "block");
+            idCompound.setString("tagDest", tagDest);
+            idCompound.setString("blockID", stringID);
+
+            tagList.appendTag(idCompound);
+        }
+        else
+        {
+            IvToolkitCoreContainer.logger.warn("Failed to apply block tag for structure with ID '" + blockID + "'");
         }
     }
 
@@ -343,26 +383,51 @@ public class IvWorldData
         {
             NBTTagList list = compound.getTagList(ID_FIX_TAG_KEY, Constants.NBT.TAG_COMPOUND);
             for (int i = 0; i < list.tagCount(); i++)
-            {
-                NBTTagCompound fixTag = list.getCompoundTagAt(i);
-                String type = fixTag.getString("type");
+                applyIDFixTag(compound, registry, list.getCompoundTagAt(i));
+        }
+    }
 
-                if ("item".equals(type))
+    public static void applyIDFixTag(NBTTagCompound compound, MCRegistry registry, NBTTagCompound fixTag)
+    {
+        String type = fixTag.getString("type");
+
+        switch (type)
+        {
+            case "item":
+            {
+                String dest = fixTag.getString("tagDest");
+                String stringID = fixTag.getString("itemID");
+                Item item = registry.itemFromID(stringID);
+                if (item != null)
                 {
-                    String dest = fixTag.getString("tagDest");
-                    String stringID = fixTag.getString("itemID");
-                    Item item = registry.itemFromID(stringID);
-                    if (item != null)
-                    {
-                        int itemID = Item.getIdFromItem(item);
-                        compound.setInteger(dest, itemID);
-                    }
-                    else
-                    {
-                        System.out.println("Failed to fix item tag from structure with ID '" + stringID + "'");
-                    }
+                    int itemID = Item.getIdFromItem(item);
+                    compound.setInteger(dest, itemID);
                 }
+                else
+                {
+                    IvToolkitCoreContainer.logger.warn("Failed to fix item tag from structure with ID '" + stringID + "'");
+                }
+                break;
             }
+            case "block":
+            {
+                String dest = fixTag.getString("tagDest");
+                String stringID = fixTag.getString("blockID");
+                Block block = registry.blockFromID(stringID);
+                if (block != null)
+                {
+                    int blockID = Block.getIdFromBlock(block);
+                    compound.setInteger(dest, blockID);
+                }
+                else
+                {
+                    IvToolkitCoreContainer.logger.warn("Failed to fix block tag from structure with ID '" + stringID + "'");
+                }
+                break;
+            }
+            default:
+                IvToolkitCoreContainer.logger.warn("Unrecognized ID fix tag in structure with type '" + type + "'");
+                break;
         }
     }
 
