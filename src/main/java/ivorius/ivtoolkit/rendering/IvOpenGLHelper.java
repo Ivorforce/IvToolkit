@@ -79,16 +79,15 @@ public class IvOpenGLHelper
         glTranslatef(0.0F, 0.0F, -2000.0F);
     }
 
-    public static void checkGLError(Logger logger, String par1Str)
+    public static void checkGLError(Logger logger, String category)
     {
-        int i = GL11.glGetError();
-
-        if (i != 0)
+        int error;
+        while ((error = GL11.glGetError()) != 0)
         {
-            String s1 = GLU.gluErrorString(i);
+            String s1 = GLU.gluErrorString(error);
             logger.error("########## GL ERROR ##########");
-            logger.error("@ " + par1Str);
-            logger.error(i + ": " + s1);
+            logger.error("@ " + category);
+            logger.error(error + ": " + s1);
         }
     }
 }
