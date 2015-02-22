@@ -128,7 +128,7 @@ public class IvNetworkHelperServer
         for (EntityPlayer player : ((WorldServer) entity.worldObj).getEntityTracker().getTrackingPlayers(entity))
             sendEEPUpdatePacketToPlayer(entity, eepKey, context, network, player, params);
 
-        if (entity instanceof EntityPlayer) // Players don't 'track' themselves
+        if (entity instanceof EntityPlayerMP) // Players don't 'track' themselves
             sendEEPUpdatePacketToPlayer(entity, eepKey, context, network, (EntityPlayer) entity, params);
     }
 }
