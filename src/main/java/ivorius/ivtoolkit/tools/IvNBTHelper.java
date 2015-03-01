@@ -16,6 +16,8 @@
 
 package ivorius.ivtoolkit.tools;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import ivorius.ivtoolkit.math.IvBytePacker;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
@@ -101,9 +103,7 @@ public class IvNBTHelper
             double[] array = new double[list.tagCount()];
 
             for (int i = 0; i < array.length; i++)
-            {
                 array[i] = list.func_150309_d(i);
-            }
 
             return array;
         }
@@ -118,9 +118,7 @@ public class IvNBTHelper
             NBTTagList list = new NBTTagList();
 
             for (double d : array)
-            {
                 list.appendTag(new NBTTagDouble(d));
-            }
 
             compound.setTag(key, list);
         }
@@ -134,9 +132,7 @@ public class IvNBTHelper
             String[] strings = new String[nbtTagList.tagCount()];
 
             for (int i = 0; i < strings.length; i++)
-            {
                 strings[i] = nbtTagList.getStringTagAt(i);
-            }
 
             return strings;
         }
@@ -151,44 +147,7 @@ public class IvNBTHelper
             NBTTagList nbtTagList = new NBTTagList();
 
             for (String s : strings)
-            {
                 nbtTagList.appendTag(new NBTTagString(s));
-            }
-
-            compound.setTag(id, nbtTagList);
-        }
-    }
-
-    public static String[][] readNBTStrings2D(String id, NBTTagCompound compound)
-    {
-        if (compound.hasKey(id))
-        {
-            NBTTagList nbtTagList = compound.getTagList(id, Constants.NBT.TAG_COMPOUND);
-            String[][] strings = new String[nbtTagList.tagCount()][];
-
-            for (int i = 0; i < strings.length; i++)
-            {
-                strings[i] = readNBTStrings("Strings", nbtTagList.getCompoundTagAt(i));
-            }
-
-            return strings;
-        }
-
-        return null;
-    }
-
-    public static void writeNBTStrings2D(String id, String[][] strings, NBTTagCompound compound)
-    {
-        if (strings != null)
-        {
-            NBTTagList nbtTagList = new NBTTagList();
-
-            for (String[] s : strings)
-            {
-                NBTTagCompound compound1 = new NBTTagCompound();
-                writeNBTStrings("Strings", s, compound1);
-                nbtTagList.appendTag(compound1);
-            }
 
             compound.setTag(id, nbtTagList);
         }
@@ -202,9 +161,7 @@ public class IvNBTHelper
             ItemStack[] itemStacks = new ItemStack[nbtTagList.tagCount()];
 
             for (int i = 0; i < itemStacks.length; i++)
-            {
                 itemStacks[i] = ItemStack.loadItemStackFromNBT(nbtTagList.getCompoundTagAt(i));
-            }
 
             return itemStacks;
         }
@@ -237,9 +194,7 @@ public class IvNBTHelper
             Block[] blocks = new Block[nbtTagList.tagCount()];
 
             for (int i = 0; i < blocks.length; i++)
-            {
                 blocks[i] = registry.blockFromID(nbtTagList.getStringTagAt(i));
-            }
 
             return blocks;
         }
@@ -254,9 +209,7 @@ public class IvNBTHelper
             NBTTagList nbtTagList = new NBTTagList();
 
             for (Block b : blocks)
-            {
                 nbtTagList.appendTag(new NBTTagString(Block.blockRegistry.getNameForObject(b)));
-            }
 
             compound.setTag(id, nbtTagList);
         }
@@ -266,15 +219,9 @@ public class IvNBTHelper
     {
         if (compound.hasKey(id))
         {
-            NBTTagList nbtTagList = compound.getTagList(id, Constants.NBT.TAG_INT);
-            long[] longs = new long[nbtTagList.tagCount()];
-
-            for (int i = 0; i < longs.length; i++)
-            {
-                int[] parts = nbtTagList.func_150306_c(i);
-                longs[i] = (long) parts[0] + ((long) parts[1] << 32);
-            }
-
+            ByteBuf bytes = Unpooled.copiedBuffer(compound.getByteArray(id));
+            long[] longs = new long[bytes.capacity() / 8];
+            for (int i = 0; i < longs.length; i++) longs[i] = bytes.readLong();
             return longs;
         }
 
@@ -285,14 +232,9 @@ public class IvNBTHelper
     {
         if (longs != null)
         {
-            NBTTagList nbtTagList = new NBTTagList();
-
-            for (long l : longs)
-            {
-                nbtTagList.appendTag(new NBTTagIntArray(new int[]{(int) l, (int) (l >>> 32)}));
-            }
-
-            compound.setTag(id, nbtTagList);
+            ByteBuf bytes = Unpooled.buffer(longs.length * 8);
+            for (long aLong : longs) bytes.writeLong(aLong);
+            compound.setByteArray(id, bytes.array());
         }
     }
 
@@ -304,9 +246,7 @@ public class IvNBTHelper
             PotionEffect[] potions = new PotionEffect[nbtTagList.tagCount()];
 
             for (int i = 0; i < potions.length; i++)
-            {
                 potions[i] = PotionEffect.readCustomPotionEffectFromNBT(nbtTagList.getCompoundTagAt(i));
-            }
 
             return potions;
         }
@@ -321,9 +261,7 @@ public class IvNBTHelper
             NBTTagList nbtTagList = new NBTTagList();
 
             for (PotionEffect p : potions)
-            {
                 nbtTagList.appendTag(p.writeCustomPotionEffectToNBT(new NBTTagCompound()));
-            }
 
             compound.setTag(id, nbtTagList);
         }
