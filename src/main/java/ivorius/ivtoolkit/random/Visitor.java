@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Lukas Tenbrink
+ * Copyright 2015 Lukas Tenbrink
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,25 +14,19 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit.maze;
-
-import net.minecraft.util.WeightedRandom;
+package ivorius.ivtoolkit.random;
 
 /**
- * Created by lukas on 24.06.14.
+ * Visits objects of type T.
+ *
+ * @param <T> The visited type.
  */
-public class WeightedIndex extends WeightedRandom.Item
+public interface Visitor<T>
 {
-    private int index;
-
-    public WeightedIndex(int weight, int index)
-    {
-        super(weight);
-        this.index = index;
-    }
-
-    public int getIndex()
-    {
-        return index;
-    }
+    /**
+     * Visits the object.
+     * @param t The object.
+     * @return True if the visitor should continue, otherwise false.
+     */
+    boolean visit(T t);
 }

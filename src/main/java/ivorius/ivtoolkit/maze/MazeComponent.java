@@ -17,10 +17,8 @@
 package ivorius.ivtoolkit.maze;
 
 import ivorius.ivtoolkit.math.IvVecMathHelper;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import ivorius.ivtoolkit.random.WeightedSelector;
 import net.minecraft.util.WeightedRandom;
-import net.minecraftforge.common.util.Constants;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,16 +27,28 @@ import java.util.List;
 /**
  * Created by lukas on 20.06.14.
  */
-public class MazeComponent extends WeightedRandom.Item
+public class MazeComponent extends WeightedRandom.Item implements WeightedSelector.Item
 {
-    private Object identifier;
+    protected Object identifier;
+    protected double weight;
 
-    private List<MazeRoom> rooms = new ArrayList<>();
-    private List<MazePath> exitPaths = new ArrayList<>();
+    protected List<MazeRoom> rooms = new ArrayList<>();
+    protected List<MazePath> exitPaths = new ArrayList<>();
 
-    public MazeComponent(int par1, Object identifier, List<MazeRoom> rooms, List<MazePath> exitPaths)
+    @Deprecated
+    public MazeComponent(int weight, Object identifier, List<MazeRoom> rooms, List<MazePath> exitPaths)
     {
-        super(par1);
+        super(weight);
+        this.identifier = identifier;
+        this.weight = weight * 0.01;
+        this.rooms.addAll(rooms);
+        this.exitPaths.addAll(exitPaths);
+    }
+
+    public MazeComponent(double weight, Object identifier, List<MazeRoom> rooms, List<MazePath> exitPaths)
+    {
+        super((int) (weight * 100));
+        this.weight = weight;
         this.identifier = identifier;
         this.rooms.addAll(rooms);
         this.exitPaths.addAll(exitPaths);
@@ -52,6 +62,17 @@ public class MazeComponent extends WeightedRandom.Item
     public void setIdentifier(Object identifier)
     {
         this.identifier = identifier;
+    }
+
+    public void setWeight(double weight)
+    {
+        this.weight = weight;
+    }
+
+    @Override
+    public double getWeight()
+    {
+        return weight;
     }
 
     public List<MazeRoom> getRooms()

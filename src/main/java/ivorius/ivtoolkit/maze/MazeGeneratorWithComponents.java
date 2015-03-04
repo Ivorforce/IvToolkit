@@ -16,6 +16,9 @@
 
 package ivorius.ivtoolkit.maze;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import ivorius.ivtoolkit.random.WeightedSelector;
 import net.minecraft.util.WeightedRandom;
 
 import java.util.ArrayList;
@@ -77,25 +80,20 @@ public class MazeGeneratorWithComponents
                 continue;
             }
 
-            boolean allZero = true;
-            for (MazeComponentPosition component : validComponents)
+            boolean allZero = Iterables.any(validComponents, new Predicate<MazeComponentPosition>()
             {
-                if (component.getComponent().itemWeight > 0)
+                @Override
+                public boolean apply(MazeComponentPosition input)
                 {
-                    allZero = false;
-                    break;
+                    return input.getComponent().getWeight() > 0;
                 }
-            }
+            });
 
             MazeComponentPosition generatingComponent;
             if (allZero)
-            {
                 generatingComponent = validComponents.get(rand.nextInt(validComponents.size()));
-            }
             else
-            {
-                generatingComponent = (MazeComponentPosition) WeightedRandom.getRandomItem(rand, validComponents);
-            }
+                generatingComponent = WeightedSelector.selectItem(rand, validComponents);
 
             for (MazeRoom room : generatingComponent.getComponent().getRooms())
             {

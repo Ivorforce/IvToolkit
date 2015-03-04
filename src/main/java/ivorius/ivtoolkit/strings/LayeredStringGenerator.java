@@ -16,6 +16,7 @@
 
 package ivorius.ivtoolkit.strings;
 
+import ivorius.ivtoolkit.random.WeightedSelector;
 import net.minecraft.util.WeightedRandom;
 
 import java.util.*;
@@ -45,7 +46,7 @@ public class LayeredStringGenerator
     public static class LayerSimple implements Layer
     {
         private Map<Character, Layer> subLayers;
-        private List<WeightedString> baseStrings = new ArrayList<>();
+        private List<WeightedSelector.SimpleItem<String>> baseStrings = new ArrayList<>();
 
         public LayerSimple(Map<Character, Layer> subLayers)
         {
@@ -62,10 +63,17 @@ public class LayeredStringGenerator
             }
         }
 
+        @Deprecated
         public void addStrings(int weight, String... strings)
         {
             for (String s : strings)
-                baseStrings.add(new WeightedString(weight, s));
+                baseStrings.add(new WeightedSelector.SimpleItem<>(weight, s));
+        }
+
+        public void addStrings(double weight, String... strings)
+        {
+            for (String s : strings)
+                baseStrings.add(new WeightedSelector.SimpleItem<>(weight, s));
         }
 
         @Override
@@ -73,7 +81,7 @@ public class LayeredStringGenerator
         {
             StringBuilder stringBuilder = new StringBuilder();
 
-            String component = ((WeightedString) WeightedRandom.getRandomItem(random, baseStrings)).string;
+            String component = WeightedSelector.select(random, baseStrings);
             for (char aChar : component.toCharArray())
             {
                 Layer subLayer = subLayers.get(aChar);
@@ -90,23 +98,30 @@ public class LayeredStringGenerator
 
     public static class LayerStatic implements Layer
     {
-        private List<WeightedString> baseStrings = new ArrayList<>();
+        private List<WeightedSelector.SimpleItem<String>> baseStrings = new ArrayList<>();
 
         public LayerStatic(String... baseStrings)
         {
             addStrings(1, baseStrings);
         }
 
+        @Deprecated
         public void addStrings(int weight, String... strings)
         {
             for (String s : strings)
-                baseStrings.add(new WeightedString(weight, s));
+                baseStrings.add(new WeightedSelector.SimpleItem<String>(weight, s));
+        }
+
+        public void addStrings(double weight, String... strings)
+        {
+            for (String s : strings)
+                baseStrings.add(new WeightedSelector.SimpleItem<String>(weight, s));
         }
 
         @Override
         public String randomString(Random random)
         {
-            return ((WeightedString) WeightedRandom.getRandomItem(random, baseStrings)).string;
+            return WeightedSelector.select(random, baseStrings);
         }
     }
 
@@ -134,16 +149,5 @@ public class LayeredStringGenerator
     private static <O> O getRandomElementFrom(List<O> list, Random random)
     {
         return list.get(random.nextInt(list.size()));
-    }
-
-    private static class WeightedString extends WeightedRandom.Item
-    {
-        public String string;
-
-        private WeightedString(int weight, String string)
-        {
-            super(weight);
-            this.string = string;
-        }
     }
 }

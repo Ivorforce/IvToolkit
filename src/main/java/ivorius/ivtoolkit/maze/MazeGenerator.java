@@ -18,6 +18,7 @@ package ivorius.ivtoolkit.maze;
 
 import ivorius.ivtoolkit.blocks.BlockCoord;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
+import ivorius.ivtoolkit.random.WeightedSelector;
 import net.minecraft.util.WeightedRandom;
 
 import java.util.*;
@@ -83,19 +84,18 @@ public class MazeGenerator
     @Deprecated
     public static MazePath randomPathInMaze(Random rand, Maze maze, int... distanceFromOutside)
     {
-        List<WeightedIndex> dimensionWeights = new ArrayList<>();
+        List<WeightedSelector.SimpleItem<Integer>> dimensionWeights = new ArrayList<>();
         for (int dim = 0; dim < maze.dimensions.length; dim++)
         {
             int dimLength = (maze.dimensions[dim] / 2) + 1 - ((distanceFromOutside[dim] + 1) / 2) * 2;
-            dimensionWeights.add(new WeightedIndex(Math.max(0, dimLength), dim));
+            dimensionWeights.add(new WeightedSelector.SimpleItem<>(Math.max(0, dimLength), dim));
         }
-        int usedDimension = ((WeightedIndex) WeightedRandom.getRandomItem(rand, dimensionWeights)).getIndex();
+        int usedDimension = WeightedSelector.select(rand, dimensionWeights);
 
         int[] roomDistanceFromOutside = new int[distanceFromOutside.length];
         for (int i = 0; i < roomDistanceFromOutside.length; i++)
-        {
             roomDistanceFromOutside[i] = distanceFromOutside[i] / 2;
-        }
+
         MazeRoom refRoom = randomRoomInMaze(rand, maze, roomDistanceFromOutside);
         int[] pathCoord = refRoom.getMazeCoordinates();
         int availablePaths = ((distanceFromOutside[usedDimension] + 1) / 2) * 2;

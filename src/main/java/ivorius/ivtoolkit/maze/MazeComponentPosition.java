@@ -16,20 +16,24 @@
 
 package ivorius.ivtoolkit.maze;
 
+import ivorius.ivtoolkit.random.WeightedSelector;
 import net.minecraft.util.WeightedRandom;
 
 /**
  * Created by lukas on 20.06.14.
  */
-public class MazeComponentPosition extends WeightedRandom.Item
+public class MazeComponentPosition extends WeightedRandom.Item implements WeightedSelector.Item
 {
-    private MazeComponent component;
+    protected MazeComponent component;
 
-    private MazeRoom positionInMaze;
+    protected MazeRoom positionInMaze;
+
+    protected double weight;
 
     public MazeComponentPosition(MazeComponent component, MazeRoom positionInMaze)
     {
         super(component.itemWeight);
+        weight = component.weight;
 
         this.component = component;
         this.positionInMaze = positionInMaze;
@@ -43,5 +47,11 @@ public class MazeComponentPosition extends WeightedRandom.Item
     public MazeRoom getPositionInMaze()
     {
         return positionInMaze;
+    }
+
+    @Override
+    public double getWeight()
+    {
+        return weight;
     }
 }
