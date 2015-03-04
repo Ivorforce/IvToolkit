@@ -102,6 +102,31 @@ public class WeightedSelector
         }
 
         @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            SimpleItem that = (SimpleItem) o;
+
+            if (Double.compare(that.weight, weight) != 0) return false;
+            if (item != null ? !item.equals(that.item) : that.item != null) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            int result;
+            long temp;
+            temp = Double.doubleToLongBits(weight);
+            result = (int) (temp ^ (temp >>> 32));
+            result = 31 * result + (item != null ? item.hashCode() : 0);
+            return result;
+        }
+
+        @Override
         public String toString()
         {
             return "SimpleItem{" +
