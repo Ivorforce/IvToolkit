@@ -25,12 +25,22 @@ import java.util.Random;
 
 public class WeightedSelector
 {
-    public static <T extends Item> T selectItem(Random rand, Collection<T> items)
+    public static <T extends Item> double totalWeight(Collection<T> items)
     {
         double totalWeight = 0.0;
         for (T t : items)
             totalWeight += t.getWeight();
-        return selectItem(rand, items, totalWeight);
+        return totalWeight;
+    }
+
+    public static <T> double totalWeight(Collection<T> items, final Function<T, Double> weightFunction)
+    {
+        return totalWeight(SimpleItem.apply(items, weightFunction));
+    }
+
+    public static <T extends Item> T selectItem(Random rand, Collection<T> items)
+    {
+        return selectItem(rand, items, totalWeight(items));
     }
 
     public static <T extends Item> T selectItem(Random rand, Collection<T> items, double totalWeight)
@@ -53,20 +63,17 @@ public class WeightedSelector
 
     public static <T> T select(Random rand, Collection<T> items, final Function<T, Double> weightFunction)
     {
-        return select(rand, Collections2.transform(items, new Function<T, SimpleItem<T>>()
-        {
-            @Nullable
-            @Override
-            public SimpleItem<T> apply(T input)
-            {
-                return new SimpleItem<>(weightFunction.apply(input), input);
-            }
-        }));
+        return select(rand, SimpleItem.apply(items, weightFunction));
+    }
+
+    public static <T> T select(Random rand, Collection<T> items, final Function<T, Double> weightFunction, double totalWeight)
+    {
+        return select(rand, SimpleItem.apply(items, weightFunction), totalWeight);
     }
 
     public static <T> T select(Random rand, Collection<SimpleItem<T>> items)
     {
-        return selectItem(rand, items).getItem();
+        return select(rand, items, totalWeight(items));
     }
 
     public static <T> T select(Random rand, Collection<SimpleItem<T>> items, double totalWeight)
@@ -88,6 +95,24 @@ public class WeightedSelector
         {
             this.item = item;
             this.weight = weight;
+        }
+
+        public static <T> SimpleItem<T> of(double weight, T item)
+        {
+            return new SimpleItem<>(weight, item);
+        }
+
+        public static <T> Collection<SimpleItem<T>> apply(Collection<T> items, final Function<T, Double> weightFunction)
+        {
+            return Collections2.transform(items, new Function<T, SimpleItem<T>>()
+            {
+                @Nullable
+                @Override
+                public SimpleItem<T> apply(@Nullable T input)
+                {
+                    return new SimpleItem<T>(weightFunction.apply(input), input);
+                }
+            });
         }
 
         public T getItem()
