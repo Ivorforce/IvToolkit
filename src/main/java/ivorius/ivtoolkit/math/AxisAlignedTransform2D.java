@@ -95,7 +95,7 @@ public class AxisAlignedTransform2D
         switch (rotation)
         {
             case 0:
-                coord = (BlockCoord) position.clone();
+                coord = new BlockCoord(positionX, position.y, position.z);
                 break;
             case 1:
                 coord = new BlockCoord(size[2] - 1 - position.z, position.y, positionX);
@@ -121,7 +121,7 @@ public class AxisAlignedTransform2D
         switch (rotation)
         {
             case 0:
-                coord = position.clone();
+                coord = new double[]{positionX, position[1], position[2]};
                 break;
             case 1:
                 coord = new double[]{size[2] - 1 - position[2], position[1], positionX};
@@ -147,7 +147,7 @@ public class AxisAlignedTransform2D
         switch (rotation)
         {
             case 0:
-                coord = position.clone();
+                coord = new int[]{positionX, position[1], position[2]};
                 break;
             case 1:
                 coord = new int[]{size[2] - 1 - position[2], position[1], positionX};
@@ -168,8 +168,6 @@ public class AxisAlignedTransform2D
     public void rotateBlock(World world, BlockCoord coord, Block block)
     {
         for (int i = 0; i < rotation; i++)
-        {
             block.rotateBlock(world, coord.x, coord.y, coord.z, ForgeDirection.UP);
-        }
     }
 }
