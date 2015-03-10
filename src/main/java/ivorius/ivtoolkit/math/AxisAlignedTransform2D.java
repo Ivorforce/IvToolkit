@@ -18,6 +18,7 @@ package ivorius.ivtoolkit.math;
 
 import ivorius.ivtoolkit.blocks.BlockCoord;
 import net.minecraft.block.Block;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -89,80 +90,78 @@ public class AxisAlignedTransform2D
 
     public BlockCoord apply(BlockCoord position, int[] size)
     {
-        BlockCoord coord;
         int positionX = mirrorX ? size[0] - 1 - position.x : position.x;
 
         switch (rotation)
         {
             case 0:
-                coord = new BlockCoord(positionX, position.y, position.z);
-                break;
+                return new BlockCoord(positionX, position.y, position.z);
             case 1:
-                coord = new BlockCoord(size[2] - 1 - position.z, position.y, positionX);
-                break;
+                return new BlockCoord(size[2] - 1 - position.z, position.y, positionX);
             case 2:
-                coord = new BlockCoord(size[0] - 1 - positionX, position.y, size[2] - 1 - position.z);
-                break;
+                return new BlockCoord(size[0] - 1 - positionX, position.y, size[2] - 1 - position.z);
             case 3:
-                coord = new BlockCoord(position.z, position.y, size[0] - 1 - positionX);
-                break;
+                return new BlockCoord(position.z, position.y, size[0] - 1 - positionX);
             default:
                 throw new InternalError();
         }
+    }
 
-        return coord;
+    public ChunkCoordinates apply(ChunkCoordinates position, int[] size)
+    {
+        int positionX = mirrorX ? size[0] - 1 - position.posX : position.posX;
+
+        switch (rotation)
+        {
+            case 0:
+                return new ChunkCoordinates(positionX, position.posY, position.posZ);
+            case 1:
+                return new ChunkCoordinates(size[2] - 1 - position.posZ, position.posY, positionX);
+            case 2:
+                return new ChunkCoordinates(size[0] - 1 - positionX, position.posY, size[2] - 1 - position.posZ);
+            case 3:
+                return new ChunkCoordinates(position.posZ, position.posY, size[0] - 1 - positionX);
+            default:
+                throw new InternalError();
+        }
     }
 
     public double[] apply(double[] position, int[] size)
     {
-        double[] coord;
         double positionX = mirrorX ? size[0] - 1 - position[0] : position[0];
 
         switch (rotation)
         {
             case 0:
-                coord = new double[]{positionX, position[1], position[2]};
-                break;
+                return new double[]{positionX, position[1], position[2]};
             case 1:
-                coord = new double[]{size[2] - 1 - position[2], position[1], positionX};
-                break;
+                return new double[]{size[2] - 1 - position[2], position[1], positionX};
             case 2:
-                coord = new double[]{size[0] - 1 - positionX, position[1], size[2] - 1 - position[2]};
-                break;
+                return new double[]{size[0] - 1 - positionX, position[1], size[2] - 1 - position[2]};
             case 3:
-                coord = new double[]{position[2], position[1], size[0] - 1 - positionX};
-                break;
+                return new double[]{position[2], position[1], size[0] - 1 - positionX};
             default:
                 throw new InternalError();
         }
-
-        return coord;
     }
 
     public int[] apply(int[] position, int[] size)
     {
-        int[] coord;
         int positionX = mirrorX ? size[0] - 1 - position[0] : position[0];
 
         switch (rotation)
         {
             case 0:
-                coord = new int[]{positionX, position[1], position[2]};
-                break;
+                return new int[]{positionX, position[1], position[2]};
             case 1:
-                coord = new int[]{size[2] - 1 - position[2], position[1], positionX};
-                break;
+                return new int[]{size[2] - 1 - position[2], position[1], positionX};
             case 2:
-                coord = new int[]{size[0] - 1 - positionX, position[1], size[2] - 1 - position[2]};
-                break;
+                return new int[]{size[0] - 1 - positionX, position[1], size[2] - 1 - position[2]};
             case 3:
-                coord = new int[]{position[2], position[1], size[0] - 1 - positionX};
-                break;
+                return new int[]{position[2], position[1], size[0] - 1 - positionX};
             default:
                 throw new InternalError();
         }
-
-        return coord;
     }
 
     public void rotateBlock(World world, BlockCoord coord, Block block)

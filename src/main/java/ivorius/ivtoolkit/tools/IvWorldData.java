@@ -24,6 +24,7 @@ import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
 import net.minecraft.block.Block;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityHanging;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
@@ -32,6 +33,7 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
@@ -197,6 +199,14 @@ public class IvWorldData
                 entityHanging.field_146062_d += coord.z;
                 entityHanging.setDirection(entityHanging.hangingDirection);
             }
+
+            if (entity instanceof EntityCreature)
+            {
+                EntityCreature entityCreature = (EntityCreature) entity;
+                ChunkCoordinates homePosition = entityCreature.getHomePosition();
+
+                EntityCreatureAccessor.setHomePosition(entityCreature, homePosition.posX + coord.x, homePosition.posY + coord.y, homePosition.posZ + coord.z);
+            }
         }
     }
 
@@ -218,6 +228,15 @@ public class IvWorldData
                 entityHanging.field_146064_c = newHangingCoord.y;
                 entityHanging.field_146062_d = newHangingCoord.z;
                 entityHanging.setDirection(entityHanging.hangingDirection);
+            }
+
+            if (entity instanceof EntityCreature)
+            {
+                EntityCreature entityCreature = (EntityCreature) entity;
+                ChunkCoordinates homePosition = entityCreature.getHomePosition();
+                ChunkCoordinates newHomePosition = transform.apply(homePosition, size);
+
+                EntityCreatureAccessor.setHomePosition(entityCreature, newHomePosition.posX, newHomePosition.posY, newHomePosition.posZ);
             }
         }
     }
