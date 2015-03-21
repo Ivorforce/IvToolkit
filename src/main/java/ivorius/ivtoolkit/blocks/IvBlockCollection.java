@@ -58,9 +58,7 @@ public class IvBlockCollection implements Iterable<BlockCoord>
     public IvBlockCollection(Block[] blocks, byte[] metas, int width, int height, int length)
     {
         if (blocks.length != width * height * length || metas.length != blocks.length)
-        {
             throw new IllegalArgumentException();
-        }
 
         this.blocks = blocks;
         this.metas = metas;
@@ -85,32 +83,45 @@ public class IvBlockCollection implements Iterable<BlockCoord>
         }
     }
 
+    public int getWidth()
+    {
+        return width;
+    }
+
+    public int getHeight()
+    {
+        return height;
+    }
+
+    public int getLength()
+    {
+        return length;
+    }
+
     public Block getBlock(BlockCoord coord)
     {
         if (!hasCoord(coord))
-        {
             return Blocks.air;
-        }
 
-        return blocks[indexFromCoord(coord)];
+        Block block = blocks[indexFromCoord(coord)];
+        return block != null ? block : Blocks.air;
     }
 
     public byte getMetadata(BlockCoord coord)
     {
         if (!hasCoord(coord))
-        {
             return 0;
-        }
 
         return metas[indexFromCoord(coord)];
     }
 
     public void setBlockAndMetadata(BlockCoord coord, Block block, byte meta)
     {
+        if (block == null)
+            throw new NullPointerException();
+
         if (!hasCoord(coord))
-        {
             return;
-        }
 
         int index = indexFromCoord(coord);
         blocks[index] = block;
@@ -119,10 +130,11 @@ public class IvBlockCollection implements Iterable<BlockCoord>
 
     public void setBlock(BlockCoord coord, Block block)
     {
+        if (block == null)
+            throw new NullPointerException();
+
         if (!hasCoord(coord))
-        {
             return;
-        }
 
         blocks[indexFromCoord(coord)] = block;
     }
@@ -130,9 +142,7 @@ public class IvBlockCollection implements Iterable<BlockCoord>
     public void setMetadata(BlockCoord coord, byte meta)
     {
         if (!hasCoord(coord))
-        {
             return;
-        }
 
         metas[indexFromCoord(coord)] = meta;
     }
@@ -249,6 +259,34 @@ public class IvBlockCollection implements Iterable<BlockCoord>
                 ", height=" + height +
                 ", width=" + width +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        IvBlockCollection that = (IvBlockCollection) o;
+
+        if (height != that.height) return false;
+        if (length != that.length) return false;
+        if (width != that.width) return false;
+        if (!Arrays.equals(blocks, that.blocks)) return false;
+        if (!Arrays.equals(metas, that.metas)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = Arrays.hashCode(blocks);
+        result = 31 * result + Arrays.hashCode(metas);
+        result = 31 * result + width;
+        result = 31 * result + height;
+        result = 31 * result + length;
+        return result;
     }
 
     @Override
