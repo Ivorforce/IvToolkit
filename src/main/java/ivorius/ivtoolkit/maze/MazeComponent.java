@@ -16,10 +16,17 @@
 
 package ivorius.ivtoolkit.maze;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import ivorius.ivtoolkit.math.IvVecMathHelper;
 import ivorius.ivtoolkit.random.WeightedSelector;
+import ivorius.ivtoolkit.tools.NBTCompoundObject;
+import ivorius.ivtoolkit.tools.NBTTagCompounds;
+import ivorius.ivtoolkit.tools.NBTTagLists;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.WeightedRandom;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,39 +34,35 @@ import java.util.List;
 /**
  * Created by lukas on 20.06.14.
  */
-public class MazeComponent extends WeightedRandom.Item implements WeightedSelector.Item
+public class MazeComponent implements WeightedSelector.Item, NBTCompoundObject
 {
-    protected Object identifier;
+    protected NBTTagCompound identifierCompound;
+    protected NBTCompoundObject identifier;
+
     protected double weight;
 
     protected List<MazeRoom> rooms = new ArrayList<>();
     protected List<MazePath> exitPaths = new ArrayList<>();
 
-    @Deprecated
-    public MazeComponent(int weight, Object identifier, List<MazeRoom> rooms, List<MazePath> exitPaths)
+    public MazeComponent()
     {
-        super(weight);
-        this.identifier = identifier;
-        this.weight = weight * 0.01;
-        this.rooms.addAll(rooms);
-        this.exitPaths.addAll(exitPaths);
+
     }
 
-    public MazeComponent(double weight, Object identifier, List<MazeRoom> rooms, List<MazePath> exitPaths)
+    public MazeComponent(double weight, NBTCompoundObject identifier, List<MazeRoom> rooms, List<MazePath> exitPaths)
     {
-        super((int) (weight * 100));
         this.weight = weight;
         this.identifier = identifier;
         this.rooms.addAll(rooms);
         this.exitPaths.addAll(exitPaths);
     }
 
-    public Object getIdentifier()
+    public NBTCompoundObject getIdentifier()
     {
         return identifier;
     }
 
-    public void setIdentifier(Object identifier)
+    public void setIdentifier(NBTCompoundObject identifier)
     {
         this.identifier = identifier;
     }
@@ -123,5 +126,67 @@ public class MazeComponent extends WeightedRandom.Item implements WeightedSelect
         }
 
         return size;
+    }
+
+    @Override
+    public void readFromNBT(final NBTTagCompound compound)
+    {
+        identifierCompound = compound.getCompoundTag("identifier");
+        weight = compound.getDouble("weight");
+
+        rooms.clear();
+        rooms.addAll(Lists.transform(NBTTagLists.intArrays(compound, "rooms"), new Function<int[], MazeRoom>()
+        {
+            @Nullable
+            @Override
+            public MazeRoom apply(int[] input)
+            {
+                return new MazeRoom(input);
+            }
+        }));
+
+        exitPaths.clear();
+        exitPaths.addAll(Lists.transform(NBTTagLists.compounds(compound, "exitPaths"), new Function<NBTTagCompound, MazePath>()
+        {
+            @Nullable
+            @Override
+            public MazePath apply(@Nullable NBTTagCompound input)
+            {
+                return NBTTagCompounds.read(compound, MazePath.class);
+            }
+        }));
+    }
+
+    public void readIdentifier(Class<? extends NBTCompoundObject> iClass)
+    {
+        identifier = NBTTagCompounds.read(identifierCompound, iClass);
+        identifierCompound = null;
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound compound)
+    {
+        compound.setTag("identifier", NBTTagCompounds.write(identifier));
+        compound.setDouble("weight", weight);
+
+        compound.setTag("rooms", NBTTagLists.storeIntArrays(Lists.transform(rooms, new Function<MazeRoom, int[]>()
+        {
+            @Nullable
+            @Override
+            public int[] apply(@Nullable MazeRoom input)
+            {
+                return input.coordinates;
+            }
+        })));
+
+        compound.setTag("exitPaths", NBTTagLists.storeCompounds(Lists.transform(exitPaths, new Function<MazePath, NBTTagCompound>()
+        {
+            @Nullable
+            @Override
+            public NBTTagCompound apply(@Nullable MazePath input)
+            {
+                return NBTTagCompounds.write(input);
+            }
+        })));
     }
 }

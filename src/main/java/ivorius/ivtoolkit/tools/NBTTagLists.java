@@ -1,0 +1,85 @@
+/*
+ * Copyright 2015 Lukas Tenbrink
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package ivorius.ivtoolkit.tools;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagIntArray;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraftforge.common.util.Constants;
+
+import javax.annotation.Nullable;
+import java.util.List;
+
+/**
+ * Created by lukas on 30.03.15.
+ */
+public class NBTTagLists
+{
+    public static List<NBTTagCompound> compounds(NBTTagCompound compound, String key)
+    {
+        return compounds(compound.getTagList(key, Constants.NBT.TAG_COMPOUND));
+    }
+
+    public static List<NBTTagCompound> compounds(final NBTTagList list)
+    {
+        return Lists.transform(Ranges.rangeList(0, list.tagCount()), new Function<Integer, NBTTagCompound>()
+        {
+            @Nullable
+            @Override
+            public NBTTagCompound apply(Integer input)
+            {
+                return list.getCompoundTagAt(input);
+            }
+        });
+    }
+
+    public static NBTTagList storeCompounds(List<NBTTagCompound> list)
+    {
+        NBTTagList tagList = new NBTTagList();
+        for (NBTTagCompound compound : list)
+            tagList.appendTag(compound);
+        return tagList;
+    }
+
+    public static List<int[]> intArrays(NBTTagCompound compound, String key)
+    {
+        return intArrays(compound.getTagList(key, Constants.NBT.TAG_INT_ARRAY));
+    }
+
+    public static List<int[]> intArrays(final NBTTagList list)
+    {
+        return Lists.transform(Ranges.rangeList(0, list.tagCount()), new Function<Integer, int[]>()
+        {
+            @Nullable
+            @Override
+            public int[] apply(Integer input)
+            {
+                return list.func_150306_c(input);
+            }
+        });
+    }
+
+    public static NBTTagList storeIntArrays(List<int[]> list)
+    {
+        NBTTagList tagList = new NBTTagList();
+        for (int[] array : list)
+            tagList.appendTag(new NBTTagIntArray(array));
+        return tagList;
+    }
+}

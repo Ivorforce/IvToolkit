@@ -17,14 +17,15 @@
 package ivorius.ivtoolkit.maze;
 
 import ivorius.ivtoolkit.math.IvVecMathHelper;
+import ivorius.ivtoolkit.tools.NBTCompoundObject;
 import net.minecraft.nbt.NBTTagCompound;
 
 /**
  * Created by lukas on 23.06.14.
  */
-public class MazePath implements MazeCoordinate, Cloneable
+public class MazePath implements MazeCoordinate, Cloneable, NBTCompoundObject
 {
-    public final MazeRoom sourceRoom;
+    public MazeRoom sourceRoom;
     public int pathDimension;
     public boolean pathGoesUp;
 
@@ -38,13 +39,6 @@ public class MazePath implements MazeCoordinate, Cloneable
     public MazePath(int pathDimension, boolean pathGoesUp, int... roomCoordinates)
     {
         this(new MazeRoom(roomCoordinates), pathDimension, pathGoesUp);
-    }
-
-    public MazePath(NBTTagCompound compound)
-    {
-        sourceRoom = new MazeRoom(compound.getCompoundTag("source"));
-        pathDimension = compound.getInteger("pathDimension");
-        pathGoesUp = compound.getBoolean("pathGoesUp");
     }
 
     public static MazePath pathFromSourceAndDest(MazeRoom source, MazeRoom dest)
@@ -137,12 +131,19 @@ public class MazePath implements MazeCoordinate, Cloneable
         return coords;
     }
 
-    public NBTTagCompound writeToNBT()
+    @Override
+    public void readFromNBT(NBTTagCompound compound)
     {
-        NBTTagCompound compound = new NBTTagCompound();
+        sourceRoom = new MazeRoom(compound.getCompoundTag("source"));
+        pathDimension = compound.getInteger("pathDimension");
+        pathGoesUp = compound.getBoolean("pathGoesUp");
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound compound)
+    {
         compound.setTag("source", sourceRoom.writeToNBT());
         compound.setInteger("pathDimension", pathDimension);
         compound.setBoolean("pathGoesUp", pathGoesUp);
-        return compound;
     }
 }

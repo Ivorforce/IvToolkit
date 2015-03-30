@@ -17,24 +17,21 @@
 package ivorius.ivtoolkit.maze;
 
 import ivorius.ivtoolkit.random.WeightedSelector;
+import ivorius.ivtoolkit.tools.NBTCompoundObject;
+import ivorius.ivtoolkit.tools.NBTTagCompounds;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.WeightedRandom;
 
 /**
  * Created by lukas on 20.06.14.
  */
-public class MazeComponentPosition extends WeightedRandom.Item implements WeightedSelector.Item
+public class MazeComponentPosition implements WeightedSelector.Item, NBTCompoundObject
 {
     protected MazeComponent component;
-
     protected MazeRoom positionInMaze;
-
-    protected double weight;
 
     public MazeComponentPosition(MazeComponent component, MazeRoom positionInMaze)
     {
-        super(component.itemWeight);
-        weight = component.weight;
-
         this.component = component;
         this.positionInMaze = positionInMaze;
     }
@@ -52,6 +49,20 @@ public class MazeComponentPosition extends WeightedRandom.Item implements Weight
     @Override
     public double getWeight()
     {
-        return weight;
+        return component.getWeight();
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound compound)
+    {
+        component = NBTTagCompounds.read(compound.getCompoundTag("component"), MazeComponent.class);
+        positionInMaze = new MazeRoom(compound.getIntArray("positionInMaze"));
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound compound)
+    {
+        compound.setTag("component", NBTTagCompounds.write(component));
+        compound.setIntArray("positionInMaze", positionInMaze.coordinates);
     }
 }

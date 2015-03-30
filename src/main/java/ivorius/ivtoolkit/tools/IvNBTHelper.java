@@ -25,13 +25,17 @@ import net.minecraft.nbt.*;
 import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.common.util.Constants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by lukas on 23.04.14.
  */
 public class IvNBTHelper
 {
+
     public static byte readByte(NBTTagCompound compound, String key, byte defaultValue)
     {
         return compound != null && compound.hasKey(key, Constants.NBT.TAG_BYTE)
