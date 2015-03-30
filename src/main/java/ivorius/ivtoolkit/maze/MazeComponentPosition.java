@@ -30,6 +30,10 @@ public class MazeComponentPosition implements WeightedSelector.Item, NBTCompound
     protected MazeComponent component;
     protected MazeRoom positionInMaze;
 
+    public MazeComponentPosition()
+    {
+    }
+
     public MazeComponentPosition(MazeComponent component, MazeRoom positionInMaze)
     {
         this.component = component;

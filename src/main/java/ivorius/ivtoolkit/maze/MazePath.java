@@ -29,6 +29,10 @@ public class MazePath implements MazeCoordinate, Cloneable, NBTCompoundObject
     public int pathDimension;
     public boolean pathGoesUp;
 
+    public MazePath()
+    {
+    }
+
     public MazePath(MazeRoom sourceRoom, int pathDimension, boolean pathGoesUp)
     {
         this.sourceRoom = sourceRoom;
