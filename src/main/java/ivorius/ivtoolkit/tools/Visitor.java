@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit.random;
+package ivorius.ivtoolkit.tools;
 
 /**
  * Visits objects of type T.
