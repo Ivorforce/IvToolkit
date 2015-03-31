@@ -18,13 +18,21 @@ package ivorius.ivtoolkit.tools;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 
 /**
  * Created by lukas on 30.06.14.
  */
 public interface MCRegistry
 {
-    public Item itemFromID(String itemID);
+    Item itemFromID(String itemID);
 
-    public Block blockFromID(String blockID);
+    String idFromItem(Item item);
+
+    Block blockFromID(String blockID);
+
+    String idFromBlock(Block block);
+
+    TileEntity loadTileEntity(NBTTagCompound compound);
 }

@@ -18,6 +18,8 @@ package ivorius.ivtoolkit.tools;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 
 /**
  * Created by lukas on 30.06.14.
@@ -33,8 +35,26 @@ public class MCRegistryDefault implements MCRegistry
     }
 
     @Override
+    public String idFromItem(Item item)
+    {
+        return Item.itemRegistry.getNameForObject(item);
+    }
+
+    @Override
     public Block blockFromID(String blockID)
     {
-        return (Block) Block.blockRegistry.getObject(blockID);
+        return Block.getBlockFromName(blockID);
+    }
+
+    @Override
+    public String idFromBlock(Block block)
+    {
+        return Block.blockRegistry.getNameForObject(block);
+    }
+
+    @Override
+    public TileEntity loadTileEntity(NBTTagCompound compound)
+    {
+        return TileEntity.createAndLoadEntity(compound);
     }
 }

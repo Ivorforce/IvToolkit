@@ -99,7 +99,7 @@ public class IvWorldData
         {
             NBTTagCompound teCompound = teList.getCompoundTagAt(i);
             recursivelyApplyIDFixTags(teCompound, registry);
-            TileEntity tileEntity = TileEntity.createAndLoadEntity(teCompound);
+            TileEntity tileEntity = registry.loadTileEntity(teCompound);
 
             if (tileEntity != null)
                 tileEntities.add(tileEntity);
