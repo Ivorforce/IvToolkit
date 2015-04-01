@@ -41,6 +41,12 @@ public class MCRegistryDefault implements MCRegistry
     }
 
     @Override
+    public void modifyItemStackCompound(NBTTagCompound compound, String itemID)
+    {
+
+    }
+
+    @Override
     public Block blockFromID(String blockID)
     {
         return Block.getBlockFromName(blockID);

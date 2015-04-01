@@ -418,14 +418,11 @@ public class IvWorldData
                 String stringID = fixTag.getString("itemID");
                 Item item = registry.itemFromID(stringID);
                 if (item != null)
-                {
-                    int itemID = Item.getIdFromItem(item);
-                    compound.setInteger(dest, itemID);
-                }
+                    compound.setInteger(dest, Item.getIdFromItem(item));
                 else
-                {
                     IvToolkitCoreContainer.logger.warn("Failed to fix item tag from structure with ID '" + stringID + "'");
-                }
+
+                registry.modifyItemStackCompound(compound, stringID);
                 break;
             }
             case "block":
@@ -434,14 +431,9 @@ public class IvWorldData
                 String stringID = fixTag.getString("blockID");
                 Block block = registry.blockFromID(stringID);
                 if (block != null)
-                {
-                    int blockID = Block.getIdFromBlock(block);
-                    compound.setInteger(dest, blockID);
-                }
+                    compound.setInteger(dest, Block.getIdFromBlock(block));
                 else
-                {
                     IvToolkitCoreContainer.logger.warn("Failed to fix block tag from structure with ID '" + stringID + "'");
-                }
                 break;
             }
             default:

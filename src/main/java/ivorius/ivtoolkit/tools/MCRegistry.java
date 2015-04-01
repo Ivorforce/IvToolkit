@@ -30,6 +30,8 @@ public interface MCRegistry
 
     String idFromItem(Item item);
 
+    void modifyItemStackCompound(NBTTagCompound compound, String itemID);
+
     Block blockFromID(String blockID);
 
     String idFromBlock(Block block);
