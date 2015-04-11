@@ -54,9 +54,7 @@ public class MazeGeneratorWithComponents
             MazeRoom position = positionStack.pop();
 
             if (maze.get(position) != Maze.NULL) // Has been filled while this was queued
-            {
                 continue;
-            }
 
             validComponents.clear();
 
@@ -67,9 +65,7 @@ public class MazeGeneratorWithComponents
                     MazeRoom componentPosition = position.sub(attachedRoom);
 
                     if (canComponentBePlaced(maze, new MazeComponentPosition(component, componentPosition)))
-                    {
                         validComponents.add(new MazeComponentPosition(component, componentPosition));
-                    }
                 }
             }
 
@@ -80,20 +76,11 @@ public class MazeGeneratorWithComponents
                 continue;
             }
 
-            boolean allZero = Iterables.any(validComponents, new Predicate<MazeComponentPosition>()
-            {
-                @Override
-                public boolean apply(MazeComponentPosition input)
-                {
-                    return input.getComponent().getWeight() > 0;
-                }
-            });
-
             MazeComponentPosition generatingComponent;
-            if (allZero)
-                generatingComponent = validComponents.get(rand.nextInt(validComponents.size()));
-            else
+            if (WeightedSelector.canSelect(validComponents))
                 generatingComponent = WeightedSelector.selectItem(rand, validComponents);
+            else
+                generatingComponent = validComponents.get(rand.nextInt(validComponents.size()));
 
             for (MazeRoom room : generatingComponent.getComponent().getRooms())
             {
@@ -104,9 +91,7 @@ public class MazeGeneratorWithComponents
                 for (MazePath neighbor : neighbors)
                 {
                     if (maze.get(neighbor) == Maze.NULL)
-                    {
                         maze.set(Maze.WALL, neighbor);
-                    }
                 }
             }
 
@@ -117,14 +102,10 @@ public class MazeGeneratorWithComponents
                 MazeRoom srcRoom = exitInMaze.getSourceRoom();
 
                 if (maze.get(destRoom) == Maze.NULL)
-                {
                     positionStack.push(destRoom);
-                }
 
                 if (maze.get(srcRoom) == Maze.NULL)
-                {
                     positionStack.push(srcRoom);
-                }
 
                 maze.set(Maze.ROOM, exitInMaze);
             }
@@ -143,18 +124,14 @@ public class MazeGeneratorWithComponents
             byte curValue = maze.get(roomInMaze);
 
             if (curValue != Maze.NULL)
-            {
                 return false;
-            }
 
             MazePath[] roomNeighborPaths = Maze.getNeighborPaths(maze.dimensions.length, roomInMaze);
             for (MazePath roomNeighborPath : roomNeighborPaths)
             {
                 byte neighborValue = maze.get(roomNeighborPath);
                 if (neighborValue == Maze.ROOM && !component.getComponent().getExitPaths().contains(roomNeighborPath.sub(component.getPositionInMaze())))
-                {
                     return false;
-                }
             }
         }
 
@@ -163,9 +140,7 @@ public class MazeGeneratorWithComponents
             byte curValue = maze.get(exit.add(component.getPositionInMaze()));
 
             if (curValue != Maze.ROOM && curValue != Maze.NULL && curValue != Maze.INVALID)
-            {
                 return false;
-            }
         }
 
         return true;

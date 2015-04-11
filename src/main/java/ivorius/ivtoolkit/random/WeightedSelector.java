@@ -38,6 +38,14 @@ public class WeightedSelector
         return totalWeight(SimpleItem.apply(items, weightFunction));
     }
 
+    public static boolean canSelect(Collection<? extends Item> items)
+    {
+        for (Item item : items)
+            if (item.getWeight() > 0)
+                return true;
+        return false;
+    }
+
     public static <T extends Item> T selectItem(Random rand, Collection<T> items)
     {
         return selectItem(rand, items, totalWeight(items));
