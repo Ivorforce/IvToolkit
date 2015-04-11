@@ -145,6 +145,25 @@ public class AxisAlignedTransform2D
         }
     }
 
+    public float[] apply(float[] position, int[] size)
+    {
+        float positionX = mirrorX ? size[0] - 1 - position[0] : position[0];
+
+        switch (rotation)
+        {
+            case 0:
+                return new float[]{positionX, position[1], position[2]};
+            case 1:
+                return new float[]{size[2] - 1 - position[2], position[1], positionX};
+            case 2:
+                return new float[]{size[0] - 1 - positionX, position[1], size[2] - 1 - position[2]};
+            case 3:
+                return new float[]{position[2], position[1], size[0] - 1 - positionX};
+            default:
+                throw new InternalError();
+        }
+    }
+
     public int[] apply(int[] position, int[] size)
     {
         int positionX = mirrorX ? size[0] - 1 - position[0] : position[0];
