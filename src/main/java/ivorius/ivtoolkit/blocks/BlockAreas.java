@@ -31,6 +31,25 @@ public class BlockAreas
 {
     public static final BlockCoord ZERO_COORD = new BlockCoord(0, 0, 0);
 
+    public static int sideLength(BlockArea area, ForgeDirection side)
+    {
+        int[] size = area.areaSize();
+        switch (side)
+        {
+            case EAST:
+            case WEST:
+                return size[0];
+            case UP:
+            case DOWN:
+                return size[1];
+            case NORTH:
+            case SOUTH:
+                return size[2];
+        }
+
+        throw new IllegalArgumentException();
+    }
+
     public static BlockArea side(BlockArea area, ForgeDirection side)
     {
         BlockCoord lowerCorner = area.getLowerCorner();
