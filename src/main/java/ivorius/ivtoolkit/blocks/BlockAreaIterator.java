@@ -40,6 +40,11 @@ public class BlockAreaIterator implements Iterator<BlockCoord>
         curZ = lower.z;
     }
 
+    public BlockAreaIterator(BlockArea area)
+    {
+        this(area.getLowerCorner(), area.getHigherCorner());
+    }
+
     @Override
     public boolean hasNext()
     {

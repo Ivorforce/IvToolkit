@@ -29,8 +29,6 @@ import javax.annotation.Nullable;
  */
 public class BlockAreas
 {
-    public static final BlockCoord ZERO_COORD = new BlockCoord(0, 0, 0);
-
     public static int sideLength(BlockArea area, ForgeDirection side)
     {
         int[] size = area.areaSize();
@@ -80,17 +78,17 @@ public class BlockAreas
         switch (side)
         {
             case UP:
-                return shrink(area, ZERO_COORD, new BlockCoord(0, amount, 0));
+                return shrink(area, BlockCoord.ZERO, new BlockCoord(0, amount, 0));
             case DOWN:
-                return shrink(area, new BlockCoord(0, amount, 0), ZERO_COORD);
+                return shrink(area, new BlockCoord(0, amount, 0), BlockCoord.ZERO);
             case NORTH:
-                return shrink(area, new BlockCoord(0, 0, amount), ZERO_COORD);
+                return shrink(area, new BlockCoord(0, 0, amount), BlockCoord.ZERO);
             case EAST:
-                return shrink(area, ZERO_COORD, new BlockCoord(amount, 0, 0));
+                return shrink(area, BlockCoord.ZERO, new BlockCoord(amount, 0, 0));
             case SOUTH:
-                return shrink(area, ZERO_COORD, new BlockCoord(0, 0, amount));
+                return shrink(area, BlockCoord.ZERO, new BlockCoord(0, 0, amount));
             case WEST:
-                return shrink(area, new BlockCoord(amount, 0, 0), ZERO_COORD);
+                return shrink(area, new BlockCoord(amount, 0, 0), BlockCoord.ZERO);
             default:
                 throw new IllegalArgumentException();
         }

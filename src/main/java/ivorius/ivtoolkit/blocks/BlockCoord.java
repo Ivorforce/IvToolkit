@@ -27,6 +27,8 @@ import net.minecraft.world.World;
  */
 public class BlockCoord implements Cloneable
 {
+    public static final BlockCoord ZERO = new BlockCoord(0, 0, 0);
+
     public final int x;
     public final int y;
     public final int z;

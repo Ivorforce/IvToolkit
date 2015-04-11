@@ -292,6 +292,11 @@ public class IvBlockCollection implements Iterable<BlockCoord>
     @Override
     public Iterator<BlockCoord> iterator()
     {
-        return new BlockAreaIterator(new BlockCoord(0, 0, 0), new BlockCoord(width - 1, height - 1, length - 1));
+        return new BlockAreaIterator(BlockCoord.ZERO, new BlockCoord(width - 1, height - 1, length - 1));
+    }
+
+    public BlockArea area()
+    {
+        return new BlockArea(BlockCoord.ZERO, new BlockCoord(width - 1, height - 1, length - 1));
     }
 }
