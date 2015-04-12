@@ -16,11 +16,16 @@
 
 package ivorius.ivtoolkit.maze;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import ivorius.ivtoolkit.random.WeightedSelector;
 import ivorius.ivtoolkit.tools.NBTCompoundObject;
 import ivorius.ivtoolkit.tools.NBTTagCompounds;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.WeightedRandom;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * Created by lukas on 20.06.14.
@@ -54,6 +59,32 @@ public class MazeComponentPosition implements WeightedSelector.Item, NBTCompound
     public double getWeight()
     {
         return component.getWeight();
+    }
+
+    public List<MazePath> getExitPaths()
+    {
+        return Lists.transform(component.getExitPaths(), new Function<MazePath, MazePath>()
+        {
+            @Nullable
+            @Override
+            public MazePath apply(MazePath path)
+            {
+                return path.add(positionInMaze);
+            }
+        });
+    }
+
+    public List<MazeRoom> getRooms()
+    {
+        return Lists.transform(component.getRooms(), new Function<MazeRoom, MazeRoom>()
+        {
+            @Nullable
+            @Override
+            public MazeRoom apply(MazeRoom room)
+            {
+                return room.add(positionInMaze);
+            }
+        });
     }
 
     @Override

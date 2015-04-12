@@ -64,9 +64,7 @@ public class Maze
         for (int i = 0; i < position.length; i++)
         {
             if (position[i] < 0 || position[i] >= this.dimensions[i])
-            {
                 return false;
-            }
         }
 
         return true;
@@ -74,14 +72,22 @@ public class Maze
 
     public byte get(MazeCoordinate coordinate)
     {
-        return contains(coordinate) ? this.blocks[getArrayPosition(coordinate.getMazeCoordinates())] : Maze.INVALID;
+        return contains(coordinate) ? blocks[getArrayPosition(coordinate.getMazeCoordinates())] : Maze.INVALID;
     }
 
     public void set(byte val, MazeCoordinate coordinates)
     {
         if (contains(coordinates))
+            blocks[getArrayPosition(coordinates.getMazeCoordinates())] = val;
+    }
+
+    public void replace(byte condition, byte val, MazeCoordinate coordinates)
+    {
+        if (contains(coordinates))
         {
-            this.blocks[getArrayPosition(coordinates.getMazeCoordinates())] = val;
+            int arrayPosition = getArrayPosition(coordinates.getMazeCoordinates());
+            if (blocks[arrayPosition] == condition)
+                blocks[arrayPosition] = val;
         }
     }
 

@@ -16,15 +16,10 @@
 
 package ivorius.ivtoolkit.maze;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import ivorius.ivtoolkit.random.WeightedSelector;
-import net.minecraft.util.WeightedRandom;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Created by lukas on 20.06.14.
@@ -35,7 +30,7 @@ public class MazeGeneratorWithComponents
     {
         List<MazeComponentPosition> positions = new ArrayList<>();
 
-        Stack<MazeRoom> positionStack = new Stack<>();
+        Deque<MazeRoom> positionStack = new ArrayDeque<>();
 
         // Gather needed start points
         for (MazePath path : maze.allPaths())
@@ -47,19 +42,20 @@ public class MazeGeneratorWithComponents
             }
         }
 
-        ArrayList<MazeComponentPosition> validComponents = new ArrayList<>();
+        List<MazeComponentPosition> validComponents = new ArrayList<>();
 
-        while (!positionStack.empty())
+        while (!positionStack.isEmpty())
         {
             MazeRoom position = positionStack.pop();
 
-            if (maze.get(position) != Maze.NULL) // Has been filled while this was queued
+            // Has been filled while this was queued ?
+            if (maze.get(position) != Maze.NULL)
                 continue;
 
             validComponents.clear();
 
+            // Find valid components
             for (MazeComponent component : mazeComponents)
-            {
                 for (MazeRoom attachedRoom : component.getRooms())
                 {
                     MazeRoom componentPosition = position.sub(attachedRoom);
@@ -67,81 +63,69 @@ public class MazeGeneratorWithComponents
                     if (canComponentBePlaced(maze, new MazeComponentPosition(component, componentPosition)))
                         validComponents.add(new MazeComponentPosition(component, componentPosition));
                 }
-            }
 
             if (validComponents.size() == 0)
             {
                 System.out.println("Did not find fitting component for maze!");
-
                 continue;
             }
 
-            MazeComponentPosition generatingComponent;
-            if (WeightedSelector.canSelect(validComponents))
-                generatingComponent = WeightedSelector.selectItem(rand, validComponents);
-            else
-                generatingComponent = validComponents.get(rand.nextInt(validComponents.size()));
+            MazeComponentPosition placedComponent = WeightedSelector.canSelect(validComponents)
+                    ? WeightedSelector.selectItem(rand, validComponents)
+                    : validComponents.get(rand.nextInt(validComponents.size()));
 
-            for (MazeRoom room : generatingComponent.getComponent().getRooms())
+            for (MazeRoom roomInMaze : placedComponent.getRooms())
             {
-                MazeRoom roomInMaze = generatingComponent.getPositionInMaze().add(room);
+                // Mark the room
                 maze.set(Maze.ROOM, roomInMaze);
 
-                MazePath[] neighbors = Maze.getNeighborPaths(maze.dimensions.length, roomInMaze);
-                for (MazePath neighbor : neighbors)
-                {
-                    if (maze.get(neighbor) == Maze.NULL)
-                        maze.set(Maze.WALL, neighbor);
-                }
+                // Prevent exits into the room
+                for (MazePath neighbor : Maze.getNeighborPaths(maze.dimensions.length, roomInMaze))
+                    maze.replace(Maze.NULL, Maze.WALL, neighbor);
             }
 
-            for (MazePath exit : generatingComponent.getComponent().getExitPaths())
+            for (MazePath exitInMaze : placedComponent.getExitPaths())
             {
-                MazePath exitInMaze = exit.add(generatingComponent.getPositionInMaze());
-                MazeRoom destRoom = exitInMaze.getDestinationRoom();
-                MazeRoom srcRoom = exitInMaze.getSourceRoom();
+                // Mark the exit's paths as to do
 
+                MazeRoom destRoom = exitInMaze.getDestinationRoom();
                 if (maze.get(destRoom) == Maze.NULL)
                     positionStack.push(destRoom);
 
+                MazeRoom srcRoom = exitInMaze.getSourceRoom();
                 if (maze.get(srcRoom) == Maze.NULL)
                     positionStack.push(srcRoom);
 
+                // Mark the exit
                 maze.set(Maze.ROOM, exitInMaze);
             }
 
-            positions.add(generatingComponent);
+            positions.add(placedComponent);
         }
 
         return positions;
     }
 
-    public static boolean canComponentBePlaced(Maze maze, MazeComponentPosition component)
+    public static boolean canComponentBePlaced(Maze maze, final MazeComponentPosition component)
     {
-        for (MazeRoom room : component.getComponent().getRooms())
-        {
-            MazeRoom roomInMaze = room.add(component.getPositionInMaze());
-            byte curValue = maze.get(roomInMaze);
+        List<MazePath> exitsInMaze = Lists.newArrayList(component.getExitPaths());
 
-            if (curValue != Maze.NULL)
+        for (MazeRoom room : component.getRooms())
+        {
+            // Room already taken
+            if (maze.get(room) != Maze.NULL)
                 return false;
 
-            MazePath[] roomNeighborPaths = Maze.getNeighborPaths(maze.dimensions.length, roomInMaze);
-            for (MazePath roomNeighborPath : roomNeighborPaths)
-            {
-                byte neighborValue = maze.get(roomNeighborPath);
-                if (neighborValue == Maze.ROOM && !component.getComponent().getExitPaths().contains(roomNeighborPath.sub(component.getPositionInMaze())))
+            // Exit is expected where component has none
+            for (MazePath roomNeighborPath : Maze.getNeighborPaths(maze.dimensions.length, room))
+                if (maze.get(roomNeighborPath) == Maze.ROOM && !exitsInMaze.contains(roomNeighborPath))
                     return false;
-            }
         }
 
-        for (MazePath exit : component.getComponent().getExitPaths())
-        {
-            byte curValue = maze.get(exit.add(component.getPositionInMaze()));
-
-            if (curValue != Maze.ROOM && curValue != Maze.NULL && curValue != Maze.INVALID)
+        // No exit is expected where component has one
+        for (MazePath exit : exitsInMaze)
+            if (maze.get(exit) == Maze.WALL)
                 return false;
-        }
 
         return true;
     }
