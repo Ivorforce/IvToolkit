@@ -369,9 +369,15 @@ public class Maze
         return cachedNeighborPathBlueprints.get(dimensions);
     }
 
+    @Deprecated
     public static MazePath[] getNeighborPaths(int dimensions, MazeRoom mazeRoom)
     {
-        MazePath[] blueprints = getNeighborPaths(dimensions);
+        return getNeighborPaths(mazeRoom);
+    }
+
+    public static MazePath[] getNeighborPaths(MazeRoom mazeRoom)
+    {
+        MazePath[] blueprints = getNeighborPaths(mazeRoom.getDimensions());
         MazePath[] neighbors = new MazePath[blueprints.length];
 
         for (int i = 0; i < blueprints.length; i++)

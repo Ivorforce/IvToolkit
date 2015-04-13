@@ -125,7 +125,7 @@ public class MazeGenerator
         {
             validRoomNeighbors.clear();
 
-            for (MazePath neighbor : Maze.getNeighborPaths(maze.dimensions.length, position))
+            for (MazePath neighbor : Maze.getNeighborPaths(position))
             {
                 if (maze.get(neighbor.getDestinationRoom()) == Maze.NULL)
                 {
@@ -156,7 +156,7 @@ public class MazeGenerator
             maze.set(Maze.ROOM, usedPath);
             maze.set(Maze.ROOM, destRoom);
 
-            MazePath[] neighbors = Maze.getNeighborPaths(maze.dimensions.length, position);
+            MazePath[] neighbors = Maze.getNeighborPaths(position);
             for (MazePath neighbor : neighbors)
             {
                 if (maze.get(neighbor) == Maze.NULL)

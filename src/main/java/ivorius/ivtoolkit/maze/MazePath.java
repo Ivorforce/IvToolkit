@@ -124,7 +124,7 @@ public class MazePath implements MazeCoordinate, Cloneable, NBTCompoundObject
     @Override
     public String toString()
     {
-        return getSourceRoom().toString() + " -> " + getDestinationRoom();
+        return String.format("%s -> %sd%d", getSourceRoom(), pathGoesUp ? "+" : "-", pathDimension);
     }
 
     @Override

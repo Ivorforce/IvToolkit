@@ -16,6 +16,8 @@
 
 package ivorius.ivtoolkit.maze;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import ivorius.ivtoolkit.random.WeightedSelector;
 
@@ -26,7 +28,7 @@ import java.util.*;
  */
 public class MazeGeneratorWithComponents
 {
-    public static List<MazeComponentPosition> generatePaths(Random rand, Maze maze, List<MazeComponent> mazeComponents)
+    public static List<MazeComponentPosition> generatePaths(Random rand, final Maze maze, List<MazeComponent> mazeComponents)
     {
         List<MazeComponentPosition> positions = new ArrayList<>();
 
@@ -67,6 +69,15 @@ public class MazeGeneratorWithComponents
             if (validComponents.size() == 0)
             {
                 System.out.println("Did not find fitting component for maze!");
+                System.out.println("Suggested: X with exits " + Lists.newArrayList(Iterables.filter(Arrays.asList(Maze.getNeighborPaths(position)), new Predicate<MazePath>()
+                {
+                    @Override
+                    public boolean apply(MazePath path)
+                    {
+                        return maze.get(path) == Maze.ROOM;
+                    }
+                })));
+
                 continue;
             }
 
@@ -80,7 +91,7 @@ public class MazeGeneratorWithComponents
                 maze.set(Maze.ROOM, roomInMaze);
 
                 // Prevent exits into the room
-                for (MazePath neighbor : Maze.getNeighborPaths(maze.dimensions.length, roomInMaze))
+                for (MazePath neighbor : Maze.getNeighborPaths(roomInMaze))
                     maze.replace(Maze.NULL, Maze.WALL, neighbor);
             }
 
@@ -117,7 +128,7 @@ public class MazeGeneratorWithComponents
                 return false;
 
             // Exit is expected where component has none
-            for (MazePath roomNeighborPath : Maze.getNeighborPaths(maze.dimensions.length, room))
+            for (MazePath roomNeighborPath : Maze.getNeighborPaths(room))
                 if (maze.get(roomNeighborPath) == Maze.ROOM && !exitsInMaze.contains(roomNeighborPath))
                     return false;
         }
