@@ -69,7 +69,7 @@ public class MazeGeneratorWithComponents
             if (validComponents.size() == 0)
             {
                 System.out.println("Did not find fitting component for maze!");
-                System.out.println("Suggested: X with exits " + Lists.newArrayList(Iterables.filter(Arrays.asList(Maze.getNeighborPaths(position)), new Predicate<MazePath>()
+                System.out.println("Suggested: X with exits " + Lists.newArrayList(Iterables.filter(Arrays.asList(MazeCoordinates.getNeighborPaths(position)), new Predicate<MazePath>()
                 {
                     @Override
                     public boolean apply(MazePath path)
@@ -91,7 +91,7 @@ public class MazeGeneratorWithComponents
                 maze.set(Maze.ROOM, roomInMaze);
 
                 // Prevent exits into the room
-                for (MazePath neighbor : Maze.getNeighborPaths(roomInMaze))
+                for (MazePath neighbor : MazeCoordinates.getNeighborPaths(roomInMaze))
                     maze.replace(Maze.NULL, Maze.WALL, neighbor);
             }
 
@@ -128,7 +128,7 @@ public class MazeGeneratorWithComponents
                 return false;
 
             // Exit is expected where component has none
-            for (MazePath roomNeighborPath : Maze.getNeighborPaths(room))
+            for (MazePath roomNeighborPath : MazeCoordinates.getNeighborPaths(room))
                 if (maze.get(roomNeighborPath) == Maze.ROOM && !exitsInMaze.contains(roomNeighborPath))
                     return false;
         }

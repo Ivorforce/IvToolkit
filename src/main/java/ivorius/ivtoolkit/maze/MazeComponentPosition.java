@@ -98,6 +98,6 @@ public class MazeComponentPosition implements WeightedSelector.Item, NBTCompound
     public void writeToNBT(NBTTagCompound compound)
     {
         compound.setTag("component", NBTTagCompounds.write(component));
-        compound.setIntArray("positionInMaze", positionInMaze.coordinates);
+        compound.setIntArray("positionInMaze", positionInMaze.getCoordinates());
     }
 }

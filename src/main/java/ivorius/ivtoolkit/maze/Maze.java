@@ -18,19 +18,13 @@ package ivorius.ivtoolkit.maze;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import ivorius.ivtoolkit.math.IvVecMathHelper;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Maze
 {
-    private static TIntObjectMap<MazeRoom[]> cachedNeighborRoomsBlueprints = new TIntObjectHashMap<>();
-    private static TIntObjectMap<MazePath[]> cachedNeighborPathBlueprints = new TIntObjectHashMap<>();
-
     public static final byte NULL = 0;
     public static final byte INVALID = 1;
     public static final byte WALL = 2;
@@ -96,9 +90,7 @@ public class Maze
         int[] returnSize = new int[size.length];
 
         for (int i = 0; i < returnSize.length; i++)
-        {
             returnSize[i] = (size[i] - pathLengths[i]) / (pathLengths[i] + roomSize[i]) * 2 + 1;
-        }
 
         return returnSize;
     }
@@ -109,9 +101,7 @@ public class Maze
         int[] returnPos = new int[pathLengths.length];
 
         for (int i = 0; i < returnPos.length; i++)
-        {
             returnPos[i] = (mazePosition[i] / 2) * roomSize[i] + ((mazePosition[i] + 1) / 2) * pathLengths[i];
-        }
 
         return returnPos;
     }
@@ -121,9 +111,7 @@ public class Maze
         int[] returnSize = new int[pathLengths.length];
 
         for (int i = 0; i < returnSize.length; i++)
-        {
             returnSize[i] = rooms[i] * roomSize[i] + (rooms[i] / 2) * pathLengths[i];
-        }
 
         return returnSize;
     }
@@ -136,33 +124,28 @@ public class Maze
     public int[] getRoomSize(MazeCoordinate coordinate, int[] pathLengths, int[] roomWidths)
     {
         int[] returnSize = new int[this.dimensions.length];
-        boolean[] isRoomPath = coordPathFlags(coordinate);
+        boolean[] isRoomPath = MazeCoordinates.coordPathFlags(coordinate);
 
         for (int i = 0; i < returnSize.length; i++)
-        {
             returnSize[i] = isRoomPath[i] ? pathLengths[i] : roomWidths[i];
-        }
 
         return returnSize;
     }
 
     public static boolean isCoordValidRoom(MazeCoordinate coordinate)
     {
-        boolean[] isRoomPath = coordPathFlags(coordinate);
+        boolean[] isRoomPath = MazeCoordinates.coordPathFlags(coordinate);
+
         for (boolean b : isRoomPath)
-        {
             if (b)
-            {
                 return false;
-            }
-        }
 
         return true;
     }
 
     public static int getPathDimensionIfPath(MazeCoordinate coordinate)
     {
-        boolean[] pathFlags = coordPathFlags(coordinate);
+        boolean[] pathFlags = MazeCoordinates.coordPathFlags(coordinate);
         int curDimension = -1;
 
         for (int dim = 0; dim < pathFlags.length; dim++)
@@ -170,9 +153,7 @@ public class Maze
             if (pathFlags[dim])
             {
                 if (curDimension >= 0)
-                {
                     return -1;
-                }
 
                 curDimension = dim;
             }
@@ -181,30 +162,13 @@ public class Maze
         return curDimension;
     }
 
-    public static boolean[] coordPathFlags(MazeCoordinate coordinate)
-    {
-        int[] mazePosition = coordinate.getMazeCoordinates();
-        boolean[] flags = new boolean[mazePosition.length];
-
-        for (int i = 0; i < flags.length; i++)
-        {
-            flags[i] = mazePosition[i] % 2 == 0;
-        }
-
-        return flags;
-    }
-
     public boolean isPathPointingOutside(MazeCoordinate coordinate)
     {
         int[] mazePosition = coordinate.getMazeCoordinates();
 
         for (int dim = 0; dim < dimensions.length; dim++)
-        {
             if (mazePosition[dim] == 0 || mazePosition[dim] == dimensions[dim] - 1)
-            {
                 return true;
-            }
-        }
 
         return false;
     }
@@ -242,19 +206,13 @@ public class Maze
         StringBuilder mazeString = new StringBuilder();
 
         for (int dim = 0; dim < dimensions.length; dim++)
-        {
             if (dim != dimension1 && dim != dimension2 && (dim < 0 || layerPositionArray[dim] >= dimensions[dim]))
-            {
                 throw new IllegalArgumentException();
-            }
-        }
 
         for (int x = 0; x < this.dimensions[dimension1]; x++)
         {
             if (x > 0)
-            {
                 mazeString.append("\n");
-            }
 
             for (int y = 0; y < this.dimensions[dimension2]; y++)
             {
@@ -262,165 +220,73 @@ public class Maze
                 layerPositionArray[dimension2] = y;
                 byte type = this.blocks[getArrayPosition(layerPositionArray)];
 
-                if (type == WALL)
+                switch (type)
                 {
-                    mazeString.append("#");
-                }
-                else if (type == INVALID)
-                {
-                    mazeString.append("*");
-                }
-                else if (type == NULL)
-                {
-                    mazeString.append("+");
-                }
-                else if (type == ROOM)
-                {
-                    if (this.dimensions.length > 2)
-                    {
-                        int curDominantDimension = -1;
-                        boolean dominantGoesUp = false;
-
-                        for (int refDim = 0; refDim < dimensions.length; refDim++)
+                    case WALL:
+                        mazeString.append("#");
+                        break;
+                    case INVALID:
+                        mazeString.append("*");
+                        break;
+                    case NULL:
+                        mazeString.append("+");
+                        break;
+                    case ROOM:
+                        if (this.dimensions.length > 2)
                         {
-                            if (refDim != dimension1 && refDim != dimension2)
+                            int curDominantDimension = -1;
+                            boolean dominantGoesUp = false;
+
+                            for (int refDim = 0; refDim < dimensions.length; refDim++)
                             {
-                                int[] abovePos = layerPositionArray.clone();
-                                abovePos[refDim] += 1;
-                                int[] belowPos = layerPositionArray.clone();
-                                belowPos[refDim] -= 1;
-
-                                byte above = get(new MazeCoordinateDirect(abovePos));
-                                byte below = get(new MazeCoordinateDirect(belowPos));
-
-                                if (above == ROOM || below == ROOM)
+                                if (refDim != dimension1 && refDim != dimension2)
                                 {
-                                    if (curDominantDimension >= 0 || above == below)
+                                    int[] abovePos = layerPositionArray.clone();
+                                    abovePos[refDim] += 1;
+                                    int[] belowPos = layerPositionArray.clone();
+                                    belowPos[refDim] -= 1;
+
+                                    byte above = get(new MazeCoordinateDirect(abovePos));
+                                    byte below = get(new MazeCoordinateDirect(belowPos));
+
+                                    if (above == ROOM || below == ROOM)
                                     {
-                                        curDominantDimension = -2;
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        curDominantDimension = refDim;
-                                        dominantGoesUp = above == ROOM;
+                                        if (curDominantDimension >= 0 || above == below)
+                                        {
+                                            curDominantDimension = -2;
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            curDominantDimension = refDim;
+                                            dominantGoesUp = above == ROOM;
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        switch (curDominantDimension)
-                        {
-                            case -2:
-                                mazeString.append('?');
-                                break;
-                            case -1:
-                                mazeString.append(' ');
-                                break;
-                            default:
-                                mazeString.append((char) ((dominantGoesUp ? 'A' : 'a') + curDominantDimension));
-                                break;
+                            switch (curDominantDimension)
+                            {
+                                case -2:
+                                    mazeString.append('?');
+                                    break;
+                                case -1:
+                                    mazeString.append(' ');
+                                    break;
+                                default:
+                                    mazeString.append((char) ((dominantGoesUp ? 'A' : 'a') + curDominantDimension));
+                                    break;
+                            }
                         }
-                    }
-                }
-                else
-                {
-                    mazeString.append(" ");
+                        break;
+                    default:
+                        mazeString.append(" ");
+                        break;
                 }
             }
         }
 
         logger.info(mazeString.toString());
-    }
-
-    public static MazeRoom[] getNeighborRooms(int dimensions)
-    {
-        if (!cachedNeighborRoomsBlueprints.containsKey(dimensions))
-        {
-            MazePath[] neighborPaths = getNeighborPaths(dimensions);
-            MazeRoom[] neighbors = new MazeRoom[neighborPaths.length];
-
-            for (int i = 0; i < neighborPaths.length; i++)
-                neighbors[i] = neighborPaths[i].getDestinationRoom();
-
-            cachedNeighborRoomsBlueprints.put(dimensions, neighbors);
-            return neighbors.clone();
-        }
-
-        return cachedNeighborRoomsBlueprints.get(dimensions).clone();
-    }
-
-    public static MazePath[] getNeighborPaths(int dimensions)
-    {
-        if (!cachedNeighborPathBlueprints.containsKey(dimensions))
-        {
-            MazePath[] neighbors = new MazePath[dimensions * 2];
-
-            for (int i = 0; i < dimensions; i++)
-            {
-                neighbors[i * 2] = new MazePath(new MazeRoom(new int[dimensions]), i, true);
-                neighbors[i * 2 + 1] = new MazePath(new MazeRoom(new int[dimensions]), i, false);
-            }
-
-            cachedNeighborPathBlueprints.put(dimensions, neighbors);
-            return neighbors;
-        }
-
-        return cachedNeighborPathBlueprints.get(dimensions);
-    }
-
-    @Deprecated
-    public static MazePath[] getNeighborPaths(int dimensions, MazeRoom mazeRoom)
-    {
-        return getNeighborPaths(mazeRoom);
-    }
-
-    public static MazePath[] getNeighborPaths(MazeRoom mazeRoom)
-    {
-        MazePath[] blueprints = getNeighborPaths(mazeRoom.getDimensions());
-        MazePath[] neighbors = new MazePath[blueprints.length];
-
-        for (int i = 0; i < blueprints.length; i++)
-            neighbors[i] = new MazePath(blueprints[i].pathDimension, blueprints[i].pathGoesUp, IvVecMathHelper.add(blueprints[i].sourceRoom.coordinates, mazeRoom.coordinates));
-
-        return neighbors;
-    }
-
-    public static MazeRoom coordToRoom(MazeCoordinate coordinate)
-    {
-        if (isCoordValidRoom(coordinate))
-        {
-            int[] roomCoord = coordinate.getMazeCoordinates();
-
-            for (int dim = 0; dim < roomCoord.length; dim++)
-                roomCoord[dim] = (roomCoord[dim] - 1) / 2;
-
-            return new MazeRoom(roomCoord);
-        }
-
-        return null;
-    }
-
-    public static MazePath coordToPath(MazeCoordinate coordinate)
-    {
-        int pathDim = getPathDimensionIfPath(coordinate);
-        return pathDim >= 0 ? coordToPath(coordinate, pathDim) : null;
-    }
-
-    public static MazePath coordToPath(MazeCoordinate coordinate, int pathDim)
-    {
-        int[] roomCoord = coordinate.getMazeCoordinates();
-        boolean goesUp = true;
-
-        for (int dim = 0; dim < roomCoord.length; dim++)
-        {
-            if (roomCoord[dim] == 0)
-                goesUp = false;
-            else
-                roomCoord[dim] = (roomCoord[dim] - 1) / 2;
-        }
-
-        return new MazePath(pathDim, goesUp, roomCoord);
     }
 
     public List<MazeRoom> allRooms()
@@ -432,7 +298,7 @@ public class Maze
             for (int i = 0; i < blocks.length; i++)
             {
                 int[] coord = getCoordPosition(i);
-                MazeRoom room = coordToRoom(new MazeCoordinateDirect(coord));
+                MazeRoom room = MazeCoordinates.coordToRoom(new MazeCoordinateDirect(coord));
 
                 if (room != null)
                     coordinates.add(room);
@@ -453,7 +319,7 @@ public class Maze
             for (int i = 0; i < blocks.length; i++)
             {
                 int[] coord = getCoordPosition(i);
-                MazePath path = coordToPath(new MazeCoordinateDirect(coord));
+                MazePath path = MazeCoordinates.coordToPath(new MazeCoordinateDirect(coord));
 
                 if (path != null)
                     coordinates.add(path);

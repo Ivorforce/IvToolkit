@@ -102,28 +102,24 @@ public class MazeComponent implements WeightedSelector.Item, NBTCompoundObject
 
     public int[] getSize()
     {
-        int[] lowest = rooms.get(0).coordinates.clone();
-        int[] highest = rooms.get(0).coordinates.clone();
+        int[] lowest = rooms.get(0).getCoordinates();
+        int[] highest = rooms.get(0).getCoordinates();
+
         for (MazeRoom room : rooms)
         {
-            for (int i = 0; i < room.coordinates.length; i++)
+            int[] coordinates = room.getCoordinates();
+            for (int i = 0; i < coordinates.length; i++)
             {
-                if (room.coordinates[i] < lowest[i])
-                {
-                    lowest[i] = room.coordinates[i];
-                }
-                else if (room.coordinates[i] > highest[i])
-                {
-                    highest[i] = room.coordinates[i];
-                }
+                if (coordinates[i] < lowest[i])
+                    lowest[i] = coordinates[i];
+                else if (coordinates[i] > highest[i])
+                    highest[i] = coordinates[i];
             }
         }
 
         int[] size = IvVecMathHelper.sub(highest, lowest);
         for (int i = 0; i < size.length; i++)
-        {
             size[i]++;
-        }
 
         return size;
     }
@@ -152,7 +148,7 @@ public class MazeComponent implements WeightedSelector.Item, NBTCompoundObject
             @Override
             public MazePath apply(@Nullable NBTTagCompound input)
             {
-                return NBTTagCompounds.read(compound, MazePath.class);
+                return new MazePath(compound);
             }
         }));
     }
@@ -175,7 +171,7 @@ public class MazeComponent implements WeightedSelector.Item, NBTCompoundObject
             @Override
             public int[] apply(@Nullable MazeRoom input)
             {
-                return input.coordinates;
+                return input.getCoordinates();
             }
         })));
 
@@ -185,7 +181,7 @@ public class MazeComponent implements WeightedSelector.Item, NBTCompoundObject
             @Override
             public NBTTagCompound apply(@Nullable MazePath input)
             {
-                return NBTTagCompounds.write(input);
+                return input.storeInNBT();
             }
         })));
     }

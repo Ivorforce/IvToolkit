@@ -20,51 +20,66 @@ import ivorius.ivtoolkit.math.IvVecMathHelper;
 import ivorius.ivtoolkit.tools.NBTCompoundObject;
 import net.minecraft.nbt.NBTTagCompound;
 
+import javax.annotation.Nonnull;
+
 /**
  * Created by lukas on 23.06.14.
  */
-public class MazePath implements MazeCoordinate, Cloneable, NBTCompoundObject
+public class MazePath implements MazeCoordinate
 {
-    public MazeRoom sourceRoom;
-    public int pathDimension;
-    public boolean pathGoesUp;
+    @Nonnull
+    private final MazeRoom sourceRoom;
+    private final int pathDimension;
 
-    public MazePath()
-    {
-    }
+    private MazeRoom destRoomCache;
 
-    public MazePath(MazeRoom sourceRoom, int pathDimension, boolean pathGoesUp)
+    public MazePath(int pathDimension, @Nonnull MazeRoom sourceRoom)
     {
         this.sourceRoom = sourceRoom;
         this.pathDimension = pathDimension;
-        this.pathGoesUp = pathGoesUp;
     }
 
-    public MazePath(int pathDimension, boolean pathGoesUp, int... roomCoordinates)
+    public MazePath(int pathDimension, @Nonnull int... roomCoordinates)
     {
-        this(new MazeRoom(roomCoordinates), pathDimension, pathGoesUp);
+        this(pathDimension, new MazeRoom(roomCoordinates.clone()));
     }
 
-    public static MazePath pathFromSourceAndDest(MazeRoom source, MazeRoom dest)
+    public MazePath(NBTTagCompound compound)
     {
-        for (int i = 0; i < source.coordinates.length; i++)
+        sourceRoom = new MazeRoom(compound.getIntArray("source"));
+        pathDimension = compound.getInteger("pathDimension");
+    }
+
+    public static MazePath fromRoom(int pathDimension, MazeRoom sourceRoom, boolean pathGoesUp)
+    {
+        return new MazePath(pathDimension, pathGoesUp ? sourceRoom : sourceRoom.subInDimension(pathDimension, 1));
+    }
+
+    public static MazePath fromConnection(MazeRoom source, MazeRoom dest)
+    {
+        return fromConnection(source.getCoordinates(), dest.getCoordinates());
+    }
+
+    public static MazePath fromConnection(int[] source, int[] dest)
+    {
+        for (int i = 0; i < source.length; i++)
         {
-            if (source.coordinates[i] != dest.coordinates[i])
-                return new MazePath(source, i, source.coordinates[i] < dest.coordinates[i]);
+            if (source[i] != dest[i])
+                return new MazePath(i, source[i] < dest[i] ? source : dest);
         }
 
         return null;
     }
 
-    public MazePath invertPath()
+    public int getPathDimension()
     {
-        return new MazePath(getDestinationRoom(), pathDimension, !pathGoesUp);
+        return pathDimension;
     }
 
     public int[] getPathDirection()
     {
-        int[] direction = new int[sourceRoom.coordinates.length];
-        direction[pathDimension] = pathGoesUp ? 1 : -1;
+        int[] direction = new int[sourceRoom.getDimensions()];
+        direction[pathDimension] = 1;
         return direction;
     }
 
@@ -75,41 +90,30 @@ public class MazePath implements MazeCoordinate, Cloneable, NBTCompoundObject
 
     public MazeRoom getDestinationRoom()
     {
-        return new MazeRoom(IvVecMathHelper.add(sourceRoom.getCoordinates(), getPathDirection()));
+        return destRoomCache != null
+            ? destRoomCache
+            : (destRoomCache = sourceRoom.addInDimension(pathDimension, 1));
     }
 
     public MazePath add(MazeRoom room)
     {
-        return new MazePath(sourceRoom.add(room), pathDimension, pathGoesUp);
+        return new MazePath(pathDimension, sourceRoom.add(room));
     }
 
     public MazePath sub(MazeRoom room)
     {
-        return new MazePath(sourceRoom.sub(room), pathDimension, pathGoesUp);
-    }
-
-    @Override
-    protected MazePath clone()
-    {
-        return new MazePath(sourceRoom.clone(), pathDimension, pathGoesUp);
+        return new MazePath(pathDimension, sourceRoom.sub(room));
     }
 
     @Override
     public boolean equals(Object o)
     {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         MazePath mazePath = (MazePath) o;
 
-        return pathDimension == mazePath.pathDimension
-                && pathGoesUp == mazePath.pathGoesUp ? sourceRoom.equals(mazePath.sourceRoom) : invertPath().sourceRoom.equals(mazePath.sourceRoom);
+        return pathDimension == mazePath.pathDimension && sourceRoom.equals(mazePath.sourceRoom);
     }
 
     @Override
@@ -117,37 +121,28 @@ public class MazePath implements MazeCoordinate, Cloneable, NBTCompoundObject
     {
         int result = sourceRoom.hashCode();
         result = 31 * result + pathDimension;
-        result = 31 * result + (pathGoesUp ? 1 : 0);
         return result;
     }
 
     @Override
     public String toString()
     {
-        return String.format("%s -> %sd%d", getSourceRoom(), pathGoesUp ? "+" : "-", pathDimension);
+        return String.format("%s <-> %s", getSourceRoom(), getDestinationRoom());
     }
 
     @Override
     public int[] getMazeCoordinates()
     {
         int[] coords = sourceRoom.getMazeCoordinates();
-        coords[pathDimension] += pathGoesUp ? 1 : -1;
+        coords[pathDimension] += 1;
         return coords;
     }
 
-    @Override
-    public void readFromNBT(NBTTagCompound compound)
+    public NBTTagCompound storeInNBT()
     {
-        sourceRoom = new MazeRoom(compound.getCompoundTag("source"));
-        pathDimension = compound.getInteger("pathDimension");
-        pathGoesUp = compound.getBoolean("pathGoesUp");
-    }
-
-    @Override
-    public void writeToNBT(NBTTagCompound compound)
-    {
-        compound.setTag("source", sourceRoom.writeToNBT());
+        NBTTagCompound compound = new NBTTagCompound();
+        compound.setIntArray("source", sourceRoom.getCoordinates());
         compound.setInteger("pathDimension", pathDimension);
-        compound.setBoolean("pathGoesUp", pathGoesUp);
+        return compound;
     }
 }

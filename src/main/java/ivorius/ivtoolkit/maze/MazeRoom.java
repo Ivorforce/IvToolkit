@@ -18,24 +18,32 @@ package ivorius.ivtoolkit.maze;
 
 import ivorius.ivtoolkit.math.IvVecMathHelper;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagIntArray;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 
 /**
  * Created by lukas on 23.06.14.
  */
-public class MazeRoom implements MazeCoordinate, Cloneable
+public class MazeRoom implements MazeCoordinate
 {
-    public final int[] coordinates;
+    @Nonnull
+    private final int[] coordinates;
 
-    public MazeRoom(int... coordinates)
+    public MazeRoom(@Nonnull int... coordinates)
     {
-        this.coordinates = coordinates;
+        this.coordinates = coordinates.clone();
     }
 
     public MazeRoom(NBTTagCompound compound)
     {
         coordinates = compound.getIntArray("coordinates");
+    }
+
+    public MazeRoom(NBTTagIntArray intArray)
+    {
+        coordinates = intArray.func_150302_c().clone();
     }
 
     public int getDimensions()
@@ -45,7 +53,7 @@ public class MazeRoom implements MazeCoordinate, Cloneable
 
     public int[] getCoordinates()
     {
-        return coordinates;
+        return coordinates.clone();
     }
 
     public MazeRoom add(MazeRoom room)
@@ -53,31 +61,37 @@ public class MazeRoom implements MazeCoordinate, Cloneable
         return new MazeRoom(IvVecMathHelper.add(coordinates, room.coordinates));
     }
 
+    public MazeRoom addInDimension(int dimension, int count)
+    {
+        coordinates[dimension] += count;
+        MazeRoom room = new MazeRoom(coordinates);
+        coordinates[dimension] -= count; // Works because was copied
+        return room;
+    }
+
     public MazeRoom sub(MazeRoom room)
     {
         return new MazeRoom(IvVecMathHelper.sub(coordinates, room.coordinates));
     }
 
+    public MazeRoom subInDimension(int dimension, int count)
+    {
+        coordinates[dimension] -= count;
+        MazeRoom room = new MazeRoom(coordinates);
+        coordinates[dimension] += count; // Works because was copied
+        return room;
+    }
+
     @Override
     public boolean equals(Object o)
     {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         MazeRoom mazeRoom = (MazeRoom) o;
 
-        if (!Arrays.equals(coordinates, mazeRoom.coordinates))
-        {
-            return false;
-        }
+        return Arrays.equals(coordinates, mazeRoom.coordinates);
 
-        return true;
     }
 
     @Override
@@ -93,27 +107,16 @@ public class MazeRoom implements MazeCoordinate, Cloneable
     }
 
     @Override
-    public MazeRoom clone()
-    {
-        return new MazeRoom(coordinates.clone());
-    }
-
-    @Override
     public int[] getMazeCoordinates()
     {
         int[] coords = new int[coordinates.length];
         for (int i = 0; i < coords.length; i++)
-        {
             coords[i] = coordinates[i] * 2 + 1;
-        }
-
         return coords;
     }
 
-    public NBTTagCompound writeToNBT()
+    public NBTTagIntArray storeInNBT()
     {
-        NBTTagCompound compound = new NBTTagCompound();
-        compound.setIntArray("coordinates", coordinates);
-        return compound;
+        return new NBTTagIntArray(getMazeCoordinates());
     }
 }
