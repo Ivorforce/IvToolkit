@@ -21,10 +21,9 @@ import com.google.common.collect.Lists;
 import ivorius.ivtoolkit.math.IvVecMathHelper;
 import ivorius.ivtoolkit.random.WeightedSelector;
 import ivorius.ivtoolkit.tools.NBTCompoundObject;
-import ivorius.ivtoolkit.tools.NBTTagCompounds;
+import ivorius.ivtoolkit.tools.NBTCompoundObjects;
 import ivorius.ivtoolkit.tools.NBTTagLists;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.WeightedRandom;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -131,7 +130,7 @@ public class MazeComponent implements WeightedSelector.Item, NBTCompoundObject
         weight = compound.getDouble("weight");
 
         rooms.clear();
-        rooms.addAll(Lists.transform(NBTTagLists.intArrays(compound, "rooms"), new Function<int[], MazeRoom>()
+        rooms.addAll(Lists.transform(NBTTagLists.intArraysFrom(compound, "rooms"), new Function<int[], MazeRoom>()
         {
             @Nullable
             @Override
@@ -142,7 +141,7 @@ public class MazeComponent implements WeightedSelector.Item, NBTCompoundObject
         }));
 
         exitPaths.clear();
-        exitPaths.addAll(Lists.transform(NBTTagLists.compounds(compound, "exitPaths"), new Function<NBTTagCompound, MazePath>()
+        exitPaths.addAll(Lists.transform(NBTTagLists.compoundsFrom(compound, "exitPaths"), new Function<NBTTagCompound, MazePath>()
         {
             @Nullable
             @Override
@@ -155,17 +154,17 @@ public class MazeComponent implements WeightedSelector.Item, NBTCompoundObject
 
     public void readIdentifier(Class<? extends NBTCompoundObject> iClass)
     {
-        identifier = NBTTagCompounds.read(identifierCompound, iClass);
+        identifier = NBTCompoundObjects.read(identifierCompound, iClass);
         identifierCompound = null;
     }
 
     @Override
     public void writeToNBT(NBTTagCompound compound)
     {
-        compound.setTag("identifier", NBTTagCompounds.write(identifier));
+        compound.setTag("identifier", NBTCompoundObjects.write(identifier));
         compound.setDouble("weight", weight);
 
-        compound.setTag("rooms", NBTTagLists.storeIntArrays(Lists.transform(rooms, new Function<MazeRoom, int[]>()
+        compound.setTag("rooms", NBTTagLists.writeIntArrays(Lists.transform(rooms, new Function<MazeRoom, int[]>()
         {
             @Nullable
             @Override
@@ -175,7 +174,7 @@ public class MazeComponent implements WeightedSelector.Item, NBTCompoundObject
             }
         })));
 
-        compound.setTag("exitPaths", NBTTagLists.storeCompounds(Lists.transform(exitPaths, new Function<MazePath, NBTTagCompound>()
+        compound.setTag("exitPaths", NBTTagLists.writeCompounds(Lists.transform(exitPaths, new Function<MazePath, NBTTagCompound>()
         {
             @Nullable
             @Override

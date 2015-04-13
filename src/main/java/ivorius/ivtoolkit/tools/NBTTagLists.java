@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class NBTTagLists
 {
-    public static List<NBTTagCompound> compounds(NBTTagCompound compound, String key)
+    public static List<NBTTagCompound> compoundsFrom(NBTTagCompound compound, String key)
     {
         return compounds(compound.getTagList(key, Constants.NBT.TAG_COMPOUND));
     }
@@ -49,7 +49,12 @@ public class NBTTagLists
         });
     }
 
-    public static NBTTagList storeCompounds(List<NBTTagCompound> list)
+    public static void writeCompoundsTo(NBTTagCompound compound, String key, List<NBTTagCompound> list)
+    {
+        compound.setTag(key, writeCompounds(list));
+    }
+
+    public static NBTTagList writeCompounds(List<NBTTagCompound> list)
     {
         NBTTagList tagList = new NBTTagList();
         for (NBTTagCompound compound : list)
@@ -57,7 +62,7 @@ public class NBTTagLists
         return tagList;
     }
 
-    public static List<int[]> intArrays(NBTTagCompound compound, String key)
+    public static List<int[]> intArraysFrom(NBTTagCompound compound, String key)
     {
         return intArrays(compound.getTagList(key, Constants.NBT.TAG_INT_ARRAY));
     }
@@ -75,7 +80,12 @@ public class NBTTagLists
         });
     }
 
-    public static NBTTagList storeIntArrays(List<int[]> list)
+    public static void writeIntArraysTo(NBTTagCompound compound, String key, List<int[]> list)
+    {
+        compound.setTag(key, writeIntArrays(list));
+    }
+
+    public static NBTTagList writeIntArrays(List<int[]> list)
     {
         NBTTagList tagList = new NBTTagList();
         for (int[] array : list)

@@ -16,20 +16,57 @@
 
 package ivorius.ivtoolkit.tools;
 
+import com.google.common.base.Function;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by lukas on 30.03.15.
  */
-public class NBTTagCompounds
+public class NBTCompoundObjects
 {
-    public static NBTTagList write(Iterable<? extends NBTCompoundObject> objects)
+    public static <T extends NBTCompoundObject> Function<NBTTagCompound, T> readFunction(final Class<T> tClass)
+    {
+        return new Function<NBTTagCompound, T>()
+        {
+            @Nullable
+            @Override
+            public T apply(NBTTagCompound input)
+            {
+                return read(input, tClass);
+            }
+        };
+    }
+
+    public static Function<? extends NBTCompoundObject, NBTTagCompound> writeFunction()
+    {
+        return new Function<NBTCompoundObject, NBTTagCompound>()
+        {
+            @Nullable
+            @Override
+            public NBTTagCompound apply(@Nullable NBTCompoundObject input)
+            {
+                return write(input);
+            }
+        };
+    }
+
+    public static void writeListTo(NBTTagCompound compound, String key, Iterable<? extends NBTCompoundObject> objects)
+    {
+        compound.setTag(key, writeList(objects));
+    }
+
+    public static <T extends NBTCompoundObject> List<T> readListFrom(NBTTagCompound compound, String key, Class<T> tClass)
+    {
+        return readList(compound.getTagList(key, Constants.NBT.TAG_COMPOUND), tClass);
+    }
+
+    public static NBTTagList writeList(Iterable<? extends NBTCompoundObject> objects)
     {
         NBTTagList tagList = new NBTTagList();
         for (NBTCompoundObject object : objects)
@@ -41,12 +78,7 @@ public class NBTTagCompounds
         return tagList;
     }
 
-    public static <T extends NBTCompoundObject> List<T> readFrom(NBTTagCompound compound, String key, Class<T> tClass)
-    {
-        return read(compound.getTagList(key, Constants.NBT.TAG_COMPOUND), tClass);
-    }
-
-    public static <T extends NBTCompoundObject> List<T> read(NBTTagList list, Class<T> tClass)
+    public static <T extends NBTCompoundObject> List<T> readList(NBTTagList list, Class<T> tClass)
     {
         List<T> rList = new ArrayList<>(list.tagCount());
 

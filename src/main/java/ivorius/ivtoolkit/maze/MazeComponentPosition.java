@@ -20,9 +20,8 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import ivorius.ivtoolkit.random.WeightedSelector;
 import ivorius.ivtoolkit.tools.NBTCompoundObject;
-import ivorius.ivtoolkit.tools.NBTTagCompounds;
+import ivorius.ivtoolkit.tools.NBTCompoundObjects;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.WeightedRandom;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -90,14 +89,14 @@ public class MazeComponentPosition implements WeightedSelector.Item, NBTCompound
     @Override
     public void readFromNBT(NBTTagCompound compound)
     {
-        component = NBTTagCompounds.read(compound.getCompoundTag("component"), MazeComponent.class);
+        component = NBTCompoundObjects.read(compound.getCompoundTag("component"), MazeComponent.class);
         positionInMaze = new MazeRoom(compound.getIntArray("positionInMaze"));
     }
 
     @Override
     public void writeToNBT(NBTTagCompound compound)
     {
-        compound.setTag("component", NBTTagCompounds.write(component));
+        compound.setTag("component", NBTCompoundObjects.write(component));
         compound.setIntArray("positionInMaze", positionInMaze.getCoordinates());
     }
 }
