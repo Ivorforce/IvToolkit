@@ -56,6 +56,11 @@ public class MazeRoom implements MazeCoordinate
         return coordinates.clone();
     }
 
+    public int getCoordinate(int index)
+    {
+        return coordinates[index];
+    }
+
     public MazeRoom add(MazeRoom room)
     {
         return new MazeRoom(IvVecMathHelper.add(coordinates, room.coordinates));
