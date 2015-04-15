@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Lukas Tenbrink
+ * Copyright 2015 Lukas Tenbrink
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,10 +14,9 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit.maze;
+package ivorius.ivtoolkit.maze.components;
 
 import ivorius.ivtoolkit.math.IvVecMathHelper;
-import ivorius.ivtoolkit.maze.classic.MazeCoordinate;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagIntArray;
 
@@ -27,7 +26,7 @@ import java.util.Arrays;
 /**
  * Created by lukas on 23.06.14.
  */
-public class MazeRoom implements MazeCoordinate
+public class MazeRoom
 {
     @Nonnull
     private final int[] coordinates;
@@ -112,17 +111,8 @@ public class MazeRoom implements MazeCoordinate
         return Arrays.toString(coordinates);
     }
 
-    @Override
-    public int[] getMazeCoordinates()
-    {
-        int[] coords = new int[coordinates.length];
-        for (int i = 0; i < coords.length; i++)
-            coords[i] = coordinates[i] * 2 + 1;
-        return coords;
-    }
-
     public NBTTagIntArray storeInNBT()
     {
-        return new NBTTagIntArray(getMazeCoordinates());
+        return new NBTTagIntArray(coordinates);
     }
 }

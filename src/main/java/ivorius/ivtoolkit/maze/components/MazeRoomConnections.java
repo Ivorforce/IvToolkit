@@ -16,15 +16,16 @@
 
 package ivorius.ivtoolkit.maze.components;
 
-import java.util.Map;
-import java.util.Set;
+import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
 
 /**
- * Created by lukas on 15.04.15.
+ * Created by lukas on 16.04.15.
  */
-public interface MazeComponent<C>
+public class MazeRoomConnections
 {
-    Set<MazeRoom> rooms();
-
-    Map<MazeRoomConnection, C> exits();
+    public MazeRoomConnection rotated(MazeRoomConnection connection, AxisAlignedTransform2D transform, int[] size)
+    {
+        return new MazeRoomConnection(MazeRooms.rotated(connection.getLeft(), transform, size),
+                MazeRooms.rotated(connection.getRight(), transform, size));
+    }
 }

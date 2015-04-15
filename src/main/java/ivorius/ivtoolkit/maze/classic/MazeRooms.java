@@ -17,7 +17,6 @@
 package ivorius.ivtoolkit.maze.classic;
 
 import com.google.common.base.Function;
-import ivorius.ivtoolkit.maze.MazeRoom;
 import net.minecraft.nbt.NBTTagIntArray;
 
 import javax.annotation.Nullable;

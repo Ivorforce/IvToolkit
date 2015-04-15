@@ -17,7 +17,6 @@
 package ivorius.ivtoolkit.maze.components;
 
 import com.google.common.base.Predicate;
-import ivorius.ivtoolkit.maze.MazeRoom;
 
 /**
  * Created by lukas on 15.04.15.

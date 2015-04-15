@@ -20,7 +20,6 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.*;
 import ivorius.ivtoolkit.IvToolkitCoreContainer;
-import ivorius.ivtoolkit.maze.MazeRoom;
 import ivorius.ivtoolkit.random.WeightedSelector;
 
 import javax.annotation.Nullable;

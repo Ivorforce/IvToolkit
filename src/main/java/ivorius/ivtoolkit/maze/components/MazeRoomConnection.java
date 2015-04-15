@@ -16,7 +16,6 @@
 
 package ivorius.ivtoolkit.maze.components;
 
-import ivorius.ivtoolkit.maze.MazeRoom;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Objects;

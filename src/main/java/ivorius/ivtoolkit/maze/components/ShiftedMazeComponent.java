@@ -16,8 +16,6 @@
 
 package ivorius.ivtoolkit.maze.components;
 
-import ivorius.ivtoolkit.maze.MazeRoom;
-
 import java.util.*;
 
 /**

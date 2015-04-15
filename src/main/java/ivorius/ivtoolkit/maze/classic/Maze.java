@@ -16,7 +16,6 @@
 
 package ivorius.ivtoolkit.maze.classic;
 
-import ivorius.ivtoolkit.maze.MazeRoom;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Array;

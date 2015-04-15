@@ -16,7 +16,6 @@
 
 package ivorius.ivtoolkit.maze.classic;
 
-import ivorius.ivtoolkit.maze.MazeRoom;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nonnull;

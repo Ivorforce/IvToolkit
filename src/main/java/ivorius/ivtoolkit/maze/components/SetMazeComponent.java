@@ -18,7 +18,6 @@ package ivorius.ivtoolkit.maze.components;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Maps;
-import ivorius.ivtoolkit.maze.MazeRoom;
 
 import java.util.*;
 

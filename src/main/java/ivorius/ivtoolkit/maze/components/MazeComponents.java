@@ -21,7 +21,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import ivorius.ivtoolkit.maze.MazeRoom;
 
 import javax.annotation.Nullable;
 

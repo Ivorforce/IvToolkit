@@ -16,15 +16,18 @@
 
 package ivorius.ivtoolkit.maze.components;
 
-import java.util.Map;
-import java.util.Set;
+import ivorius.ivtoolkit.blocks.BlockCoord;
+import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
 
 /**
- * Created by lukas on 15.04.15.
+ * Created by lukas on 23.06.14.
  */
-public interface MazeComponent<C>
+public class MazeRooms
 {
-    Set<MazeRoom> rooms();
-
-    Map<MazeRoomConnection, C> exits();
+    public static MazeRoom rotated(MazeRoom room, AxisAlignedTransform2D transform, int[] size)
+    {
+        int[] roomPosition = room.getCoordinates();
+        BlockCoord transformedRoom = transform.apply(new BlockCoord(roomPosition[0], roomPosition[1], roomPosition[2]), size);
+        return new MazeRoom(transformedRoom.x, transformedRoom.y, transformedRoom.z);
+    }
 }
