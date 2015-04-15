@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Lukas Tenbrink
+ * Copyright 2015 Lukas Tenbrink
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package ivorius.ivtoolkit.maze;
 
+import com.google.common.collect.Lists;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
 import ivorius.ivtoolkit.random.WeightedSelector;
 
@@ -23,41 +24,43 @@ import java.util.*;
 
 public class MazeGenerator
 {
-    public static void generateStartPathsForEnclosedMaze(Maze maze, Iterable<MazePath> startPoints, Iterable<MazeRoom> blockedRooms, AxisAlignedTransform2D transform)
+    public static <T> void blockRoomAndExits(Maze<T> maze, MazeRoom coordinate, T room, T blockedPath)
+    {
+        maze.set(room, coordinate);
+
+        for (MazePath neighbor : MazeCoordinates.getNeighborPaths(coordinate))
+            maze.replace(maze.nullValue, blockedPath, neighbor);
+    }
+
+    public static <T> void generateStartPathsForEnclosedMaze(Maze<T> maze, Iterable<MazePath> startPoints, Iterable<MazeRoom> blockedRooms, AxisAlignedTransform2D transform, T path, T room, T blockedPath)
     {
         int[] mazeSizeInRooms = new int[maze.dimensions.length];
         for (int i = 0; i < mazeSizeInRooms.length; i++)
             mazeSizeInRooms[i] = (maze.dimensions[i] - 1) / 2;
 
-        for (MazePath path : maze.allPaths())
+        for (MazePath exitPath : maze.allPaths())
         {
-            if (maze.isPathPointingOutside(path))
-                maze.set(Maze.WALL, path);
+            if (maze.isPathPointingOutside(exitPath))
+                maze.set(blockedPath, exitPath);
         }
 
         for (MazeRoom blockedRoom : blockedRooms)
         {
             blockedRoom = MazeCoordinates.rotatedRoom(blockedRoom, transform, mazeSizeInRooms);
-
-            maze.set(Maze.WALL, blockedRoom);
-            for (int dim = 0; dim < maze.dimensions.length; dim++)
-            {
-                maze.set(Maze.WALL, MazePath.fromRoom(dim, blockedRoom, true));
-                maze.set(Maze.WALL, MazePath.fromRoom(dim, blockedRoom, false));
-            }
+            blockRoomAndExits(maze, blockedRoom, room, blockedPath);
         }
 
         for (MazePath startPoint : startPoints)
-            maze.set(Maze.ROOM, MazeCoordinates.rotatedPath(startPoint, transform, mazeSizeInRooms));
+            maze.set(path, MazeCoordinates.rotatedPath(startPoint, transform, mazeSizeInRooms));
     }
 
-    public static MazePath randomEmptyPathInMaze(Random rand, Maze maze, Collection<Integer> applicableDimensions)
+    public static <T> MazePath randomEmptyPathInMaze(Random rand, Maze<T> maze, Collection<Integer> applicableDimensions)
     {
-        List<MazePath> paths = new ArrayList<>(maze.allPaths());
+        List<MazePath> paths = Lists.newArrayList(maze.allPaths());
         for (Iterator<MazePath> iterator = paths.iterator(); iterator.hasNext(); )
         {
             MazePath path = iterator.next();
-            if (maze.get(path) != Maze.NULL || !applicableDimensions.contains(path.getPathDimension()))
+            if (!maze.isNull(maze.get(path)) || !applicableDimensions.contains(path.getPathDimension()))
                 iterator.remove();
         }
 
@@ -99,92 +102,4 @@ public class MazeGenerator
 
         return MazeCoordinates.coordToPath(new MazeCoordinateDirect(pathCoord), usedDimension);
     }
-
-    public static void generatePaths(Random rand, Maze maze, int[] pathWeights, MazeRoom startPoint)
-    {
-        for (int i = 0; i < maze.dimensions.length; i++)
-            if (maze.dimensions[i] < 3)
-                return;
-
-        MazeRoom position = startPoint;
-        maze.set(Maze.ROOM, position);
-
-        Stack<MazeRoom> positionStack = new Stack<>();
-
-        ArrayList<MazePath> validRoomNeighbors = new ArrayList<>();
-
-        while (true)
-        {
-            validRoomNeighbors.clear();
-
-            for (MazePath neighbor : MazeCoordinates.getNeighborPaths(position))
-            {
-                if (maze.get(neighbor.getDestinationRoom()) == Maze.NULL)
-                {
-                    for (int n = 0; n < pathWeights[neighbor.getPathDimension()]; n++)
-                        validRoomNeighbors.add(neighbor);
-                }
-            }
-
-            if (validRoomNeighbors.size() == 0)
-            {
-                if (positionStack.empty())
-                    break;
-
-                position = positionStack.pop();
-
-                continue;
-            }
-
-            positionStack.push(position);
-
-            MazePath usedPath = validRoomNeighbors.get(rand.nextInt(validRoomNeighbors.size()));
-            MazeRoom destRoom = usedPath.getDestinationRoom();
-
-            maze.set(Maze.ROOM, usedPath);
-            maze.set(Maze.ROOM, destRoom);
-
-            MazePath[] neighbors = MazeCoordinates.getNeighborPaths(position);
-            for (MazePath neighbor : neighbors)
-            {
-                if (maze.get(neighbor) == Maze.NULL)
-                {
-                    maze.set(Maze.WALL, neighbor);
-                }
-            }
-
-            position = destRoom;
-        }
-
-        for (int i = 0; i < maze.blocks.length; i++)
-            if (maze.blocks[i] == Maze.INVALID || maze.blocks[i] == Maze.NULL)
-                maze.blocks[i] = Maze.WALL; //Should not happen. Potentially.
-    }
-
-    @Deprecated
-    public static void addRandomPaths(Maze maze, int paths, Random rand)
-    {
-        for (int i = 0; i < maze.dimensions.length; i++)
-            if ((maze.dimensions[i] - 2) / 2 <= 0)
-                return;
-
-        int[] distFromOutside = new int[maze.dimensions.length];
-        for (; paths > 0; paths--)
-        {
-            MazePath position = randomPathInMaze(rand, maze, distFromOutside);
-            maze.set(Maze.ROOM, position);
-        }
-    }
-
-    @Deprecated
-    public static void generateStartPathsForEnclosedMaze(Maze maze, MazePath... startPoints)
-    {
-        for (MazePath path : maze.allPaths())
-            if (maze.isPathPointingOutside(path))
-                maze.set(Maze.WALL, path);
-
-        for (MazePath startPoint : startPoints)
-            maze.set(Maze.ROOM, startPoint);
-    }
-
 }

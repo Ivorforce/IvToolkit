@@ -20,23 +20,25 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
-public class Maze
+public class Maze<T>
 {
-    public static final byte NULL = 0;
-    public static final byte INVALID = 1;
-    public static final byte WALL = 2;
-    public static final byte ROOM = 3;
 
     public final int[] dimensions;
-    public final byte[] blocks;
+    public final T[] blocks;
+
+    public final T invalidValue;
+    public final T nullValue;
 
     private List<MazeRoom> cachedRooms;
     private List<MazePath> cachedPaths;
 
-    public Maze(int... dimensions)
+    public Maze(Class<T> tClass, T invalidValue, T nullValue, int... dimensions)
     {
         int fullLength = 1;
         for (int dimension : dimensions)
@@ -47,8 +49,14 @@ public class Maze
             fullLength *= dimension;
         }
 
+        this.invalidValue = invalidValue;
+        this.nullValue = null;
+
         this.dimensions = dimensions;
-        this.blocks = new byte[fullLength];
+
+        this.blocks = (T[]) Array.newInstance(tClass, fullLength);
+        if (nullValue != null)
+            Arrays.fill(blocks, nullValue);
     }
 
     public boolean contains(MazeCoordinate coordinate)
@@ -64,25 +72,40 @@ public class Maze
         return true;
     }
 
-    public byte get(MazeCoordinate coordinate)
+    public T get(MazeCoordinate coordinate)
     {
-        return contains(coordinate) ? blocks[getArrayPosition(coordinate.getMazeCoordinates())] : Maze.INVALID;
+        return contains(coordinate) ? blocks[getArrayPosition(coordinate.getMazeCoordinates())] : invalidValue;
     }
 
-    public void set(byte val, MazeCoordinate coordinates)
+    public void set(T val, MazeCoordinate coordinates)
     {
         if (contains(coordinates))
             blocks[getArrayPosition(coordinates.getMazeCoordinates())] = val;
     }
 
-    public void replace(byte condition, byte val, MazeCoordinate coordinates)
+    public void replace(T condition, T val, MazeCoordinate coordinates)
     {
         if (contains(coordinates))
         {
             int arrayPosition = getArrayPosition(coordinates.getMazeCoordinates());
-            if (blocks[arrayPosition] == condition)
+            if (Objects.equals(blocks[arrayPosition], condition))
                 blocks[arrayPosition] = val;
         }
+    }
+
+    public boolean isInvalid(T value)
+    {
+        return Objects.equals(value, invalidValue);
+    }
+
+    public boolean isNull(T value)
+    {
+        return Objects.equals(value, nullValue);
+    }
+
+    public boolean isInvalidOrNull(T value)
+    {
+        return isNull(value) || isInvalid(value);
     }
 
     public static int[] getMazeSize(int size[], int pathLengths[], int roomSize[])
@@ -218,71 +241,72 @@ public class Maze
             {
                 layerPositionArray[dimension1] = x;
                 layerPositionArray[dimension2] = y;
-                byte type = this.blocks[getArrayPosition(layerPositionArray)];
+                T type = this.blocks[getArrayPosition(layerPositionArray)];
+                mazeString.append(type.toString());
 
-                switch (type)
-                {
-                    case WALL:
-                        mazeString.append("#");
-                        break;
-                    case INVALID:
-                        mazeString.append("*");
-                        break;
-                    case NULL:
-                        mazeString.append("+");
-                        break;
-                    case ROOM:
-                        if (this.dimensions.length > 2)
-                        {
-                            int curDominantDimension = -1;
-                            boolean dominantGoesUp = false;
-
-                            for (int refDim = 0; refDim < dimensions.length; refDim++)
-                            {
-                                if (refDim != dimension1 && refDim != dimension2)
-                                {
-                                    int[] abovePos = layerPositionArray.clone();
-                                    abovePos[refDim] += 1;
-                                    int[] belowPos = layerPositionArray.clone();
-                                    belowPos[refDim] -= 1;
-
-                                    byte above = get(new MazeCoordinateDirect(abovePos));
-                                    byte below = get(new MazeCoordinateDirect(belowPos));
-
-                                    if (above == ROOM || below == ROOM)
-                                    {
-                                        if (curDominantDimension >= 0 || above == below)
-                                        {
-                                            curDominantDimension = -2;
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            curDominantDimension = refDim;
-                                            dominantGoesUp = above == ROOM;
-                                        }
-                                    }
-                                }
-                            }
-
-                            switch (curDominantDimension)
-                            {
-                                case -2:
-                                    mazeString.append('?');
-                                    break;
-                                case -1:
-                                    mazeString.append(' ');
-                                    break;
-                                default:
-                                    mazeString.append((char) ((dominantGoesUp ? 'A' : 'a') + curDominantDimension));
-                                    break;
-                            }
-                        }
-                        break;
-                    default:
-                        mazeString.append(" ");
-                        break;
-                }
+//                switch (type)
+//                {
+//                    case WALL:
+//                        mazeString.append("#");
+//                        break;
+//                    case INVALID:
+//                        mazeString.append("*");
+//                        break;
+//                    case NULL:
+//                        mazeString.append("+");
+//                        break;
+//                    case ROOM:
+//                        if (this.dimensions.length > 2)
+//                        {
+//                            int curDominantDimension = -1;
+//                            boolean dominantGoesUp = false;
+//
+//                            for (int refDim = 0; refDim < dimensions.length; refDim++)
+//                            {
+//                                if (refDim != dimension1 && refDim != dimension2)
+//                                {
+//                                    int[] abovePos = layerPositionArray.clone();
+//                                    abovePos[refDim] += 1;
+//                                    int[] belowPos = layerPositionArray.clone();
+//                                    belowPos[refDim] -= 1;
+//
+//                                    byte above = get(new MazeCoordinateDirect(abovePos));
+//                                    byte below = get(new MazeCoordinateDirect(belowPos));
+//
+//                                    if (above == ROOM || below == ROOM)
+//                                    {
+//                                        if (curDominantDimension >= 0 || above == below)
+//                                        {
+//                                            curDominantDimension = -2;
+//                                            break;
+//                                        }
+//                                        else
+//                                        {
+//                                            curDominantDimension = refDim;
+//                                            dominantGoesUp = above == ROOM;
+//                                        }
+//                                    }
+//                                }
+//                            }
+//
+//                            switch (curDominantDimension)
+//                            {
+//                                case -2:
+//                                    mazeString.append('?');
+//                                    break;
+//                                case -1:
+//                                    mazeString.append(' ');
+//                                    break;
+//                                default:
+//                                    mazeString.append((char) ((dominantGoesUp ? 'A' : 'a') + curDominantDimension));
+//                                    break;
+//                            }
+//                        }
+//                        break;
+//                    default:
+//                        mazeString.append(" ");
+//                        break;
+//                }
             }
         }
 

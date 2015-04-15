@@ -19,6 +19,7 @@ package ivorius.ivtoolkit.maze;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
 import ivorius.ivtoolkit.random.WeightedSelector;
 
 import java.util.*;
@@ -28,7 +29,23 @@ import java.util.*;
  */
 public class MazeGeneratorWithComponents
 {
-    public static List<MazeComponentPosition> generatePaths(Random rand, final Maze maze, List<MazeComponent> mazeComponents)
+    private static final Entry INVALID = new Entry();
+
+    private static final BlockedPath BLOCKED_PATH = new BlockedPath();
+    private static final Room ROOM = new Room();
+    private static final Path PATH = new Path();
+
+    public static Maze<Entry> initialize(int... dimensions)
+    {
+        return new Maze<>(Entry.class, INVALID, null, dimensions);
+    }
+
+    public static void generateStartPathsForEnclosedMaze(Maze<Entry> maze, Iterable<MazePath> startPoints, Iterable<MazeRoom> blockedRooms, AxisAlignedTransform2D transform)
+    {
+        MazeGenerator.generateStartPathsForEnclosedMaze(maze, startPoints, blockedRooms, transform, PATH, ROOM, BLOCKED_PATH);
+    }
+
+    public static List<MazeComponentPosition> generatePaths(Random rand, final Maze<Entry> maze, List<MazeComponent> mazeComponents)
     {
         List<MazeComponentPosition> positions = new ArrayList<>();
 
@@ -37,7 +54,7 @@ public class MazeGeneratorWithComponents
         // Gather needed start points
         for (MazePath path : maze.allPaths())
         {
-            if (maze.get(path) == Maze.ROOM)
+            if (maze.get(path) instanceof Path)
             {
                 positionStack.push(path.getSourceRoom());
                 positionStack.push(path.getDestinationRoom());
@@ -51,7 +68,7 @@ public class MazeGeneratorWithComponents
             MazeRoom position = positionStack.pop();
 
             // Has been filled while this was queued ?
-            if (maze.get(position) != Maze.NULL)
+            if (!maze.isNull(maze.get(position)))
                 continue;
 
             validComponents.clear();
@@ -74,7 +91,7 @@ public class MazeGeneratorWithComponents
                     @Override
                     public boolean apply(MazePath path)
                     {
-                        return maze.get(path) == Maze.ROOM;
+                        return maze.get(path) instanceof Path;
                     }
                 })));
 
@@ -86,29 +103,22 @@ public class MazeGeneratorWithComponents
                     : validComponents.get(rand.nextInt(validComponents.size()));
 
             for (MazeRoom roomInMaze : placedComponent.getRooms())
-            {
-                // Mark the room
-                maze.set(Maze.ROOM, roomInMaze);
-
-                // Prevent exits into the room
-                for (MazePath neighbor : MazeCoordinates.getNeighborPaths(roomInMaze))
-                    maze.replace(Maze.NULL, Maze.WALL, neighbor);
-            }
+                MazeGenerator.blockRoomAndExits(maze, roomInMaze, ROOM, BLOCKED_PATH);
 
             for (MazePath exitInMaze : placedComponent.getExitPaths())
             {
                 // Mark the exit's paths as to do
 
                 MazeRoom destRoom = exitInMaze.getDestinationRoom();
-                if (maze.get(destRoom) == Maze.NULL)
+                if (maze.isNull(maze.get(destRoom)))
                     positionStack.push(destRoom);
 
                 MazeRoom srcRoom = exitInMaze.getSourceRoom();
-                if (maze.get(srcRoom) == Maze.NULL)
+                if (maze.isNull(maze.get(srcRoom)))
                     positionStack.push(srcRoom);
 
                 // Mark the exit
-                maze.set(Maze.ROOM, exitInMaze);
+                maze.set(PATH, exitInMaze);
             }
 
             positions.add(placedComponent);
@@ -117,27 +127,47 @@ public class MazeGeneratorWithComponents
         return positions;
     }
 
-    public static boolean canComponentBePlaced(Maze maze, final MazeComponentPosition component)
+    public static boolean canComponentBePlaced(Maze<Entry> maze, final MazeComponentPosition component)
     {
         List<MazePath> exitsInMaze = Lists.newArrayList(component.getExitPaths());
 
         for (MazeRoom room : component.getRooms())
         {
             // Room already taken
-            if (maze.get(room) != Maze.NULL)
+            if (!maze.isNull(maze.get(room)))
                 return false;
 
             // Exit is expected where component has none
             for (MazePath roomNeighborPath : MazeCoordinates.getNeighborPaths(room))
-                if (maze.get(roomNeighborPath) == Maze.ROOM && !exitsInMaze.contains(roomNeighborPath))
+                if (maze.get(roomNeighborPath) instanceof Path && !exitsInMaze.contains(roomNeighborPath))
                     return false;
         }
 
         // No exit is expected where component has one
         for (MazePath exit : exitsInMaze)
-            if (maze.get(exit) == Maze.WALL)
+            if (maze.get(exit) instanceof BlockedPath)
                 return false;
 
         return true;
+    }
+
+    public static class Entry
+    {
+
+    }
+
+    public static class Path extends Entry
+    {
+
+    }
+
+    public static class Room extends Entry
+    {
+
+    }
+
+    public static class BlockedPath extends Entry
+    {
+
     }
 }
