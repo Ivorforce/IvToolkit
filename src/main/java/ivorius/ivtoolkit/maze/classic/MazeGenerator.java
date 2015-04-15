@@ -14,10 +14,11 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit.maze;
+package ivorius.ivtoolkit.maze.classic;
 
 import com.google.common.collect.Lists;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
+import ivorius.ivtoolkit.maze.MazeRoom;
 import ivorius.ivtoolkit.random.WeightedSelector;
 
 import java.util.*;

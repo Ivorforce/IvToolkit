@@ -33,7 +33,7 @@ public class WeightedSelector
         return totalWeight;
     }
 
-    public static <T> double totalWeight(Collection<T> items, final Function<T, Double> weightFunction)
+    public static <T> double totalWeight(Collection<T> items, final WeightFunction<T> weightFunction)
     {
         return totalWeight(SimpleItem.apply(items, weightFunction));
     }
@@ -42,6 +42,14 @@ public class WeightedSelector
     {
         for (Item item : items)
             if (item.getWeight() > 0)
+                return true;
+        return false;
+    }
+
+    public static <T> boolean canSelect(Collection<T> items, WeightFunction<T> weightFunction)
+    {
+        for (T item : items)
+            if (weightFunction.apply(item) > 0)
                 return true;
         return false;
     }
@@ -69,12 +77,12 @@ public class WeightedSelector
         return last;
     }
 
-    public static <T> T select(Random rand, Collection<T> items, final Function<T, Double> weightFunction)
+    public static <T> T select(Random rand, Collection<T> items, final WeightFunction<T> weightFunction)
     {
         return select(rand, SimpleItem.apply(items, weightFunction));
     }
 
-    public static <T> T select(Random rand, Collection<T> items, final Function<T, Double> weightFunction, double totalWeight)
+    public static <T> T select(Random rand, Collection<T> items, final WeightFunction<T> weightFunction, double totalWeight)
     {
         return select(rand, SimpleItem.apply(items, weightFunction), totalWeight);
     }
@@ -89,7 +97,7 @@ public class WeightedSelector
         return selectItem(rand, items, totalWeight).getItem();
     }
 
-    public static interface Item
+    public interface Item
     {
         double getWeight();
     }
@@ -110,7 +118,7 @@ public class WeightedSelector
             return new SimpleItem<>(weight, item);
         }
 
-        public static <T> Collection<SimpleItem<T>> apply(Collection<T> items, final Function<T, Double> weightFunction)
+        public static <T> Collection<SimpleItem<T>> apply(Collection<T> items, final WeightFunction<T> weightFunction)
         {
             return Collections2.transform(items, new Function<T, SimpleItem<T>>()
             {
@@ -167,6 +175,11 @@ public class WeightedSelector
                     ", item=" + item +
                     '}';
         }
+    }
+
+    public interface WeightFunction<T>
+    {
+        double apply(T item);
     }
 }
 

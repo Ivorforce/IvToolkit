@@ -14,9 +14,10 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit.maze;
+package ivorius.ivtoolkit.maze.classic;
 
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
+import ivorius.ivtoolkit.maze.MazeRoom;
 
 import java.util.*;
 

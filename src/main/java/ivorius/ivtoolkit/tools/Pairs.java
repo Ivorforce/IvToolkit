@@ -17,19 +17,53 @@
 package ivorius.ivtoolkit.tools;
 
 import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by lukas on 12.03.15.
  */
 public class Pairs
 {
+    public static <T> Iterable<T> both(Iterable<? extends Pair<T, T>> set)
+    {
+        return Sets.newHashSet(Iterables.concat(Iterables.transform(set, Pairs.<T>leftFunction()), Iterables.transform(set, Pairs.<T>rightFunction())));
+    }
+
+    public static <T> Function<Pair<T, T>, T> rightFunction()
+    {
+        return new Function<Pair<T, T>, T>()
+        {
+            @Nullable
+            @Override
+            public T apply(@Nullable Pair<T, T> input)
+            {
+                return input.getRight();
+            }
+        };
+    }
+
+    public static <T> Function<Pair<T, T>, T> leftFunction()
+    {
+        return new Function<Pair<T, T>, T>()
+        {
+            @Nullable
+            @Override
+            public T apply(@Nullable Pair<T, T> input)
+            {
+                return input.getLeft();
+            }
+        };
+    }
+
     public static <L, R> Iterable<Pair<L, R>> pairLeft(final L left, Iterable<R> right)
     {
         return Iterables.transform(right, new Function<R, Pair<L, R>>()
@@ -56,32 +90,21 @@ public class Pairs
         });
     }
 
-    public static <L, R> Iterable<Pair<L, R>> of(Iterable<L> left, Iterable<R> right)
+    public static <L, R> Iterable<Pair<L, R>> of(final Iterable<L> left, final Iterable<R> right)
     {
-        return new PairIterable<>(left, right);
+        return new FluentIterable<Pair<L, R>>()
+        {
+            @Override
+            public Iterator<Pair<L, R>> iterator()
+            {
+                return new PairIterator<>(left.iterator(), right.iterator());
+            }
+        };
     }
 
     public static <L, R> List<Pair<L, R>> of(List<L> left, List<R> right)
     {
         return new PairList<>(left, right);
-    }
-
-    protected static class PairIterable<L, R> implements Iterable<Pair<L, R>>
-    {
-        protected Iterable<L> left;
-        protected Iterable<R> right;
-
-        public PairIterable(Iterable<L> left, Iterable<R> right)
-        {
-            this.left = left;
-            this.right = right;
-        }
-
-        @Override
-        public Iterator<Pair<L, R>> iterator()
-        {
-            return new PairIterator<>(left.iterator(), right.iterator());
-        }
     }
 
     protected static class PairIterator<L, R> implements Iterator<Pair<L, R>>

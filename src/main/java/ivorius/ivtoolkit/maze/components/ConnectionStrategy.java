@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Lukas Tenbrink
+ * Copyright 2015 Lukas Tenbrink
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,12 +14,14 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit.maze;
+package ivorius.ivtoolkit.maze.components;
+
+import javax.annotation.Nullable;
 
 /**
- * Created by lukas on 23.06.14.
+ * Created by lukas on 15.04.15.
  */
-public interface MazeCoordinate
+public interface ConnectionStrategy<T>
 {
-    int[] getMazeCoordinates();
+    boolean connect(@Nullable T a, @Nullable T b);
 }

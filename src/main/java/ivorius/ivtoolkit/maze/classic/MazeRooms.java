@@ -14,10 +14,10 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit.maze;
+package ivorius.ivtoolkit.maze.classic;
 
 import com.google.common.base.Function;
-import net.minecraft.nbt.NBTTagCompound;
+import ivorius.ivtoolkit.maze.MazeRoom;
 import net.minecraft.nbt.NBTTagIntArray;
 
 import javax.annotation.Nullable;

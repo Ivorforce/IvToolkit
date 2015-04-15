@@ -14,10 +14,9 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit.maze;
+package ivorius.ivtoolkit.maze.classic;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import ivorius.ivtoolkit.maze.MazeRoom;
 import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Array;

@@ -17,6 +17,7 @@
 package ivorius.ivtoolkit.maze;
 
 import ivorius.ivtoolkit.math.IvVecMathHelper;
+import ivorius.ivtoolkit.maze.classic.MazeCoordinate;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagIntArray;
 
