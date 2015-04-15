@@ -16,6 +16,8 @@
 
 package ivorius.ivtoolkit.math;
 
+import gnu.trove.function.TDoubleFunction;
+import gnu.trove.function.TIntFunction;
 import net.minecraft.util.MathHelper;
 
 /**
@@ -169,12 +171,8 @@ public class IvVecMathHelper
     {
         int[] result = new int[vectors[0].length];
         for (int i = 0; i < result.length; i++)
-        {
             for (int[] vector : vectors)
-            {
                 result[i] += vector[i];
-            }
-        }
 
         return result;
     }
@@ -183,12 +181,8 @@ public class IvVecMathHelper
     {
         double[] result = new double[vectors[0].length];
         for (int i = 0; i < result.length; i++)
-        {
             for (double[] vector : vectors)
-            {
                 result[i] += vector[i];
-            }
-        }
 
         return result;
     }
@@ -197,12 +191,8 @@ public class IvVecMathHelper
     {
         int[] result = vector.clone();
         for (int i = 0; i < result.length; i++)
-        {
             for (int[] subVector : subVectors)
-            {
                 result[i] -= subVector[i];
-            }
-        }
 
         return result;
     }
@@ -211,12 +201,68 @@ public class IvVecMathHelper
     {
         double[] result = vector.clone();
         for (int i = 0; i < result.length; i++)
-        {
             for (double[] subVector : subVectors)
-            {
                 result[i] -= subVector[i];
-            }
-        }
+
+        return result;
+    }
+
+    public static int[] mul(int[]... vectors)
+    {
+        int[] result = new int[vectors[0].length];
+        for (int i = 0; i < result.length; i++)
+            for (int[] vector : vectors)
+                result[i] *= vector[i];
+
+        return result;
+    }
+
+    public static double[] mul(double[]... vectors)
+    {
+        double[] result = new double[vectors[0].length];
+        for (int i = 0; i < result.length; i++)
+            for (double[] vector : vectors)
+                result[i] *= vector[i];
+
+        return result;
+    }
+
+    public static int[] div(int[]... vectors)
+    {
+        int[] result = new int[vectors[0].length];
+        for (int i = 0; i < result.length; i++)
+            for (int[] vector : vectors)
+                result[i] /= vector[i];
+
+        return result;
+    }
+
+    public static double[] div(double[]... vectors)
+    {
+        double[] result = new double[vectors[0].length];
+        for (int i = 0; i < result.length; i++)
+            for (double[] vector : vectors)
+                result[i] /= vector[i];
+
+        return result;
+    }
+
+    public static int[] mod(int[]... vectors)
+    {
+        int[] result = new int[vectors[0].length];
+        for (int i = 0; i < result.length; i++)
+            for (int[] vector : vectors)
+                result[i] %= vector[i];
+
+        return result;
+    }
+
+    public static double[] mod(double[]... vectors)
+    {
+        double[] result = new double[vectors[0].length];
+        for (int i = 0; i < result.length; i++)
+            for (double[] vector : vectors)
+                result[i] %= vector[i];
 
         return result;
     }
