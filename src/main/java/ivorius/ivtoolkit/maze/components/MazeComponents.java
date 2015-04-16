@@ -111,9 +111,9 @@ public class MazeComponents
         };
     }
 
-    public static <C> boolean componentsCompatible(final MazeComponent<C> left, final MazeComponent<C> right, final ConnectionStrategy<C> strategy)
+    public static <C> boolean componentsCompatible(final MazeComponent<C> existing, final MazeComponent<C> add, final ConnectionStrategy<C> strategy)
     {
-        return !overlap(left, right) && allExitsCompatible(left, right, strategy);
+        return !overlap(existing, add) && allExitsCompatible(existing, add, strategy);
     }
 
     public static boolean overlap(MazeComponent<?> left, MazeComponent<?> right)
@@ -121,14 +121,14 @@ public class MazeComponents
         return Sets.intersection(left.rooms(), right.rooms()).size() > 0;
     }
 
-    public static <C> boolean allExitsCompatible(final MazeComponent<C> left, final MazeComponent<C> right, final ConnectionStrategy<C> strategy)
+    public static <C> boolean allExitsCompatible(final MazeComponent<C> existing, final MazeComponent<C> add, final ConnectionStrategy<C> strategy)
     {
-        return Iterables.all(Sets.union(left.exits().keySet(), right.exits().keySet()), new Predicate<MazeRoomConnection>()
+        return Iterables.all(add.exits().entrySet(), new Predicate<Map.Entry<MazeRoomConnection, C>>()
         {
             @Override
-            public boolean apply(@Nullable MazeRoomConnection input)
+            public boolean apply(@Nullable Map.Entry<MazeRoomConnection, C> input)
             {
-                return input == null || strategy.connect(input, left.exits().get(input), right.exits().get(input));
+                return input == null || strategy.connect(input.getKey(), existing.exits().get(input.getKey()), input.getValue());
             }
         });
     }
