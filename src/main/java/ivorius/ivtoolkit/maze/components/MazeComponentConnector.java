@@ -21,6 +21,8 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.*;
 import ivorius.ivtoolkit.IvToolkitCoreContainer;
 import ivorius.ivtoolkit.random.WeightedSelector;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -34,7 +36,7 @@ public class MazeComponentConnector
                                                                     ConnectionStrategy<C> connectionStrategy, final MazeComponentPlacementStrategy<M, C> placementStrategy, Random random)
     {
         List<ShiftedMazeComponent<M, C>> result = new ArrayList<>();
-        Deque<MazeRoom> exitStack = new ArrayDeque<>();
+        Deque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack = new ArrayDeque<>();
 
         Predicate<ShiftedMazeComponent<M, C>> componentPredicate = Predicates.and(MazeComponents.<M, C>compatibilityPredicate(morphingComponent, connectionStrategy),
                 MazeComponentPlacementStrategies.placeable(placementStrategy));
@@ -44,12 +46,16 @@ public class MazeComponentConnector
 
         while (exitStack.size() > 0)
         {
-            MazeRoom room = exitStack.removeLast();
+            Triple<MazeRoom, MazeRoomConnection, C> triple = exitStack.removeLast();
+            MazeRoom room = triple.getLeft();
 
             if (morphingComponent.rooms().contains(room))
                 continue; // Has been filled while queued
 
-            List<ShiftedMazeComponent<M, C>> placeable = FluentIterable.from(components).transform(MazeComponents.<M, C>shiftFunction(room)).filter(componentPredicate).toList();
+            MazeRoomConnection exit = triple.getMiddle();
+            C connection = triple.getRight();
+
+            List<ShiftedMazeComponent<M, C>> placeable = FluentIterable.from(components).transformAndConcat(MazeComponents.<M, C>shiftAllFunction(exit, connection, connectionStrategy)).filter(componentPredicate).toList();
 
             if (placeable.size() == 0)
             {
@@ -83,14 +89,14 @@ public class MazeComponentConnector
         };
     }
 
-    private static <M extends WeightedMazeComponent<C>, C> void addAllExits(MazeComponentPlacementStrategy<M, C> placementStrategy, Deque<MazeRoom> exitStack, Set<Map.Entry<MazeRoomConnection, C>> entries)
+    private static <M extends WeightedMazeComponent<C>, C> void addAllExits(MazeComponentPlacementStrategy<M, C> placementStrategy, Deque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack, Set<Map.Entry<MazeRoomConnection, C>> entries)
     {
         for (Map.Entry<MazeRoomConnection, C> exit : entries)
         {
             if (placementStrategy.shouldContinue(exit.getKey().getLeft()))
-                exitStack.add(exit.getKey().getLeft());
+                exitStack.add(Triple.of(exit.getKey().getLeft(), exit.getKey(), exit.getValue()));
             if (placementStrategy.shouldContinue(exit.getKey().getRight()))
-                exitStack.add(exit.getKey().getRight());
+                exitStack.add(Triple.of(exit.getKey().getRight(), exit.getKey(), exit.getValue()));
         }
     }
 

@@ -87,6 +87,14 @@ public class MazeRoom
         return room;
     }
 
+    public MazeRoom negate()
+    {
+        int[] coords = getCoordinates();
+        for (int i = 0; i < coords.length; i++)
+            coords[i] = -coords[i];
+        return new MazeRoom(coords);
+    }
+
     @Override
     public boolean equals(Object o)
     {
