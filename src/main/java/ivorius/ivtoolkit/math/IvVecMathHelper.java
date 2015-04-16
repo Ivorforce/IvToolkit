@@ -169,20 +169,20 @@ public class IvVecMathHelper
 
     public static int[] add(int[]... vectors)
     {
-        int[] result = new int[vectors[0].length];
-        for (int i = 0; i < result.length; i++)
-            for (int[] vector : vectors)
-                result[i] += vector[i];
+        int[] result = vectors[0].clone();
+        for (int d = 0; d < result.length; d++)
+            for (int v = 1; v < vectors.length; v++)
+                result[d] += vectors[v][d];
 
         return result;
     }
 
     public static double[] add(double[]... vectors)
     {
-        double[] result = new double[vectors[0].length];
-        for (int i = 0; i < result.length; i++)
-            for (double[] vector : vectors)
-                result[i] += vector[i];
+        double[] result = vectors[0].clone();
+        for (int d = 0; d < result.length; d++)
+            for (int v = 1; v < vectors.length; v++)
+                result[d] += vectors[v][d];
 
         return result;
     }
@@ -209,60 +209,60 @@ public class IvVecMathHelper
 
     public static int[] mul(int[]... vectors)
     {
-        int[] result = new int[vectors[0].length];
-        for (int i = 0; i < result.length; i++)
-            for (int[] vector : vectors)
-                result[i] *= vector[i];
+        int[] result = vectors[0].clone();
+        for (int d = 0; d < result.length; d++)
+            for (int v = 1; v < vectors.length; v++)
+                result[d] *= vectors[v][d];
 
         return result;
     }
 
     public static double[] mul(double[]... vectors)
     {
-        double[] result = new double[vectors[0].length];
-        for (int i = 0; i < result.length; i++)
-            for (double[] vector : vectors)
-                result[i] *= vector[i];
+        double[] result = vectors[0].clone();
+        for (int d = 0; d < result.length; d++)
+            for (int v = 1; v < vectors.length; v++)
+                result[d] *= vectors[v][d];
 
         return result;
     }
 
     public static int[] div(int[]... vectors)
     {
-        int[] result = new int[vectors[0].length];
-        for (int i = 0; i < result.length; i++)
-            for (int[] vector : vectors)
-                result[i] /= vector[i];
+        int[] result = vectors[0].clone();
+        for (int d = 0; d < result.length; d++)
+            for (int v = 1; v < vectors.length; v++)
+                result[d] /= vectors[v][d];
 
         return result;
     }
 
     public static double[] div(double[]... vectors)
     {
-        double[] result = new double[vectors[0].length];
-        for (int i = 0; i < result.length; i++)
-            for (double[] vector : vectors)
-                result[i] /= vector[i];
+        double[] result = vectors[0].clone();
+        for (int d = 0; d < result.length; d++)
+            for (int v = 1; v < vectors.length; v++)
+                result[d] /= vectors[v][d];
 
         return result;
     }
 
     public static int[] mod(int[]... vectors)
     {
-        int[] result = new int[vectors[0].length];
-        for (int i = 0; i < result.length; i++)
-            for (int[] vector : vectors)
-                result[i] %= vector[i];
+        int[] result = vectors[0].clone();
+        for (int d = 0; d < result.length; d++)
+            for (int v = 1; v < vectors.length; v++)
+                result[d] %= vectors[v][d];
 
         return result;
     }
 
     public static double[] mod(double[]... vectors)
     {
-        double[] result = new double[vectors[0].length];
-        for (int i = 0; i < result.length; i++)
-            for (double[] vector : vectors)
-                result[i] %= vector[i];
+        double[] result = vectors[0].clone();
+        for (int d = 0; d < result.length; d++)
+            for (int v = 1; v < vectors.length; v++)
+                result[d] %= vectors[v][d];
 
         return result;
     }
