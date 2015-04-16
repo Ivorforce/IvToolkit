@@ -100,7 +100,7 @@ public class MazeComponents
             @Override
             public boolean apply(@Nullable MazeRoomConnection input)
             {
-                return strategy.connect(left.exits().get(input), right.exits().get(input));
+                return input == null || strategy.connect(input, left.exits().get(input), right.exits().get(input));
             }
         });
     }

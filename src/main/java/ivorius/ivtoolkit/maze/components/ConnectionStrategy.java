@@ -16,6 +16,7 @@
 
 package ivorius.ivtoolkit.maze.components;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -23,5 +24,5 @@ import javax.annotation.Nullable;
  */
 public interface ConnectionStrategy<T>
 {
-    boolean connect(@Nullable T a, @Nullable T b);
+    boolean connect(@Nonnull MazeRoomConnection connection, @Nullable T a, @Nullable T b);
 }
