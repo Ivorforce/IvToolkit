@@ -86,11 +86,12 @@ public class MazeComponentConnector
     private static <M extends WeightedMazeComponent<C>, C> void addAllExits(MazeComponentPlacementStrategy<M, C> placementStrategy, Deque<MazeRoom> exitStack, Set<Map.Entry<MazeRoomConnection, C>> entries)
     {
         for (Map.Entry<MazeRoomConnection, C> exit : entries)
-            if (placementStrategy.shouldConnect(exit.getKey(), exit.getValue()))
-            {
+        {
+            if (placementStrategy.shouldContinue(exit.getKey().getLeft()))
                 exitStack.add(exit.getKey().getLeft());
+            if (placementStrategy.shouldContinue(exit.getKey().getRight()))
                 exitStack.add(exit.getKey().getRight());
-            }
+        }
     }
 
     private static <M extends WeightedMazeComponent<C>, C> WeightedSelector.WeightFunction<ShiftedMazeComponent<M, C>> getWeightFunction()
