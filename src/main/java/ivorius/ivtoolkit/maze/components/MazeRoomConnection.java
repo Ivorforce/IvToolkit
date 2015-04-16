@@ -33,6 +33,9 @@ public class MazeRoomConnection extends Pair<MazeRoom, MazeRoom>
         boolean lower = lower(left, right);
         this.left = lower ? left : right;
         this.right = lower ? right : left;
+
+        if (left.getDimensions() != right.getDimensions())
+            throw new IllegalArgumentException();
     }
 
     private static boolean lower(MazeRoom left, MazeRoom right)
@@ -42,11 +45,6 @@ public class MazeRoomConnection extends Pair<MazeRoom, MazeRoom>
                 return left.getCoordinate(i) < right.getCoordinate(i);
 
         return false; // Same
-    }
-
-    public MazeRoomConnection add(MazeRoom add)
-    {
-        return new MazeRoomConnection(left.add(add), right.add(add));
     }
 
     @Override
@@ -61,6 +59,16 @@ public class MazeRoomConnection extends Pair<MazeRoom, MazeRoom>
         return right;
     }
 
+    public int getDimensions()
+    {
+        return left.getDimensions();
+    }
+
+    public MazeRoomConnection add(MazeRoom add)
+    {
+        return new MazeRoomConnection(left.add(add), right.add(add));
+    }
+
     public boolean has(MazeRoom room)
     {
         return Objects.equals(left, room) || Objects.equals(right, room);
@@ -70,11 +78,5 @@ public class MazeRoomConnection extends Pair<MazeRoom, MazeRoom>
     public MazeRoom setValue(MazeRoom value)
     {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String toString()
-    {
-        return String.format("%s <-> %s", getLeft(), getRight());
     }
 }

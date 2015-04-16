@@ -16,8 +16,15 @@
 
 package ivorius.ivtoolkit.maze.components;
 
+import gnu.trove.procedure.TIntProcedure;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import ivorius.ivtoolkit.blocks.BlockCoord;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
+import ivorius.ivtoolkit.tools.Ranges;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by lukas on 23.06.14.
@@ -26,8 +33,37 @@ public class MazeRooms
 {
     public static MazeRoom rotated(MazeRoom room, AxisAlignedTransform2D transform, int[] size)
     {
+        if (room.getDimensions() < 3)
+            throw new IllegalArgumentException();
+        
         int[] roomPosition = room.getCoordinates();
-        BlockCoord transformedRoom = transform.apply(new BlockCoord(roomPosition[0], roomPosition[1], roomPosition[2]), size);
-        return new MazeRoom(transformedRoom.x, transformedRoom.y, transformedRoom.z);
+        int[] transformedRoom = transform.apply(roomPosition, size);
+
+        roomPosition[0] = transformedRoom[0];
+        roomPosition[1] = transformedRoom[1];
+        roomPosition[2] = transformedRoom[2];
+
+        return new MazeRoom(roomPosition);
+    }
+
+    public static Set<MazeRoomConnection> neighbors(final MazeRoom room, TIntSet dimensions)
+    {
+        final Set<MazeRoomConnection> set = new HashSet<>(dimensions.size() * 2);
+        dimensions.forEach(new TIntProcedure()
+        {
+            @Override
+            public boolean execute(int value)
+            {
+                set.add(new MazeRoomConnection(room, room.addInDimension(value, 1)));
+                set.add(new MazeRoomConnection(room, room.addInDimension(value, -1)));
+                return true;
+            }
+        });
+        return set;
+    }
+
+    public static Set<MazeRoomConnection> neighbors(MazeRoom room)
+    {
+        return neighbors(room, new TIntHashSet(Ranges.to(room.getDimensions())));
     }
 }
