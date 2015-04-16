@@ -42,10 +42,10 @@ public class MazeComponentConnector
 
         addAllExits(placementStrategy, exitStack, morphingComponent.exits().entrySet());
 
-        MazeRoom room;
-
-        while ((room = exitStack.removeLast()) != null)
+        while (exitStack.size() > 0)
         {
+            MazeRoom room = exitStack.removeLast();
+
             if (morphingComponent.rooms().contains(room))
                 continue; // Has been filled while queued
 
