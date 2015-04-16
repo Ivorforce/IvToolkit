@@ -69,6 +69,11 @@ public class MazeRoomConnection extends Pair<MazeRoom, MazeRoom>
         return new MazeRoomConnection(left.add(add), right.add(add));
     }
 
+    public MazeRoomConnection sub(MazeRoom sub)
+    {
+        return new MazeRoomConnection(left.sub(sub), right.sub(sub));
+    }
+
     public boolean has(MazeRoom room)
     {
         return Objects.equals(left, room) || Objects.equals(right, room);

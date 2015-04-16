@@ -66,7 +66,7 @@ public class MazeComponents
             @Override
             public C apply(@Nullable MazeRoomConnection input)
             {
-                return component.exits().get(input);
+                return component.exits().get(input != null ? input.sub(shift) : null);
             }
         }));
     }
