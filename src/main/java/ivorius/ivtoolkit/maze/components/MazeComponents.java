@@ -23,10 +23,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by lukas on 15.04.15.
@@ -54,18 +53,19 @@ public class MazeComponents
             @Override
             public Iterable<ShiftedMazeComponent<M, C>> apply(@Nullable M input)
             {
-                Set<ShiftedMazeComponent<M, C>> set = new HashSet<>();
+                List<ShiftedMazeComponent<M, C>> list = new ArrayList<>();
 
                 if (input != null)
                 {
                     for (Map.Entry<MazeRoomConnection, C> entry : input.exits().entrySet())
                     {
                         MazeRoom dist = entry.getKey().distance(connection);
-                        if (dist != null) set.add(shift(input, dist));
+                        if (dist != null && strategy.connect(connection, connector, entry.getValue()))
+                            list.add(shift(input, dist));
                     }
                 }
 
-                return set;
+                return list;
             }
         };
     }

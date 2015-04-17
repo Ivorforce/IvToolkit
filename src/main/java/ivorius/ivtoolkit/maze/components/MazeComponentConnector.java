@@ -38,9 +38,10 @@ public class MazeComponentConnector
         List<ShiftedMazeComponent<M, C>> result = new ArrayList<>();
         Deque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack = new ArrayDeque<>();
 
-        Predicate<ShiftedMazeComponent<M, C>> componentPredicate = Predicates.and(MazeComponents.<M, C>compatibilityPredicate(morphingComponent, connectionStrategy),
+        Predicate<ShiftedMazeComponent<M, C>> componentPredicate = Predicates.and(
+                MazeComponents.<M, C>compatibilityPredicate(morphingComponent, connectionStrategy),
                 MazeComponentPlacementStrategies.placeable(placementStrategy));
-        WeightedSelector.WeightFunction<ShiftedMazeComponent<M, C>> weightFunction = MazeComponentConnector.getWeightFunction();
+        WeightedSelector.WeightFunction<ShiftedMazeComponent<M, C>> weightFunction = getWeightFunction();
 
         addAllExits(placementStrategy, exitStack, morphingComponent.exits().entrySet());
 
@@ -66,7 +67,7 @@ public class MazeComponentConnector
 
             ShiftedMazeComponent<M, C> selected = WeightedSelector.canSelect(placeable, weightFunction)
                 ? WeightedSelector.select(random, placeable, weightFunction)
-                : placeable.get(random.nextInt(placeable.size()));
+                : placeable.get(random.nextInt(placeable.size())); // All weight 0 = select at random
 
             addAllExits(placementStrategy, exitStack, selected.exits().entrySet());
 
