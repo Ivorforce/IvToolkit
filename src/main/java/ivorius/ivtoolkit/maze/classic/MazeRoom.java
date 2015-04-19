@@ -17,7 +17,6 @@
 package ivorius.ivtoolkit.maze.classic;
 
 import ivorius.ivtoolkit.math.IvVecMathHelper;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagIntArray;
 
 import javax.annotation.Nonnull;
@@ -34,11 +33,6 @@ public class MazeRoom implements MazeCoordinate
     public MazeRoom(@Nonnull int... coordinates)
     {
         this.coordinates = coordinates.clone();
-    }
-
-    public MazeRoom(NBTTagCompound compound)
-    {
-        coordinates = compound.getIntArray("coordinates");
     }
 
     public MazeRoom(NBTTagIntArray intArray)
