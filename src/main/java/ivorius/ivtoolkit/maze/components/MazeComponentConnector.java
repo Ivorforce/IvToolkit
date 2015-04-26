@@ -94,10 +94,13 @@ public class MazeComponentConnector
     {
         for (Map.Entry<MazeRoomConnection, C> exit : entries)
         {
-            if (placementStrategy.shouldContinue(exit.getKey().getLeft()))
-                exitStack.add(Triple.of(exit.getKey().getLeft(), exit.getKey(), exit.getValue()));
-            if (placementStrategy.shouldContinue(exit.getKey().getRight()))
-                exitStack.add(Triple.of(exit.getKey().getRight(), exit.getKey(), exit.getValue()));
+            MazeRoomConnection connection = exit.getKey();
+            C c = exit.getValue();
+
+            if (placementStrategy.shouldContinue(connection.getLeft(), connection.getRight(), c))
+                exitStack.add(Triple.of(connection.getLeft(), connection, c));
+            if (placementStrategy.shouldContinue(connection.getRight(), connection.getLeft(), c))
+                exitStack.add(Triple.of(connection.getRight(), connection, c));
         }
     }
 

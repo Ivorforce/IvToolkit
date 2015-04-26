@@ -23,5 +23,5 @@ public interface MazeComponentPlacementStrategy<M extends MazeComponent<C>, C>
 {
     boolean canPlace(ShiftedMazeComponent<M, C> component);
 
-    boolean shouldContinue(MazeRoom room);
+    boolean shouldContinue(MazeRoom dest, MazeRoom source, C c);
 }
