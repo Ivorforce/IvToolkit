@@ -19,12 +19,11 @@ package ivorius.ivtoolkit.maze.components;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,7 +52,7 @@ public class MazeComponents
             @Override
             public Iterable<ShiftedMazeComponent<M, C>> apply(@Nullable M input)
             {
-                List<ShiftedMazeComponent<M, C>> list = new ArrayList<>();
+                ImmutableList.Builder<ShiftedMazeComponent<M, C>> list = ImmutableList.builder();
 
                 if (input != null)
                 {
@@ -65,7 +64,7 @@ public class MazeComponents
                     }
                 }
 
-                return list;
+                return list.build();
             }
         };
     }

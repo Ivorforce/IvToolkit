@@ -16,14 +16,13 @@
 
 package ivorius.ivtoolkit.maze.components;
 
+import com.google.common.collect.ImmutableSet;
 import gnu.trove.procedure.TIntProcedure;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-import ivorius.ivtoolkit.blocks.BlockCoord;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
 import ivorius.ivtoolkit.tools.Ranges;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -35,7 +34,7 @@ public class MazeRooms
     {
         if (room.getDimensions() < 3)
             throw new IllegalArgumentException();
-        
+
         int[] roomPosition = room.getCoordinates();
         int[] transformedRoom = transform.apply(roomPosition, size);
 
@@ -48,7 +47,7 @@ public class MazeRooms
 
     public static Set<MazeRoomConnection> neighbors(final MazeRoom room, TIntSet dimensions)
     {
-        final Set<MazeRoomConnection> set = new HashSet<>(dimensions.size() * 2);
+        final ImmutableSet.Builder<MazeRoomConnection> set = ImmutableSet.builder();
         dimensions.forEach(new TIntProcedure()
         {
             @Override
@@ -59,7 +58,7 @@ public class MazeRooms
                 return true;
             }
         });
-        return set;
+        return set.build();
     }
 
     public static Set<MazeRoomConnection> neighbors(MazeRoom room)

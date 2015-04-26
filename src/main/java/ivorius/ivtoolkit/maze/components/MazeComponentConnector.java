@@ -21,7 +21,6 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.*;
 import ivorius.ivtoolkit.IvToolkitCoreContainer;
 import ivorius.ivtoolkit.random.WeightedSelector;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 
 import javax.annotation.Nullable;
@@ -35,7 +34,7 @@ public class MazeComponentConnector
     public static <M extends WeightedMazeComponent<C>, C> List<ShiftedMazeComponent<M, C>> randomlyConnect(MorphingMazeComponent<C> morphingComponent, List<M> components,
                                                                     ConnectionStrategy<C> connectionStrategy, final MazeComponentPlacementStrategy<M, C> placementStrategy, Random random)
     {
-        List<ShiftedMazeComponent<M, C>> result = new ArrayList<>();
+        ImmutableList.Builder<ShiftedMazeComponent<M, C>> result = new ImmutableList.Builder<>();
         Deque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack = new ArrayDeque<>();
 
         Predicate<ShiftedMazeComponent<M, C>> componentPredicate = Predicates.and(
@@ -75,7 +74,7 @@ public class MazeComponentConnector
             result.add(selected);
         }
 
-        return result;
+        return result.build();
     }
 
     private static Predicate<Map.Entry<MazeRoomConnection, ?>> entryConnectsTo(final MazeRoom finalRoom)
