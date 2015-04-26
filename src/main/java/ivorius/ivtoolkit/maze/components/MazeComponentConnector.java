@@ -39,7 +39,7 @@ public class MazeComponentConnector
         Deque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack = new ArrayDeque<>();
 
         Predicate<ShiftedMazeComponent<M, C>> componentPredicate = Predicates.and(
-                MazeComponents.<M, C>compatibilityPredicate(morphingComponent, connectionStrategy),
+                MazeComponents.compatibilityPredicate(morphingComponent, connectionStrategy),
                 MazeComponentPlacementStrategies.placeable(placementStrategy));
         WeightedSelector.WeightFunction<ShiftedMazeComponent<M, C>> weightFunction = getWeightFunction();
 

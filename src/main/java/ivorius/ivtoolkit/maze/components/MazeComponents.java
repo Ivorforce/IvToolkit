@@ -99,12 +99,12 @@ public class MazeComponents
         }));
     }
 
-    public static <M extends MazeComponent<C>, C> Predicate<ShiftedMazeComponent<M, C>> compatibilityPredicate(final MazeComponent<C> component, final ConnectionStrategy<C> strategy)
+    public static <C> Predicate<MazeComponent<C>> compatibilityPredicate(final MazeComponent<C> component, final ConnectionStrategy<C> strategy)
     {
-        return new Predicate<ShiftedMazeComponent<M, C>>()
+        return new Predicate<MazeComponent<C>>()
         {
             @Override
-            public boolean apply(@Nullable ShiftedMazeComponent<M, C> input)
+            public boolean apply(@Nullable MazeComponent<C> input)
             {
                 return componentsCompatible(component, input, strategy);
             }

@@ -16,6 +16,9 @@
 
 package ivorius.ivtoolkit.maze.components;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
 import java.util.*;
 
 /**
@@ -26,20 +29,15 @@ public class ShiftedMazeComponent<M extends MazeComponent<C>, C> implements Maze
     private final M component;
     private final MazeRoom shift;
 
-    private final Set<MazeRoom> rooms = new HashSet<>();
-    private final Map<MazeRoomConnection, C> exits = new HashMap<>();
+    private final ImmutableSet<MazeRoom> rooms;
+    private final ImmutableMap<MazeRoomConnection, C> exits;
 
-    public ShiftedMazeComponent(M component, MazeRoom shift)
+    public ShiftedMazeComponent(M component, MazeRoom shift, ImmutableSet<MazeRoom> rooms, ImmutableMap<MazeRoomConnection, C> exits)
     {
         this.component = component;
         this.shift = shift;
-    }
-
-    public ShiftedMazeComponent(M component, MazeRoom shift, Set<MazeRoom> rooms, Map<MazeRoomConnection, C> exits)
-    {
-        this(component, shift);
-        this.rooms.addAll(rooms);
-        this.exits.putAll(exits);
+        this.rooms = rooms;
+        this.exits = exits;
     }
 
     public M getComponent()
