@@ -53,12 +53,12 @@ public class ShiftedMazeComponent<M extends MazeComponent<C>, C> implements Maze
     @Override
     public Set<MazeRoom> rooms()
     {
-        return Collections.unmodifiableSet(rooms);
+        return rooms;
     }
 
     @Override
     public Map<MazeRoomConnection, C> exits()
     {
-        return Collections.unmodifiableMap(exits);
+        return exits;
     }
 }
