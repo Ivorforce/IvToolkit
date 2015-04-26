@@ -232,4 +232,34 @@ public class AxisAlignedTransform2D
         for (int i = 0; i < rotation; i++)
             block.rotateBlock(world, coord.x, coord.y, coord.z, ForgeDirection.UP);
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AxisAlignedTransform2D that = (AxisAlignedTransform2D) o;
+
+        if (rotation != that.rotation) return false;
+        return mirrorX == that.mirrorX;
+
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = rotation;
+        result = 31 * result + (mirrorX ? 1 : 0);
+        return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "AxisAlignedTransform2D{" +
+                "rotation=" + rotation +
+                ", mirrorX=" + mirrorX +
+                '}';
+    }
 }
