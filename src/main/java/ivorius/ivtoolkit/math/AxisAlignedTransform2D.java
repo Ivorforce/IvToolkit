@@ -27,30 +27,54 @@ import net.minecraftforge.common.util.ForgeDirection;
  */
 public class AxisAlignedTransform2D
 {
-    public static final AxisAlignedTransform2D ORIGINAL = new AxisAlignedTransform2D(0, false);
+    public static final AxisAlignedTransform2D R0 = new AxisAlignedTransform2D(0, false);
+    public static final AxisAlignedTransform2D R1 = new AxisAlignedTransform2D(1, false);
+    public static final AxisAlignedTransform2D R2 = new AxisAlignedTransform2D(2, false);
+    public static final AxisAlignedTransform2D R3 = new AxisAlignedTransform2D(3, false);
+
+    public static final AxisAlignedTransform2D R0_F = new AxisAlignedTransform2D(0, true);
+    public static final AxisAlignedTransform2D R1_F = new AxisAlignedTransform2D(1, true);
+    public static final AxisAlignedTransform2D R2_F = new AxisAlignedTransform2D(2, true);
+    public static final AxisAlignedTransform2D R3_F = new AxisAlignedTransform2D(3, true);
+
+    public static final AxisAlignedTransform2D ORIGINAL = R0;
 
     private final int rotation;
     private final boolean mirrorX;
 
+    @Deprecated
     public AxisAlignedTransform2D(int rotation, boolean mirrorX)
     {
         this.rotation = ((rotation % 4) + 4) % 4;
         this.mirrorX = mirrorX;
     }
 
+    @Deprecated
     public static AxisAlignedTransform2D transform(int rotationClockwise, boolean flipX)
     {
-        return flipX ? ORIGINAL.rotateClockwise(rotationClockwise).flipX() : ORIGINAL.rotateClockwise(rotationClockwise);
+        return from(rotationClockwise, flipX);
+    }
+
+    public static AxisAlignedTransform2D from(int rotationClockwise, boolean flipX)
+    {
+        switch (((rotationClockwise % 4) + 4) % 4)
+        {
+            case 0:
+                return flipX ? R0_F : R0;
+            case 1:
+                return flipX ? R1_F : R1;
+            case 2:
+                return flipX ? R2_F : R2;
+            case 3:
+                return flipX ? R3_F : R3;
+        }
+
+        throw new InternalError();
     }
 
     public static AxisAlignedTransform2D transform(AxisAlignedTransform2D original, int rotationClockwise, boolean flipX)
     {
         return flipX ? original.rotateClockwise(rotationClockwise).flipX() : original.rotateClockwise(rotationClockwise);
-    }
-
-    public AxisAlignedTransform2D rotateClockwise(int steps)
-    {
-        return new AxisAlignedTransform2D(rotation + steps, mirrorX);
     }
 
     public int getRotation()
@@ -63,29 +87,49 @@ public class AxisAlignedTransform2D
         return mirrorX;
     }
 
+    public AxisAlignedTransform2D rotateClockwise(int steps)
+    {
+        return from(rotation + steps, mirrorX);
+    }
+
     public AxisAlignedTransform2D rotateClockwise()
     {
-        return new AxisAlignedTransform2D(rotation + 1, mirrorX);
+        return from(rotation + 1, mirrorX);
     }
 
     public AxisAlignedTransform2D rotateCounterClockwise(int steps)
     {
-        return new AxisAlignedTransform2D(rotation - steps, mirrorX);
+        return from(rotation - steps, mirrorX);
     }
 
     public AxisAlignedTransform2D rotateCounterClockwise()
     {
-        return new AxisAlignedTransform2D(rotation - 1, mirrorX);
+        return from(rotation - 1, mirrorX);
     }
 
     public AxisAlignedTransform2D flipX()
     {
-        return new AxisAlignedTransform2D(rotation, !mirrorX);
+        return from(rotation, !mirrorX);
     }
 
     public AxisAlignedTransform2D flipZ()
     {
-        return new AxisAlignedTransform2D(rotation + 2, !mirrorX);
+        return from(rotation + 2, !mirrorX);
+    }
+
+    public boolean resultSwitchesXZ()
+    {
+        return rotation == 1 || rotation == 3;
+    }
+
+    public boolean resultMirrorsFormerX()
+    {
+        return mirrorX ^ (rotation == 2 || rotation == 3);
+    }
+
+    public boolean resultMirrorsFormerZ()
+    {
+        return rotation == 1 || rotation == 2;
     }
 
     public BlockCoord apply(BlockCoord position, int[] size)
