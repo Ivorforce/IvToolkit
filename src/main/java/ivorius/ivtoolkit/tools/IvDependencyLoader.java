@@ -74,7 +74,7 @@ public abstract class IvDependencyLoader
         while ((startIndex = res.indexOf(importStart)) >= 0
                 && (endIndex = res.indexOf(importEnd)) >= 0)
         {
-            String dep = loadResource(k);
+            String dep = loadResource(res.substring(startIndex + importStart.length(), endIndex), loading);
             res = res.substring(0, startIndex) + dep + res.substring(endIndex + importEnd.length());
         }
 
