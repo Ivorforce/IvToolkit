@@ -27,8 +27,8 @@ import java.util.Map;
 @IFMLLoadingPlugin.TransformerExclusions(value = {"ivorius.ivtoolkit.asm."})
 public class IvToolkitLoadingPlugin implements IFMLLoadingPlugin
 {
-    public static final String NAME = "1.2";
-    public static final String VERSION = "IvToolkit";
+    public static final String NAME = "IvToolkit";
+    public static final String VERSION = "1.2";
     public static final String MODID = "ivtoolkit";
 
     @Override
