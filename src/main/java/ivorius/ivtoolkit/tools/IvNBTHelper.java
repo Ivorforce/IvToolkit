@@ -23,6 +23,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.ArrayList;
@@ -107,7 +108,7 @@ public class IvNBTHelper
             double[] array = new double[list.tagCount()];
 
             for (int i = 0; i < array.length; i++)
-                array[i] = list.func_150309_d(i);
+                array[i] = list.getDoubleAt(i);
 
             return array;
         }
@@ -198,7 +199,7 @@ public class IvNBTHelper
             Block[] blocks = new Block[nbtTagList.tagCount()];
 
             for (int i = 0; i < blocks.length; i++)
-                blocks[i] = registry.blockFromID(nbtTagList.getStringTagAt(i));
+                blocks[i] = registry.blockFromID(new ResourceLocation(nbtTagList.getStringTagAt(i)));
 
             return blocks;
         }
@@ -213,7 +214,7 @@ public class IvNBTHelper
             NBTTagList nbtTagList = new NBTTagList();
 
             for (Block b : blocks)
-                nbtTagList.appendTag(new NBTTagString(Block.blockRegistry.getNameForObject(b)));
+                nbtTagList.appendTag(new NBTTagString(Block.blockRegistry.getNameForObject(b).toString()));
 
             compound.setTag(id, nbtTagList);
         }

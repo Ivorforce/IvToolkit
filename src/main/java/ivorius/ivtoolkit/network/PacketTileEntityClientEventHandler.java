@@ -16,12 +16,12 @@
 
 package ivorius.ivtoolkit.network;
 
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
  * Created by lukas on 02.07.14.
@@ -32,7 +32,7 @@ public class PacketTileEntityClientEventHandler implements IMessageHandler<Packe
     public IMessage onMessage(PacketTileEntityClientEvent message, MessageContext ctx)
     {
         World world = MinecraftServer.getServer().worldServerForDimension(message.getDimension());
-        TileEntity entity = world.getTileEntity(message.getX(), message.getY(), message.getZ());
+        TileEntity entity = world.getTileEntity(message.getPos());
 
         if (entity != null)
             ((ClientEventHandler) entity).onClientEvent(message.getPayload(), message.getContext(), ctx.getServerHandler().playerEntity);

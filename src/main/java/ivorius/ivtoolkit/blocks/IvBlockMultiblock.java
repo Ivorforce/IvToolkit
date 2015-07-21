@@ -20,8 +20,10 @@ package ivorius.ivtoolkit.blocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -34,9 +36,9 @@ public abstract class IvBlockMultiblock extends BlockContainer
     }
 
     @Override
-    public void breakBlock(World world, int x, int y, int z, Block block, int blockMeta)
+    public void breakBlock(World world, BlockPos pos, IBlockState state)
     {
-        TileEntity tileEntity = world.getTileEntity(x, y, z);
+        TileEntity tileEntity = world.getTileEntity(pos);
 
         if (tileEntity instanceof IvTileEntityMultiBlock)
         {
@@ -47,27 +49,26 @@ public abstract class IvBlockMultiblock extends BlockContainer
                 tileEntityMultiBlock.multiblockInvalid = true;
 
                 if (tileEntityMultiBlock.isParent())
-                    destroyChildrenOf(world, x, y, z, block, blockMeta, tileEntityMultiBlock);
+                    destroyChildrenOf(world, pos, state, tileEntityMultiBlock);
                 else
                     destroyParentOf(tileEntityMultiBlock);
             }
         }
 
-        super.breakBlock(world, x, y, z, block, blockMeta);
+        super.breakBlock(world, pos, state);
     }
 
-    public void destroyChildrenOf(World world, int x, int y, int z, Block block, int blockMeta, IvTileEntityMultiBlock tileEntityMultiBlock)
+    public void destroyChildrenOf(World world, BlockPos pos, IBlockState state, IvTileEntityMultiBlock tileEntityMultiBlock)
     {
         if (!world.isRemote)
-            this.parentBlockDropItemContents(world, tileEntityMultiBlock, x, y, z, block, blockMeta);
+            this.parentBlockDropItemContents(world, tileEntityMultiBlock, pos, state);
 
-        int[][] toDestroy = tileEntityMultiBlock.getActiveChildCoords();
+        BlockPos[] toDestroy = tileEntityMultiBlock.getActiveChildCoords();
         TileEntity[] destroyTEs = new TileEntity[toDestroy.length];
 
         for (int i = 0; i < toDestroy.length; i++)
         {
-            int[] coords = toDestroy[i];
-            TileEntity otherTE = world.getTileEntity(coords[0], coords[1], coords[2]);
+            TileEntity otherTE = world.getTileEntity(toDestroy[i]);
 
             if (otherTE instanceof IvTileEntityMultiBlock && !((IvTileEntityMultiBlock) otherTE).multiblockInvalid)
                 ((IvTileEntityMultiBlock) (destroyTEs[i] = otherTE)).multiblockInvalid = true;
@@ -77,72 +78,71 @@ public abstract class IvBlockMultiblock extends BlockContainer
         {
             if (destroyTE != null)
             {
-                triggerBlockDestroyEffects(world, destroyTE.xCoord, destroyTE.yCoord, destroyTE.zCoord);
-                world.setBlockToAir(destroyTE.xCoord, destroyTE.yCoord, destroyTE.zCoord);
+                triggerBlockDestroyEffects(world, destroyTE.getPos());
+                world.setBlockToAir(destroyTE.getPos());
             }
         }
     }
 
-    protected void triggerBlockDestroyEffects(World world, int x, int y, int z)
+    protected void triggerBlockDestroyEffects(World world, BlockPos pos)
     {
-        world.playAuxSFX(2001, x, y, z, Block.getIdFromBlock(this) + (world.getBlockMetadata(x, y, z) << 12));
+        world.playAuxSFX(2001, pos, Block.getStateId(world.getBlockState(pos)));
 //        if (world.isRemote)
 //            Minecraft.getMinecraft().effectRenderer.addBlockDestroyEffects(parentTE.xCoord, parentTE.yCoord, parentTE.zCoord, parentTE.getBlockType(), parentTE.getBlockMetadata());
     }
 
     public void destroyParentOf(IvTileEntityMultiBlock tileEntityMultiBlock)
     {
-        World world = tileEntityMultiBlock.getWorldObj();
-        int[] parentTECoords = tileEntityMultiBlock.getActiveParentCoords();
-        TileEntity parentTE = world.getTileEntity(parentTECoords[0], parentTECoords[1], parentTECoords[2]);
+        World world = tileEntityMultiBlock.getWorld();
+        TileEntity parentTE = world.getTileEntity(tileEntityMultiBlock.getActiveParentCoords());
 
         if (parentTE instanceof IvTileEntityMultiBlock && !((IvTileEntityMultiBlock) parentTE).multiblockInvalid)
         {
-            triggerBlockDestroyEffects(world, parentTE.xCoord, parentTE.yCoord, parentTE.zCoord);
-            world.setBlockToAir(parentTE.xCoord, parentTE.yCoord, parentTE.zCoord);
+            triggerBlockDestroyEffects(world, parentTE.getPos());
+            world.setBlockToAir(parentTE.getPos());
         }
     }
 
     @Override
-    public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest)
+    public boolean removedByPlayer(World world, BlockPos pos, EntityPlayer player, boolean willHarvest)
     {
-        IvTileEntityMultiBlock tileEntityMultiBlock = getValidatedTotalParent(this, world, x, y, z);
+        IvTileEntityMultiBlock tileEntityMultiBlock = getValidatedTotalParent(this, world, pos);
 
         if (tileEntityMultiBlock != null)
         {
             if (!world.isRemote && willHarvest)
-                this.parentBlockHarvestItem(world, tileEntityMultiBlock, x, y, z, this, world.getBlockMetadata(x, y, z));
+                this.parentBlockHarvestItem(world, tileEntityMultiBlock, pos, world.getBlockState(pos));
         }
 
-        return super.removedByPlayer(world, player, x, y, z, willHarvest);
+        return super.removedByPlayer(world, pos, player, willHarvest);
     }
 
     @Override
-    public void onBlockExploded(World world, int x, int y, int z, Explosion explosion)
+    public void onBlockExploded(World world, BlockPos pos, Explosion explosion)
     {
-        IvTileEntityMultiBlock tileEntityMultiBlock = getValidatedTotalParent(this, world, x, y, z);
+        IvTileEntityMultiBlock tileEntityMultiBlock = getValidatedTotalParent(this, world, pos);
 
         if (tileEntityMultiBlock != null)
         {
             if (!world.isRemote)
-                this.parentBlockHarvestItem(world, tileEntityMultiBlock, x, y, z, this, world.getBlockMetadata(x, y, z));
+                this.parentBlockHarvestItem(world, tileEntityMultiBlock, pos, world.getBlockState(pos));
         }
 
-        super.onBlockExploded(world, x, y, z, explosion);
+        super.onBlockExploded(world, pos, explosion);
     }
 
-    public void parentBlockDropItemContents(World world, IvTileEntityMultiBlock tileEntity, int x, int y, int z, Block block, int metadata)
+    public void parentBlockDropItemContents(World world, IvTileEntityMultiBlock tileEntity, BlockPos pos, IBlockState state)
     {
     }
 
-    public void parentBlockHarvestItem(World world, IvTileEntityMultiBlock tileEntity, int x, int y, int z, Block block, int metadata)
+    public void parentBlockHarvestItem(World world, IvTileEntityMultiBlock tileEntity, BlockPos pos, IBlockState state)
     {
     }
 
     @Override
-    public void dropBlockAsItemWithChance(World par1World, int par2, int par3, int par4, int par5, float par6, int par7)
+    public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
     {
-
+        super.dropBlockAsItemWithChance(worldIn, pos, state, chance, fortune);
     }
 
 //    @Override
@@ -153,17 +153,15 @@ public abstract class IvBlockMultiblock extends BlockContainer
 //        validateMultiblock(this, par1World, par2, par3, par4);
 //    }
 
-    public static boolean validateMultiblock(Block block, IBlockAccess access, int x, int y, int z)
+    public static boolean validateMultiblock(Block block, IBlockAccess access, BlockPos pos)
     {
-        if (access.getBlock(x, y, z) != block)
-        {
+        if (access.getBlockState(pos) != block)
             return false;
-        }
 
         boolean isValidChild = false;
         boolean destroy = false;
 
-        TileEntity tileEntity = access.getTileEntity(x, y, z);
+        TileEntity tileEntity = access.getTileEntity(pos);
         if (tileEntity instanceof IvTileEntityMultiBlock)
         {
             IvTileEntityMultiBlock tileEntityMultiBlock = (IvTileEntityMultiBlock) tileEntity;
@@ -176,28 +174,28 @@ public abstract class IvBlockMultiblock extends BlockContainer
         if (destroy)
         {
             if (access instanceof World)
-                ((World) access).setBlockToAir(x, y, z);
+                ((World) access).setBlockToAir(pos);
         }
 
         return isValidChild;
     }
 
-    public static IvTileEntityMultiBlock getValidatedIfParent(Block block, World world, int x, int y, int z)
+    public static IvTileEntityMultiBlock getValidatedIfParent(Block block, World world, BlockPos pos)
     {
-        if (validateMultiblock(block, world, x, y, z))
+        if (validateMultiblock(block, world, pos))
         {
-            IvTileEntityMultiBlock tileEntity = (IvTileEntityMultiBlock) world.getTileEntity(x, y, z);
+            IvTileEntityMultiBlock tileEntity = (IvTileEntityMultiBlock) world.getTileEntity(pos);
             return tileEntity.isParent() ? tileEntity : null;
         }
 
         return null;
     }
 
-    public static IvTileEntityMultiBlock getValidatedTotalParent(Block block, IBlockAccess access, int x, int y, int z)
+    public static IvTileEntityMultiBlock getValidatedTotalParent(Block block, IBlockAccess access, BlockPos pos)
     {
-        if (validateMultiblock(block, access, x, y, z))
+        if (validateMultiblock(block, access, pos))
         {
-            TileEntity tileEntity = access.getTileEntity(x, y, z);
+            TileEntity tileEntity = access.getTileEntity(pos);
 
             if (tileEntity instanceof IvTileEntityMultiBlock)
                 return ((IvTileEntityMultiBlock) tileEntity).getTotalParent();

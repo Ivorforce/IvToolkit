@@ -19,25 +19,25 @@ package ivorius.ivtoolkit.blocks;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
 import ivorius.ivtoolkit.tools.IvGsonHelper;
 import net.minecraft.util.StatCollector;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nullable;
 
-import static net.minecraftforge.common.util.ForgeDirection.*;
+import static net.minecraft.util.EnumFacing.*;
 
 /**
  * Created by lukas on 03.03.15.
  */
 public class Directions
 {
-    public static final ForgeDirection[] HORIZONTAL = new ForgeDirection[]{NORTH, EAST, SOUTH, WEST};
-    public static final ForgeDirection[] X_AXIS = new ForgeDirection[]{EAST, WEST};
-    public static final ForgeDirection[] Y_AXIS = new ForgeDirection[]{UP, DOWN};
-    public static final ForgeDirection[] Z_AXIS = new ForgeDirection[]{SOUTH, NORTH};
+    public static final EnumFacing[] HORIZONTAL = new EnumFacing[]{NORTH, EAST, SOUTH, WEST};
+    public static final EnumFacing[] X_AXIS = new EnumFacing[]{EAST, WEST};
+    public static final EnumFacing[] Y_AXIS = new EnumFacing[]{UP, DOWN};
+    public static final EnumFacing[] Z_AXIS = new EnumFacing[]{SOUTH, NORTH};
     
     @Nullable
-    public static Integer getHorizontalClockwiseRotations(ForgeDirection source, ForgeDirection dest, boolean mirrorX)
+    public static Integer getHorizontalClockwiseRotations(EnumFacing source, EnumFacing dest, boolean mirrorX)
     {
         if (source == dest)
             return mirrorX && ArrayUtils.contains(Directions.X_AXIS, dest) ? 2 : 0;
@@ -54,7 +54,7 @@ public class Directions
         return null;
     }
 
-    public static ForgeDirection rotate(ForgeDirection direction, AxisAlignedTransform2D transform)
+    public static EnumFacing rotate(EnumFacing direction, AxisAlignedTransform2D transform)
     {
         if (direction == UP || direction == DOWN)
             return direction;
@@ -65,24 +65,24 @@ public class Directions
         return HORIZONTAL[(ArrayUtils.indexOf(HORIZONTAL, direction) + rotations) % HORIZONTAL.length];
     }
 
-    public static ForgeDirection deserialize(String id)
+    public static EnumFacing deserialize(String id)
     {
-        ForgeDirection direction = IvGsonHelper.enumForNameIgnoreCase(id, values());
+        EnumFacing direction = IvGsonHelper.enumForNameIgnoreCase(id, values());
         return direction != null ? direction : NORTH;
     }
 
-    public static ForgeDirection deserializeHorizontal(String id)
+    public static EnumFacing deserializeHorizontal(String id)
     {
-        ForgeDirection direction = IvGsonHelper.enumForNameIgnoreCase(id, HORIZONTAL);
+        EnumFacing direction = IvGsonHelper.enumForNameIgnoreCase(id, HORIZONTAL);
         return direction != null ? direction : NORTH;
     }
 
-    public static String serialize(ForgeDirection direction)
+    public static String serialize(EnumFacing direction)
     {
         return IvGsonHelper.serializedName(direction);
     }
 
-    public static ForgeDirection getDirectionFromVRotation(int front)
+    public static EnumFacing getDirectionFromVRotation(int front)
     {
         switch (front)
         {

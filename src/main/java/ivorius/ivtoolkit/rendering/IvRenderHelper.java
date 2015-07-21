@@ -16,12 +16,13 @@
 
 package ivorius.ivtoolkit.rendering;
 
+import ivorius.ivtoolkit.tools.WorldRendererAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Random;
@@ -35,71 +36,21 @@ public class IvRenderHelper
 
     public static void drawRectFullScreen(int screenWidth, int screenHeight)
     {
-        Tessellator tessellator = Tessellator.instance;
+        WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
 
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(0.0, 0.0, 0.0, 0.0, 1.0);
-        tessellator.addVertexWithUV(0.0, screenHeight, 0.0, 0.0, 0.0);
-        tessellator.addVertexWithUV(screenWidth, screenHeight, 0.0, 1.0, 0.0);
-        tessellator.addVertexWithUV(screenWidth, 0.0, 0.0, 1.0, 1.0);
-        tessellator.draw();
-    }
-
-    public static void renderCubeInvBlock(RenderBlocks rb, Block block, int metadata)
-    {
-        block.setBlockBoundsForItemRender();
-        Tessellator tessellator = Tessellator.instance;
-
-        double x = 0.0;
-        double y = 0.0;
-        double z = 0.0;
-
-        rb.setRenderBoundsFromBlock(block);
-        GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
-        tessellator.startDrawingQuads();
-        tessellator.setNormal(0.0F, -1.0F, 0.0F);
-        rb.renderFaceYNeg(block, x, y, z, rb.getBlockIconFromSideAndMetadata(block, 0, metadata));
-        tessellator.draw();
-        tessellator.startDrawingQuads();
-        tessellator.setNormal(0.0F, 1.0F, 0.0F);
-        rb.renderFaceYPos(block, x, y, z, rb.getBlockIconFromSideAndMetadata(block, 1, metadata));
-        tessellator.draw();
-        tessellator.startDrawingQuads();
-        tessellator.setNormal(0.0F, 0.0F, -1.0F);
-        rb.renderFaceZNeg(block, x, y, z, rb.getBlockIconFromSideAndMetadata(block, 2, metadata));
-        tessellator.draw();
-        tessellator.startDrawingQuads();
-        tessellator.setNormal(0.0F, 0.0F, 1.0F);
-        rb.renderFaceZPos(block, x, y, z, rb.getBlockIconFromSideAndMetadata(block, 3, metadata));
-        tessellator.draw();
-        tessellator.startDrawingQuads();
-        tessellator.setNormal(-1.0F, 0.0F, 0.0F);
-        rb.renderFaceXNeg(block, x, y, z, rb.getBlockIconFromSideAndMetadata(block, 4, metadata));
-        tessellator.draw();
-        tessellator.startDrawingQuads();
-        tessellator.setNormal(1.0F, 0.0F, 0.0F);
-        rb.renderFaceXPos(block, x, y, z, rb.getBlockIconFromSideAndMetadata(block, 5, metadata));
-        tessellator.draw();
-        GL11.glTranslatef(0.5F, 0.5F, 0.5F);
-    }
-
-    public static void renderDefaultBlock(RenderBlocks rb, Block block, double x, double y, double z)
-    {
-        block.setBlockBoundsForItemRender();
-        rb.setRenderBoundsFromBlock(block);
-        rb.renderFaceYNeg(block, x, y, z, rb.getBlockIconFromSide(block, 0));
-        rb.renderFaceYPos(block, x, y, z, rb.getBlockIconFromSide(block, 1));
-        rb.renderFaceZNeg(block, x, y, z, rb.getBlockIconFromSide(block, 2));
-        rb.renderFaceZPos(block, x, y, z, rb.getBlockIconFromSide(block, 3));
-        rb.renderFaceXNeg(block, x, y, z, rb.getBlockIconFromSide(block, 4));
-        rb.renderFaceXPos(block, x, y, z, rb.getBlockIconFromSide(block, 5));
+        renderer.startDrawingQuads();
+        renderer.addVertexWithUV(0.0, 0.0, 0.0, 0.0, 1.0);
+        renderer.addVertexWithUV(0.0, screenHeight, 0.0, 0.0, 0.0);
+        renderer.addVertexWithUV(screenWidth, screenHeight, 0.0, 1.0, 0.0);
+        renderer.addVertexWithUV(screenWidth, 0.0, 0.0, 1.0, 1.0);
+        Tessellator.getInstance().draw();
     }
 
     public static void renderLights(float ticks, int color, float alpha, int number)
     {
         float width = 2.5f;
 
-        Tessellator tessellator = Tessellator.instance;
+        WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
 
         float usedTicks = ticks / 200.0F;
 
@@ -133,17 +84,17 @@ public class IvRenderHelper
                 GL11.glRotatef(random.nextFloat() * 360.0F, 1.0F, 0.0F, 0.0F);
                 GL11.glRotatef(random.nextFloat() * 360.0F, 0.0F, 1.0F, 0.0F);
                 GL11.glRotatef(random.nextFloat() * 360.0F + usedTicks * 90.0F, 0.0F, 0.0F, 1.0F);
-                tessellator.startDrawing(6);
+                renderer.startDrawing(6);
                 float var8 = random.nextFloat() * 20.0F + 5.0F;
                 float var9 = random.nextFloat() * 2.0F + 1.0F;
-                tessellator.setColorRGBA_I(color, (int) (255.0F * alpha * lightAlpha));
-                tessellator.addVertex(0.0D, 0.0D, 0.0D);
-                tessellator.setColorRGBA_I(color, 0);
-                tessellator.addVertex(-width * (double) var9, var8, (-0.5F * var9));
-                tessellator.addVertex(width * (double) var9, var8, (-0.5F * var9));
-                tessellator.addVertex(0.0D, var8, (1.0F * var9));
-                tessellator.addVertex(-width * (double) var9, var8, (-0.5F * var9));
-                tessellator.draw();
+                renderer.setColorRGBA_I(color, (int) (255.0F * alpha * lightAlpha));
+                renderer.addVertex(0.0D, 0.0D, 0.0D);
+                renderer.setColorRGBA_I(color, 0);
+                renderer.addVertex(-width * (double) var9, var8, (-0.5F * var9));
+                renderer.addVertex(width * (double) var9, var8, (-0.5F * var9));
+                renderer.addVertex(0.0D, var8, (1.0F * var9));
+                renderer.addVertex(-width * (double) var9, var8, (-0.5F * var9));
+                Tessellator.getInstance().draw();
             }
         }
 
@@ -157,13 +108,13 @@ public class IvRenderHelper
         GL11.glEnable(GL11.GL_ALPHA_TEST);
     }
 
-    public static void renderParticle(Tessellator par1Tessellator, float time, float scale)
+    public static void renderParticle(WorldRenderer renderer, float time, float scale)
     {
-        float f1 = ActiveRenderInfo.rotationX;
-        float f2 = ActiveRenderInfo.rotationZ;
-        float f3 = ActiveRenderInfo.rotationYZ;
-        float f4 = ActiveRenderInfo.rotationXY;
-        float f5 = ActiveRenderInfo.rotationXZ;
+        float f1 = ActiveRenderInfo.getRotationX();
+        float f2 = ActiveRenderInfo.getRotationZ();
+        float f3 = ActiveRenderInfo.getRotationYZ();
+        float f4 = ActiveRenderInfo.getRotationXY();
+        float f5 = ActiveRenderInfo.getRotationXZ();
 //        double interpPosX = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double)time;
 //        double interpPosY = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double)time;
 //        double interpPosZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double)time;
@@ -177,15 +128,15 @@ public class IvRenderHelper
         float f11 = 0.0f;
         float f12 = 0.0f;
         float f13 = 0.0f;
-        par1Tessellator.startDrawingQuads();
-        par1Tessellator.addVertexWithUV((double) (f11 - f1 * f10 - f3 * f10), (double) (f12 - f5 * f10), (double) (f13 - f2 * f10 - f4 * f10), (double) f7, (double) f9);
-        par1Tessellator.addVertexWithUV((double) (f11 - f1 * f10 + f3 * f10), (double) (f12 + f5 * f10), (double) (f13 - f2 * f10 + f4 * f10), (double) f7, (double) f8);
-        par1Tessellator.addVertexWithUV((double) (f11 + f1 * f10 + f3 * f10), (double) (f12 + f5 * f10), (double) (f13 + f2 * f10 + f4 * f10), (double) f6, (double) f8);
-        par1Tessellator.addVertexWithUV((double) (f11 + f1 * f10 - f3 * f10), (double) (f12 - f5 * f10), (double) (f13 + f2 * f10 - f4 * f10), (double) f6, (double) f9);
-        par1Tessellator.draw();
+        renderer.startDrawingQuads();
+        renderer.addVertexWithUV((double) (f11 - f1 * f10 - f3 * f10), (double) (f12 - f5 * f10), (double) (f13 - f2 * f10 - f4 * f10), (double) f7, (double) f9);
+        renderer.addVertexWithUV((double) (f11 - f1 * f10 + f3 * f10), (double) (f12 + f5 * f10), (double) (f13 - f2 * f10 + f4 * f10), (double) f7, (double) f8);
+        renderer.addVertexWithUV((double) (f11 + f1 * f10 + f3 * f10), (double) (f12 + f5 * f10), (double) (f13 + f2 * f10 + f4 * f10), (double) f6, (double) f8);
+        renderer.addVertexWithUV((double) (f11 + f1 * f10 - f3 * f10), (double) (f12 - f5 * f10), (double) (f13 + f2 * f10 - f4 * f10), (double) f6, (double) f9);
+        Tessellator.getInstance().draw();
     }
 
-    public static void drawNormalCube(Tessellator tessellator, float size, float in, boolean lined)
+    public static void drawNormalCube(WorldRenderer tessellator, float size, float in, boolean lined)
     {
         if (lined)
         {
@@ -202,7 +153,7 @@ public class IvRenderHelper
         tessellator.addVertex(-size * in, size * in, -size);
         if (lined)
         {
-            tessellator.draw();
+            Tessellator.getInstance().draw();
         }
 
         if (lined)
@@ -215,7 +166,7 @@ public class IvRenderHelper
         tessellator.addVertex(size * in, -size * in, size);
         if (lined)
         {
-            tessellator.draw();
+            Tessellator.getInstance().draw();
         }
 
         if (lined)
@@ -228,7 +179,7 @@ public class IvRenderHelper
         tessellator.addVertex(-size, -size * in, size * in);
         if (lined)
         {
-            tessellator.draw();
+            Tessellator.getInstance().draw();
         }
 
         if (lined)
@@ -241,7 +192,7 @@ public class IvRenderHelper
         tessellator.addVertex(size, size * in, -size * in);
         if (lined)
         {
-            tessellator.draw();
+            Tessellator.getInstance().draw();
         }
 
         if (lined)
@@ -254,7 +205,7 @@ public class IvRenderHelper
         tessellator.addVertex(-size * in, size, size * in);
         if (lined)
         {
-            tessellator.draw();
+            Tessellator.getInstance().draw();
         }
 
         if (lined)
@@ -266,10 +217,10 @@ public class IvRenderHelper
         tessellator.addVertex(size * in, -size, size * in);
         tessellator.addVertex(size * in, -size, -size * in);
 
-        tessellator.draw();
+        Tessellator.getInstance().draw();
     }
 
-    public static void drawCuboid(Tessellator tessellator, float sizeX, float sizeY, float sizeZ, float in, boolean lined)
+    public static void drawCuboid(WorldRenderer tessellator, float sizeX, float sizeY, float sizeZ, float in, boolean lined)
     {
         if (lined)
         {
@@ -286,7 +237,7 @@ public class IvRenderHelper
         tessellator.addVertex(sizeX * in, -sizeY * in, -sizeZ);
         if (lined)
         {
-            tessellator.draw();
+            Tessellator.getInstance().draw();
         }
 
         if (lined)
@@ -299,7 +250,7 @@ public class IvRenderHelper
         tessellator.addVertex(-sizeX * in, sizeY * in, sizeZ);
         if (lined)
         {
-            tessellator.draw();
+            Tessellator.getInstance().draw();
         }
 
         if (lined)
@@ -312,7 +263,7 @@ public class IvRenderHelper
         tessellator.addVertex(-sizeX, sizeY * in, -sizeZ * in);
         if (lined)
         {
-            tessellator.draw();
+            Tessellator.getInstance().draw();
         }
 
         if (lined)
@@ -325,7 +276,7 @@ public class IvRenderHelper
         tessellator.addVertex(sizeX, -sizeY * in, sizeZ * in);
         if (lined)
         {
-            tessellator.draw();
+            Tessellator.getInstance().draw();
         }
 
         if (lined)
@@ -338,7 +289,7 @@ public class IvRenderHelper
         tessellator.addVertex(sizeX * in, sizeY, -sizeZ * in);
         if (lined)
         {
-            tessellator.draw();
+            Tessellator.getInstance().draw();
         }
 
         if (lined)
@@ -350,10 +301,10 @@ public class IvRenderHelper
         tessellator.addVertex(sizeX * in, -sizeY, sizeZ * in);
         tessellator.addVertex(-sizeX * in, -sizeY, sizeZ * in);
 
-        tessellator.draw();
+        Tessellator.getInstance().draw();
     }
 
-    public static void renderCuboid(Tessellator tessellator, float sizeX, float sizeY, float sizeZ, float in)
+    public static void renderCuboid(WorldRenderer tessellator, float sizeX, float sizeY, float sizeZ, float in)
     {
         tessellator.addVertex(-sizeX * in, -sizeY * in, -sizeZ);
         tessellator.addVertex(-sizeX * in, sizeY * in, -sizeZ);
@@ -386,7 +337,7 @@ public class IvRenderHelper
         tessellator.addVertex(-sizeX * in, -sizeY, sizeZ * in);
     }
 
-    public static void drawModelCuboid(Tessellator tessellator, float x, float y, float z, float sizeX, float sizeY, float sizeZ)
+    public static void drawModelCuboid(WorldRenderer renderer, float x, float y, float z, float sizeX, float sizeY, float sizeZ)
     {
         float tM = 1.0f / 16.0f;
 
@@ -394,8 +345,8 @@ public class IvRenderHelper
         float transY = (y + sizeY * 0.5f) * tM - 0.5f;
         float transZ = (z + sizeZ * 0.5f) * tM;
 
-        tessellator.addTranslation(transX, transY, transZ);
-        renderCuboid(tessellator, sizeX * tM * 0.5f, sizeY * tM * 0.5f, sizeZ * tM * 0.5f, 1.0f);
-        tessellator.addTranslation(-transX, -transY, -transZ);
+        WorldRendererAccessor.addTranslation(renderer, transX, transY, transZ);
+        renderCuboid(renderer, sizeX * tM * 0.5f, sizeY * tM * 0.5f, sizeZ * tM * 0.5f, 1.0f);
+        WorldRendererAccessor.addTranslation(renderer, -transX, -transY, -transZ);
     }
 }

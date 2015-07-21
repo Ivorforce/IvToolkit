@@ -27,6 +27,6 @@ public class IvTileEntityHelper
     {
         NBTTagCompound var1 = new NBTTagCompound();
         tileEntity.writeToNBT(var1);
-        return new S35PacketUpdateTileEntity(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord, 1, var1);
+        return new S35PacketUpdateTileEntity(tileEntity.getPos(), 1, var1);
     }
 }

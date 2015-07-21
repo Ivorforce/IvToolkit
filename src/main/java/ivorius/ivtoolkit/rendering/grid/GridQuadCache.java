@@ -19,15 +19,15 @@ package ivorius.ivtoolkit.rendering.grid;
 import com.google.common.base.Function;
 import gnu.trove.TIntCollection;
 import gnu.trove.list.array.TIntArrayList;
-import ivorius.ivtoolkit.blocks.BlockCoord;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
 import java.util.*;
 
-import static net.minecraftforge.common.util.ForgeDirection.*;
+import static net.minecraft.util.EnumFacing.*;
 
 /**
  * Created by lukas on 20.03.15.
@@ -38,7 +38,7 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
 
     protected float[] size;
 
-    public static int[] getCacheAxes(ForgeDirection direction, int... axes)
+    public static int[] getCacheAxes(EnumFacing direction, int... axes)
     {
         switch (direction)
         {
@@ -56,12 +56,12 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
         throw new IllegalArgumentException();
     }
 
-    public static int[] getNormalAxes(ForgeDirection direction, int... axes)
+    public static int[] getNormalAxes(EnumFacing direction, int... axes)
     {
         return getCacheAxes(direction, axes);
     }
 
-    public static float[] getCacheAxes(ForgeDirection direction, float... axes)
+    public static float[] getCacheAxes(EnumFacing direction, float... axes)
     {
         switch (direction)
         {
@@ -79,17 +79,17 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
         throw new IllegalArgumentException();
     }
 
-    public static float[] getNormalAxes(ForgeDirection direction, float... axes)
+    public static float[] getNormalAxes(EnumFacing direction, float... axes)
     {
         return getCacheAxes(direction, axes);
     }
 
-    public static <T> GridQuadCache<T> createQuadCache(int[] size, float[] scale, Function<Pair<BlockCoord, ForgeDirection>, T> mapper)
+    public static <T> GridQuadCache<T> createQuadCache(int[] size, float[] scale, Function<Pair<BlockPos, EnumFacing>, T> mapper)
     {
         return createQuadCacheGreedy(size, scale, mapper);
     }
 
-    protected static <T> GridQuadCache<T> createQuadCacheGreedy(int[] size, float[] scale, Function<Pair<BlockCoord, ForgeDirection>, T> mapper)
+    protected static <T> GridQuadCache<T> createQuadCacheGreedy(int[] size, float[] scale, Function<Pair<BlockPos, EnumFacing>, T> mapper)
     {
         Map<QuadContext<T>, CoordGrid> partialCache = new HashMap<>();
 
@@ -97,7 +97,7 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
             for (int y = 0; y < size[1]; y++)
                 for (int z = 0; z < size[2]; z++)
                 {
-                    BlockCoord coord = new BlockCoord(x, y, z);
+                    BlockPos coord = new BlockPos(x, y, z);
                     addToCache(partialCache, mapper, UP, coord);
                     addToCache(partialCache, mapper, DOWN, coord);
                     addToCache(partialCache, mapper, NORTH, coord);
@@ -135,7 +135,7 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
             cachedQuadCoords.position(0);
 
             float zLevel;
-            zLevel = (context.direction.offsetX + context.direction.offsetY + context.direction.offsetZ > 0
+            zLevel = (context.direction.getFrontOffsetX() + context.direction.getFrontOffsetY() + context.direction.getFrontOffsetZ() > 0
                     ? context.layer + 1 : context.layer) * scAxes[0];
 
             cache.cachedQuadLevels.add(new CachedQuadLevel<>(zLevel, context.direction, context.t, cachedQuadCoords));
@@ -144,12 +144,12 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
         return cache;
     }
 
-    protected static <T> void addToCache(Map<QuadContext<T>, CoordGrid> cache, Function<Pair<BlockCoord, ForgeDirection>, T> mapper, ForgeDirection direction, BlockCoord coord)
+    protected static <T> void addToCache(Map<QuadContext<T>, CoordGrid> cache, Function<Pair<BlockPos, EnumFacing>, T> mapper, EnumFacing direction, BlockPos coord)
     {
         T t = mapper.apply(Pair.of(coord, direction));
         if (t != null)
         {
-            int[] sAxes = getCacheAxes(direction, coord.x, coord.y, coord.z);
+            int[] sAxes = getCacheAxes(direction, coord.getX(), coord.getY(), coord.getZ());
             addToCache(cache, new QuadContext<>(sAxes[0], direction, t), sAxes[1], sAxes[2]);
         }
     }
@@ -176,10 +176,10 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
     public static class QuadContext<T>
     {
         public final int layer;
-        public final ForgeDirection direction;
+        public final EnumFacing direction;
         public final T t;
 
-        public QuadContext(int layer, ForgeDirection direction, T t)
+        public QuadContext(int layer, EnumFacing direction, T t)
         {
             this.layer = layer;
             this.direction = direction;
@@ -379,12 +379,12 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
     public static class CachedQuadLevel<T>
     {
         public final float zLevel;
-        public final ForgeDirection direction;
+        public final EnumFacing direction;
         public final T t;
 
         public final FloatBuffer quads;
 
-        public CachedQuadLevel(float zLevel, ForgeDirection direction, T t, FloatBuffer quads)
+        public CachedQuadLevel(float zLevel, EnumFacing direction, T t, FloatBuffer quads)
         {
             this.zLevel = zLevel;
             this.direction = direction;

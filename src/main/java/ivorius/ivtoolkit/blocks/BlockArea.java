@@ -17,87 +17,88 @@
 package ivorius.ivtoolkit.blocks;
 
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 
 import java.util.Iterator;
 
 /**
  * Created by lukas on 09.06.14.
  */
-public class BlockArea implements Iterable<BlockCoord>
+public class BlockArea implements Iterable<BlockPos>
 {
-    private BlockCoord point1;
-    private BlockCoord point2;
+    private BlockPos point1;
+    private BlockPos point2;
 
-    public BlockArea(BlockCoord point1, BlockCoord point2)
+    public BlockArea(BlockPos point1, BlockPos point2)
     {
         this.point1 = point1;
         this.point2 = point2;
     }
 
-    public static BlockArea areaFromSize(BlockCoord coord, int[] size)
+    public static BlockArea areaFromSize(BlockPos coord, int[] size)
     {
         if (size[0] <= 0 || size[1] <= 0 || size[2] <= 0)
             throw new IllegalArgumentException();
 
-        return new BlockArea(coord, new BlockCoord(coord.x + size[0] - 1, coord.y + size[1] - 1, coord.z + size[2] - 1));
+        return new BlockArea(coord, new BlockPos(coord.getX() + size[0] - 1, coord.getY() + size[1] - 1, coord.getZ() + size[2] - 1));
     }
 
-    public BlockCoord getPoint1()
+    public BlockPos getPoint1()
     {
         return point1;
     }
 
-    public void setPoint1(BlockCoord point1)
+    public void setPoint1(BlockPos point1)
     {
         this.point1 = point1;
     }
 
-    public BlockCoord getPoint2()
+    public BlockPos getPoint2()
     {
         return point2;
     }
 
-    public void setPoint2(BlockCoord point2)
+    public void setPoint2(BlockPos point2)
     {
         this.point2 = point2;
     }
 
-    public BlockCoord getLowerCorner()
+    public BlockPos getLowerCorner()
     {
-        return point1.getLowerCorner(point2);
+        return BlockPositions.getLowerCorner(point1, point2);
     }
 
-    public BlockCoord getHigherCorner()
+    public BlockPos getHigherCorner()
     {
-        return point1.getHigherCorner(point2);
+        return BlockPositions.getHigherCorner(point1, point2);
     }
 
     public int[] areaSize()
     {
-        BlockCoord lower = getLowerCorner();
-        BlockCoord higher = getHigherCorner();
+        BlockPos lower = getLowerCorner();
+        BlockPos higher = getHigherCorner();
 
-        return new int[]{higher.x - lower.x + 1, higher.y - lower.y + 1, higher.z - lower.z + 1};
+        return new int[]{higher.getX() - lower.getX() + 1, higher.getY() - lower.getY() + 1, higher.getZ() - lower.getZ() + 1};
     }
 
-    public boolean contains(BlockCoord coord)
+    public boolean contains(BlockPos coord)
     {
-        BlockCoord lower = getLowerCorner();
-        BlockCoord higher = getHigherCorner();
+        BlockPos lower = getLowerCorner();
+        BlockPos higher = getHigherCorner();
 
-        return coord.x >= lower.x && coord.y >= lower.y && coord.z >= lower.z && coord.x <= higher.x && coord.y <= higher.y && coord.z <= higher.z;
+        return coord.getX() >= lower.getX() && coord.getY() >= lower.getY() && coord.getZ() >= lower.getZ() && coord.getX() <= higher.getX() && coord.getY() <= higher.getY() && coord.getZ() <= higher.getZ();
     }
 
     public AxisAlignedBB asAxisAlignedBB()
     {
-        BlockCoord lower = getLowerCorner();
-        BlockCoord higher = getHigherCorner();
+        BlockPos lower = getLowerCorner();
+        BlockPos higher = getHigherCorner();
 
-        return AxisAlignedBB.getBoundingBox(lower.x, lower.y, lower.z, higher.x, higher.y, higher.z);
+        return AxisAlignedBB.fromBounds(lower.getX(), lower.getY(), lower.getZ(), higher.getX(), higher.getY(), higher.getZ());
     }
 
     @Override
-    public Iterator<BlockCoord> iterator()
+    public Iterator<BlockPos> iterator()
     {
         return new BlockAreaIterator(getLowerCorner(), getHigherCorner());
     }

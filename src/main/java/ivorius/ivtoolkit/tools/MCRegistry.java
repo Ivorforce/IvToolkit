@@ -20,21 +20,22 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 
 /**
  * Created by lukas on 30.06.14.
  */
 public interface MCRegistry
 {
-    Item itemFromID(String itemID);
+    Item itemFromID(ResourceLocation itemID);
 
-    String idFromItem(Item item);
+    Object idFromItem(Item item);
 
-    void modifyItemStackCompound(NBTTagCompound compound, String itemID);
+    void modifyItemStackCompound(NBTTagCompound compound, ResourceLocation itemID);
 
-    Block blockFromID(String blockID);
+    Block blockFromID(ResourceLocation blockID);
 
-    String idFromBlock(Block block);
+    ResourceLocation idFromBlock(Block block);
 
     TileEntity loadTileEntity(NBTTagCompound compound);
 }

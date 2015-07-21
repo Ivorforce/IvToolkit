@@ -20,6 +20,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 
 /**
  * Created by lukas on 30.06.14.
@@ -29,33 +30,33 @@ public class MCRegistryDefault implements MCRegistry
     public static final MCRegistryDefault INSTANCE = new MCRegistryDefault();
 
     @Override
-    public Item itemFromID(String itemID)
+    public Item itemFromID(ResourceLocation itemID)
     {
         return (Item) Item.itemRegistry.getObject(itemID);
     }
 
     @Override
-    public String idFromItem(Item item)
+    public ResourceLocation idFromItem(Item item)
     {
-        return Item.itemRegistry.getNameForObject(item);
+        return (ResourceLocation) Item.itemRegistry.getNameForObject(item);
     }
 
     @Override
-    public void modifyItemStackCompound(NBTTagCompound compound, String itemID)
+    public void modifyItemStackCompound(NBTTagCompound compound, ResourceLocation itemID)
     {
 
     }
 
     @Override
-    public Block blockFromID(String blockID)
+    public Block blockFromID(ResourceLocation blockID)
     {
-        return Block.getBlockFromName(blockID);
+        return (Block) Block.blockRegistry.getObject(blockID);
     }
 
     @Override
-    public String idFromBlock(Block block)
+    public ResourceLocation idFromBlock(Block block)
     {
-        return Block.blockRegistry.getNameForObject(block);
+        return (ResourceLocation) Block.blockRegistry.getNameForObject(block);
     }
 
     @Override

@@ -54,7 +54,7 @@ public class IvRaytracerMC
     public static void drawStandardOutlinesFromTileEntity(List<IvRaytraceableObject> objects, double d, double d1, double d2, TileEntity tileEntity)
     {
         GL11.glPushMatrix();
-        GL11.glTranslatef((float) d - tileEntity.xCoord, (float) d1 - tileEntity.yCoord, (float) d2 - tileEntity.zCoord);
+        GL11.glTranslatef((float) d - tileEntity.getPos().getX(), (float) d1 - tileEntity.getPos().getY(), (float) d2 - tileEntity.getPos().getZ());
         IvRaytracer.drawStandardOutlines(objects);
         GL11.glPopMatrix();
     }

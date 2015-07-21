@@ -18,8 +18,8 @@ package ivorius.ivtoolkit.maze.classic;
 
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import ivorius.ivtoolkit.blocks.BlockCoord;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
+import net.minecraft.util.BlockPos;
 
 /**
  * Created by lukas on 13.04.15.
@@ -32,18 +32,18 @@ public class MazeCoordinates
     public static MazeRoom rotatedRoom(MazeRoom room, AxisAlignedTransform2D transform, int[] size)
     {
         int[] roomPosition = room.getCoordinates();
-        BlockCoord transformedRoom = transform.apply(new BlockCoord(roomPosition[0], roomPosition[1], roomPosition[2]), size);
-        return new MazeRoom(transformedRoom.x, transformedRoom.y, transformedRoom.z);
+        BlockPos transformedRoom = transform.apply(new BlockPos(roomPosition[0], roomPosition[1], roomPosition[2]), size);
+        return new MazeRoom(transformedRoom.getX(), transformedRoom.getY(), transformedRoom.getZ());
     }
 
     public static MazePath rotatedPath(MazePath path, AxisAlignedTransform2D transform, int[] size)
     {
         int[] sourceCoords = path.getSourceRoom().getCoordinates();
         int[] destCoords = path.getDestinationRoom().getCoordinates();
-        BlockCoord transformedSource = transform.apply(new BlockCoord(sourceCoords[0], sourceCoords[1], sourceCoords[2]), size);
-        BlockCoord transformedDest = transform.apply(new BlockCoord(destCoords[0], destCoords[1], destCoords[2]), size);
+        BlockPos transformedSource = transform.apply(new BlockPos(sourceCoords[0], sourceCoords[1], sourceCoords[2]), size);
+        BlockPos transformedDest = transform.apply(new BlockPos(destCoords[0], destCoords[1], destCoords[2]), size);
 
-        return MazePath.fromConnection(new MazeRoom(transformedSource.x, transformedSource.y, transformedSource.z), new MazeRoom(transformedDest.x, transformedDest.y, transformedDest.z));
+        return MazePath.fromConnection(new MazeRoom(transformedSource.getX(), transformedSource.getY(), transformedSource.getZ()), new MazeRoom(transformedDest.getX(), transformedDest.getY(), transformedDest.getZ()));
     }
 
     public static boolean[] coordPathFlags(MazeCoordinate coordinate)

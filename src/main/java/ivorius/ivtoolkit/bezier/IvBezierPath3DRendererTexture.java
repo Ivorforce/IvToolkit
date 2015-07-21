@@ -19,6 +19,7 @@ package ivorius.ivtoolkit.bezier;
 import ivorius.ivtoolkit.math.IvMathHelper;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -73,7 +74,7 @@ public class IvBezierPath3DRendererTexture
             path.buildDistances();
         }
 
-        Tessellator tessellator = Tessellator.instance;
+        WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
 
         GL11.glEnable(GL11.GL_BLEND);
         OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
@@ -96,18 +97,18 @@ public class IvBezierPath3DRendererTexture
             double textureX = totalProgress + textureShift;
             if (!isVeryFirst)
             {
-                tessellator.setColorRGBA_F((float) red, (float) green, (float) blue, (float) alpha);
-                tessellator.addVertexWithUV(position[0] - pVector[0] * lineWidth, position[1] - pVector[1] * lineWidth, position[2] - pVector[2] * lineWidth, textureX, 0);
-                tessellator.addVertexWithUV(position[0] + pVector[0] * lineWidth, position[1] + pVector[1] * lineWidth, position[2] + pVector[2] * lineWidth, textureX, 1);
-                tessellator.draw();
+                renderer.setColorRGBA_F((float) red, (float) green, (float) blue, (float) alpha);
+                renderer.addVertexWithUV(position[0] - pVector[0] * lineWidth, position[1] - pVector[1] * lineWidth, position[2] - pVector[2] * lineWidth, textureX, 0);
+                renderer.addVertexWithUV(position[0] + pVector[0] * lineWidth, position[1] + pVector[1] * lineWidth, position[2] + pVector[2] * lineWidth, textureX, 1);
+                Tessellator.getInstance().draw();
             }
 
             if (!isVeryLast)
             {
-                tessellator.startDrawingQuads();
-                tessellator.setColorRGBA_F((float) red, (float) green, (float) blue, (float) alpha);
-                tessellator.addVertexWithUV(position[0] + pVector[0] * lineWidth, position[1] + pVector[1] * lineWidth, position[2] + pVector[2] * lineWidth, textureX, 1);
-                tessellator.addVertexWithUV(position[0] - pVector[0] * lineWidth, position[1] - pVector[1] * lineWidth, position[2] - pVector[2] * lineWidth, textureX, 0);
+                renderer.startDrawingQuads();
+                renderer.setColorRGBA_F((float) red, (float) green, (float) blue, (float) alpha);
+                renderer.addVertexWithUV(position[0] + pVector[0] * lineWidth, position[1] + pVector[1] * lineWidth, position[2] + pVector[2] * lineWidth, textureX, 1);
+                renderer.addVertexWithUV(position[0] - pVector[0] * lineWidth, position[1] - pVector[1] * lineWidth, position[2] - pVector[2] * lineWidth, textureX, 0);
             }
         }
 

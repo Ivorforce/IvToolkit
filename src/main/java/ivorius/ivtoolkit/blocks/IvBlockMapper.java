@@ -23,6 +23,7 @@ import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.ArrayList;
@@ -50,20 +51,16 @@ public class IvBlockMapper
         mapping = new ArrayList<>(list.tagCount());
 
         for (int i = 0; i < list.tagCount(); i++)
-        {
-            mapping.add(registry.blockFromID(list.getStringTagAt(i)));
-        }
+            mapping.add(registry.blockFromID(new ResourceLocation(list.getStringTagAt(i))));
     }
 
     public void addMapping(Block block)
     {
         if (!mapping.contains(block))
-        {
             mapping.add(block);
-        }
     }
 
-    public void addMapping(Block[] blocks)
+    public void addMapping(List<Block> blocks)
     {
         for (Block block : blocks)
         {
@@ -92,7 +89,7 @@ public class IvBlockMapper
 
         for (Block block : mapping)
         {
-            String name = Block.blockRegistry.getNameForObject(block);
+            String name = Block.blockRegistry.getNameForObject(block).toString();
 
             if (name != null)
                 list.appendTag(new NBTTagString(name));
@@ -106,13 +103,13 @@ public class IvBlockMapper
         return list;
     }
 
-    public NBTTagCompound createNBTForBlocks(Block[] blocks)
+    public NBTTagCompound createNBTForBlocks(List<Block> blocks)
     {
         NBTTagCompound compound = new NBTTagCompound();
 
-        int[] vals = new int[blocks.length];
-        for (int i = 0; i < blocks.length; i++)
-            vals[i] = getMapping(blocks[i]);
+        int[] vals = new int[blocks.size()];
+        for (int i = 0; i < blocks.size(); i++)
+            vals[i] = getMapping(blocks.get(i));
         NBTTagCompound compressed = new NBTTagCompound();
         IvNBTHelper.writeCompressed("data", vals, getMapSize() - 1, compressed);
         compound.setTag("blocksCompressed", compressed);

@@ -16,8 +16,8 @@
 
 package ivorius.ivtoolkit.network;
 
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 /**
  * Created by lukas on 25.09.14.
@@ -32,7 +32,7 @@ public class IvNetworkHelperClient
 
     public static <ETileEntity extends TileEntity & ClientEventHandler> void sendTileEntityEventPacket(ETileEntity tileEntity, String context, SimpleNetworkWrapper network, Object... params)
     {
-        if (!(tileEntity.getWorldObj().isRemote))
+        if (!(tileEntity.getWorld().isRemote))
             throw new UnsupportedOperationException();
 
         network.sendToServer(PacketTileEntityClientEvent.packetEntityData(tileEntity, context, params));

@@ -17,6 +17,7 @@
 package ivorius.ivtoolkit.raytracing;
 
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 
 import java.util.List;
 
@@ -216,33 +217,33 @@ public class IvRaytraceableAxisAlignedSurface extends IvRaytraceableObject
     @Override
     public void drawOutlines()
     {
-        Tessellator tessellator = Tessellator.instance;
+        WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
 
-        tessellator.startDrawing(3);
+        renderer.startDrawing(3);
         if (width == 0)
         {
-            tessellator.addVertex(x, y, z);
-            tessellator.addVertex(x, y + height, z);
-            tessellator.addVertex(x, y + height, z + depth);
-            tessellator.addVertex(x, y, z + depth);
-            tessellator.addVertex(x, y, z);
+            renderer.addVertex(x, y, z);
+            renderer.addVertex(x, y + height, z);
+            renderer.addVertex(x, y + height, z + depth);
+            renderer.addVertex(x, y, z + depth);
+            renderer.addVertex(x, y, z);
         }
         if (height == 0)
         {
-            tessellator.addVertex(x, y, z);
-            tessellator.addVertex(x + width, y, z);
-            tessellator.addVertex(x + width, y, z + depth);
-            tessellator.addVertex(x, y, z + depth);
-            tessellator.addVertex(x, y, z);
+            renderer.addVertex(x, y, z);
+            renderer.addVertex(x + width, y, z);
+            renderer.addVertex(x + width, y, z + depth);
+            renderer.addVertex(x, y, z + depth);
+            renderer.addVertex(x, y, z);
         }
         if (depth == 0)
         {
-            tessellator.addVertex(x, y, z);
-            tessellator.addVertex(x + width, y, z);
-            tessellator.addVertex(x + width, y + height, z);
-            tessellator.addVertex(x, y + height, z);
-            tessellator.addVertex(x, y, z);
+            renderer.addVertex(x, y, z);
+            renderer.addVertex(x + width, y, z);
+            renderer.addVertex(x + width, y + height, z);
+            renderer.addVertex(x, y + height, z);
+            renderer.addVertex(x, y, z);
         }
-        tessellator.draw();
+        Tessellator.getInstance().draw();
     }
 }

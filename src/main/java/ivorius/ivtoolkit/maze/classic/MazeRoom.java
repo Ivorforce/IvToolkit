@@ -37,7 +37,7 @@ public class MazeRoom implements MazeCoordinate
 
     public MazeRoom(NBTTagIntArray intArray)
     {
-        coordinates = intArray.func_150302_c().clone();
+        coordinates = intArray.getIntArray().clone();
     }
 
     public int getDimensions()

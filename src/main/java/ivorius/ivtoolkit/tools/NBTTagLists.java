@@ -75,7 +75,7 @@ public class NBTTagLists
             @Override
             public int[] apply(Integer input)
             {
-                return list.func_150306_c(input);
+                return list.getIntArrayAt(input);
             }
         });
     }

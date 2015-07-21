@@ -16,10 +16,15 @@
 
 package ivorius.ivtoolkit.tools;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityHanging;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Created by lukas on 10.03.15.
@@ -35,10 +40,10 @@ public class EntityCreatureAccessor
                 : (maximumHomeDistance = ReflectionHelper.findField(EntityCreature.class, "maximumHomeDistance", "field_70772_bD"));
     }
 
-    public static void setHomePosition(EntityCreature creature, int x, int y, int z)
+    public static void setHomePosition(EntityCreature creature, BlockPos pos)
     {
-        float currentHomeDistance = creature.func_110174_bM();
-        creature.setHomeArea(x, y, z, (int) currentHomeDistance);
+        float currentHomeDistance = creature.getMaximumHomeDistance();
+        creature.setHomePosAndDistance(pos, (int) currentHomeDistance);
         setMaximumHomeDistance(creature, currentHomeDistance); // Fix for setHomeArea taking an int
     }
 

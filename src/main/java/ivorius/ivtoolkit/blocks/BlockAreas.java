@@ -16,10 +16,9 @@
 
 package ivorius.ivtoolkit.blocks;
 
-import ivorius.ivtoolkit.blocks.BlockArea;
-import ivorius.ivtoolkit.blocks.BlockCoord;
 import ivorius.ivtoolkit.gui.IntegerRange;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,7 +28,7 @@ import javax.annotation.Nullable;
  */
 public class BlockAreas
 {
-    public static int sideLength(BlockArea area, ForgeDirection side)
+    public static int sideLength(BlockArea area, EnumFacing side)
     {
         int[] size = area.areaSize();
         switch (side)
@@ -48,63 +47,63 @@ public class BlockAreas
         throw new IllegalArgumentException();
     }
 
-    public static BlockArea side(BlockArea area, ForgeDirection side)
+    public static BlockArea side(BlockArea area, EnumFacing side)
     {
-        BlockCoord lowerCorner = area.getLowerCorner();
-        BlockCoord higherCorner = area.getHigherCorner();
+        BlockPos lowerCorner = area.getLowerCorner();
+        BlockPos higherCorner = area.getHigherCorner();
 
         switch (side)
         {
             case UP:
-                return new BlockArea(new BlockCoord(lowerCorner.x, higherCorner.y, lowerCorner.z), higherCorner);
+                return new BlockArea(new BlockPos(lowerCorner.getX(), higherCorner.getY(), lowerCorner.getZ()), higherCorner);
             case DOWN:
-                return new BlockArea(lowerCorner, new BlockCoord(higherCorner.x, lowerCorner.y, higherCorner.z));
+                return new BlockArea(lowerCorner, new BlockPos(higherCorner.getX(), lowerCorner.getY(), higherCorner.getZ()));
             case NORTH:
-                return new BlockArea(lowerCorner, new BlockCoord(higherCorner.x, higherCorner.y, lowerCorner.z));
+                return new BlockArea(lowerCorner, new BlockPos(higherCorner.getX(), higherCorner.getY(), lowerCorner.getZ()));
             case EAST:
-                return new BlockArea(new BlockCoord(higherCorner.x, lowerCorner.y, lowerCorner.z), higherCorner);
+                return new BlockArea(new BlockPos(higherCorner.getX(), lowerCorner.getY(), lowerCorner.getZ()), higherCorner);
             case SOUTH:
-                return new BlockArea(new BlockCoord(lowerCorner.x, lowerCorner.y, higherCorner.z), higherCorner);
+                return new BlockArea(new BlockPos(lowerCorner.getX(), lowerCorner.getY(), higherCorner.getZ()), higherCorner);
             case WEST:
-                return new BlockArea(lowerCorner, new BlockCoord(lowerCorner.x, higherCorner.y, higherCorner.z));
+                return new BlockArea(lowerCorner, new BlockPos(lowerCorner.getX(), higherCorner.getY(), higherCorner.getZ()));
             default:
                 throw new IllegalArgumentException();
         }
     }
 
     @Nullable
-    public static BlockArea shrink(BlockArea area, ForgeDirection side, int amount)
+    public static BlockArea shrink(BlockArea area, EnumFacing side, int amount)
     {
         switch (side)
         {
             case UP:
-                return shrink(area, BlockCoord.ZERO, new BlockCoord(0, amount, 0));
+                return shrink(area, BlockPos.ORIGIN, new BlockPos(0, amount, 0));
             case DOWN:
-                return shrink(area, new BlockCoord(0, amount, 0), BlockCoord.ZERO);
+                return shrink(area, new BlockPos(0, amount, 0), BlockPos.ORIGIN);
             case NORTH:
-                return shrink(area, new BlockCoord(0, 0, amount), BlockCoord.ZERO);
+                return shrink(area, new BlockPos(0, 0, amount), BlockPos.ORIGIN);
             case EAST:
-                return shrink(area, BlockCoord.ZERO, new BlockCoord(amount, 0, 0));
+                return shrink(area, BlockPos.ORIGIN, new BlockPos(amount, 0, 0));
             case SOUTH:
-                return shrink(area, BlockCoord.ZERO, new BlockCoord(0, 0, amount));
+                return shrink(area, BlockPos.ORIGIN, new BlockPos(0, 0, amount));
             case WEST:
-                return shrink(area, new BlockCoord(amount, 0, 0), BlockCoord.ZERO);
+                return shrink(area, new BlockPos(amount, 0, 0), BlockPos.ORIGIN);
             default:
                 throw new IllegalArgumentException();
         }
     }
 
     @Nullable
-    public static BlockArea shrink(BlockArea area, BlockCoord lower, BlockCoord higher)
+    public static BlockArea shrink(BlockArea area, BlockPos lower, BlockPos higher)
     {
-        BlockCoord p1 = area.getPoint1();
-        BlockCoord p2 = area.getPoint2();
-        IntegerRange x = shrink(p1.x, p2.x, lower.x, higher.x);
-        IntegerRange y = shrink(p1.y, p2.y, lower.y, higher.y);
-        IntegerRange z = shrink(p1.z, p2.z, lower.z, higher.z);
+        BlockPos p1 = area.getPoint1();
+        BlockPos p2 = area.getPoint2();
+        IntegerRange x = shrink(p1.getX(), p2.getX(), lower.getX(), higher.getX());
+        IntegerRange y = shrink(p1.getY(), p2.getY(), lower.getY(), higher.getY());
+        IntegerRange z = shrink(p1.getZ(), p2.getZ(), lower.getZ(), higher.getZ());
 
         return x != null && y != null && z != null
-                ? new BlockArea(new BlockCoord(x.min, y.min, z.min), new BlockCoord(x.max, y.max, z.max))
+                ? new BlockArea(new BlockPos(x.min, y.min, z.min), new BlockPos(x.max, y.max, z.max))
                 : null;
     }
 
@@ -118,15 +117,15 @@ public class BlockAreas
     }
 
     @Nonnull
-    public static BlockArea expand(BlockArea area, BlockCoord lower, BlockCoord higher)
+    public static BlockArea expand(BlockArea area, BlockPos lower, BlockPos higher)
     {
-        BlockCoord p1 = area.getPoint1();
-        BlockCoord p2 = area.getPoint2();
-        IntegerRange x = expand(p1.x, p2.x, lower.x, higher.x);
-        IntegerRange y = expand(p1.y, p2.y, lower.y, higher.y);
-        IntegerRange z = expand(p1.z, p2.z, lower.z, higher.z);
+        BlockPos p1 = area.getPoint1();
+        BlockPos p2 = area.getPoint2();
+        IntegerRange x = expand(p1.getX(), p2.getX(), lower.getX(), higher.getX());
+        IntegerRange y = expand(p1.getY(), p2.getY(), lower.getY(), higher.getY());
+        IntegerRange z = expand(p1.getZ(), p2.getZ(), lower.getZ(), higher.getZ());
 
-        return new BlockArea(new BlockCoord(x.min, y.min, z.min), new BlockCoord(x.max, y.max, z.max));
+        return new BlockArea(new BlockPos(x.min, y.min, z.min), new BlockPos(x.max, y.max, z.max));
     }
 
     @Nonnull

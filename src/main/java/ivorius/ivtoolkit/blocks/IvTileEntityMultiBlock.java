@@ -25,17 +25,19 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.util.List;
 
-public class IvTileEntityMultiBlock extends TileEntity
+public class IvTileEntityMultiBlock extends TileEntity implements IUpdatePlayerListBox
 {
-    public int[] parentCoords;
-    public int[][] childCoords;
+    public BlockPos parentCoords;
+    public BlockPos[] childCoords;
     public int direction;
 
     public double[] centerCoords = new double[]{0.5, 0.5, 0.5};
@@ -49,18 +51,12 @@ public class IvTileEntityMultiBlock extends TileEntity
     }
 
     @Override
-    public void updateEntity()
+    public void update()
     {
-        super.updateEntity();
-
         if (isParent())
-        {
             updateEntityParent();
-        }
         else
-        {
             updateEntityChild();
-        }
     }
 
     public void updateEntityParent()
@@ -73,75 +69,53 @@ public class IvTileEntityMultiBlock extends TileEntity
 
     }
 
-    public int[] getActiveParentCoords()
+    public BlockPos getActiveParentCoords()
     {
         if (parentCoords == null)
-        {
-            return new int[]{xCoord, yCoord, zCoord};
-        }
+            return getPos();
 
-        return new int[]{xCoord + parentCoords[0], yCoord + parentCoords[1], zCoord + parentCoords[2]};
+        return getPos().add(parentCoords.getX(), parentCoords.getY(), parentCoords.getZ());
     }
 
-    public int[][] getActiveChildCoords()
+    public BlockPos[] getActiveChildCoords()
     {
         if (childCoords == null)
-        {
-            return new int[0][0];
-        }
+            return new BlockPos[0];
 
-        int[][] returnInt = new int[childCoords.length][3];
-        for (int i = 0; i < returnInt.length; i++)
-        {
-            returnInt[i][0] = childCoords[i][0] + xCoord;
-            returnInt[i][1] = childCoords[i][1] + yCoord;
-            returnInt[i][2] = childCoords[i][2] + zCoord;
-        }
+        BlockPos[] returnVal = new BlockPos[childCoords.length];
+        for (int i = 0; i < returnVal.length; i++)
+            returnVal[i] = getPos().add(childCoords[i]);
 
-        return returnInt;
+        return returnVal;
     }
 
     public double[] getActiveCenterCoords()
     {
         if (centerCoords == null)
-        {
-            return new double[]{xCoord + 0.5, yCoord + 0.5, zCoord + 0.5};
-        }
+            return new double[]{getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getY() + 0.5};
 
-        return new double[]{xCoord + centerCoords[0], yCoord + centerCoords[1], zCoord + centerCoords[2]};
+        return new double[]{getPos().getX() + centerCoords[0], getPos().getY() + centerCoords[1], getPos().getZ() + centerCoords[2]};
     }
 
     public void becomeChild(TileEntity parent)
     {
         if (parent != null)
-        {
-            this.parentCoords = new int[]{parent.xCoord - this.xCoord, parent.yCoord - this.yCoord, parent.zCoord - this.zCoord};
-        }
+            this.parentCoords = BlockPositions.sub(parent.getPos(), getPos());
         else
-        {
             this.parentCoords = null;
-        }
     }
 
-    public void becomeParent(List<int[]> childCoords)
+    public void becomeParent(List<BlockPos> childCoords)
     {
         if (childCoords != null)
         {
-            this.childCoords = new int[childCoords.size()][3];
+            this.childCoords = new BlockPos[childCoords.size()];
 
             for (int i = 0; i < childCoords.size(); i++)
-            {
-                int[] location = childCoords.get(i);
-
-                this.childCoords[i][0] = location[0] - xCoord;
-                this.childCoords[i][1] = location[1] - yCoord;
-                this.childCoords[i][2] = location[2] - zCoord;
-            }
+                this.childCoords[i] = BlockPositions.sub(childCoords.get(i), getPos());
         }
         else
-        {
-            this.childCoords = new int[0][0];
-        }
+            this.childCoords = new BlockPos[0];
     }
 
     public boolean isParent()
@@ -158,13 +132,10 @@ public class IvTileEntityMultiBlock extends TileEntity
     {
         if (parentCoords != null)
         {
-            int[] parentCoords = getActiveParentCoords();
-            TileEntity parentTileEntity = getWorldObj().getTileEntity(parentCoords[0], parentCoords[1], parentCoords[2]);
+            TileEntity parentTileEntity = worldObj.getTileEntity(getActiveParentCoords());
 
             if (parentTileEntity != null && this.getClass().equals(parentTileEntity.getClass()))
-            {
                 return (IvTileEntityMultiBlock) parentTileEntity;
-            }
         }
 
         return null;
@@ -172,107 +143,73 @@ public class IvTileEntityMultiBlock extends TileEntity
 
     public float getDistanceToCenter()
     {
-        return (float) IvVecMathHelper.distance(new double[]{xCoord + 0.5, yCoord + 0.5, zCoord + 0.5}, getActiveCenterCoords());
+        return (float) IvVecMathHelper.distance(new double[]{getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5}, getActiveCenterCoords());
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound par1nbtTagCompound)
+    public void readFromNBT(NBTTagCompound tagCompound)
     {
-        super.readFromNBT(par1nbtTagCompound);
+        super.readFromNBT(tagCompound);
 
-        direction = par1nbtTagCompound.getInteger("direction");
+        direction = tagCompound.getInteger("direction");
 
-        centerCoords = IvNBTHelper.readDoubleArray("multiBlockCenter", par1nbtTagCompound);
+        centerCoords = IvNBTHelper.readDoubleArray("multiBlockCenter", tagCompound);
         if (centerCoords == null) // Legacy
         {
             centerCoords = new double[3];
 
-            if (par1nbtTagCompound.hasKey("centerCoords[0]"))
-            {
-                centerCoords[0] = par1nbtTagCompound.getDouble("centerCoords[0]") - xCoord;
-            }
+            if (tagCompound.hasKey("centerCoords[0]"))
+                centerCoords[0] = tagCompound.getDouble("centerCoords[0]") - getPos().getX();
             else
-            {
                 centerCoords[0] = 0.5f;
-            }
 
-            if (par1nbtTagCompound.hasKey("centerCoords[1]"))
-            {
-                centerCoords[1] = par1nbtTagCompound.getDouble("centerCoords[1]") - yCoord;
-            }
+            if (tagCompound.hasKey("centerCoords[1]"))
+                centerCoords[1] = tagCompound.getDouble("centerCoords[1]") - getPos().getY();
             else
-            {
                 centerCoords[1] = 0.5f;
-            }
 
-            if (par1nbtTagCompound.hasKey("centerCoords[2]"))
-            {
-                centerCoords[2] = par1nbtTagCompound.getDouble("centerCoords[2]") - zCoord;
-            }
+            if (tagCompound.hasKey("centerCoords[2]"))
+                centerCoords[2] = tagCompound.getDouble("centerCoords[2]") - getPos().getZ();
             else
-            {
                 centerCoords[2] = 0.5f;
-            }
         }
 
-        centerCoordsSize = IvNBTHelper.readDoubleArray("multiBlockSize", par1nbtTagCompound);
+        centerCoordsSize = IvNBTHelper.readDoubleArray("multiBlockSize", tagCompound);
         if (centerCoordsSize == null) // Legacy
         {
             centerCoordsSize = new double[3];
-            if (par1nbtTagCompound.hasKey("centerCoordsSize[0]"))
-            {
-                centerCoordsSize[0] = par1nbtTagCompound.getFloat("centerCoordsSize[0]");
-            }
+            if (tagCompound.hasKey("centerCoordsSize[0]"))
+                centerCoordsSize[0] = tagCompound.getFloat("centerCoordsSize[0]");
             else
-            {
                 centerCoordsSize[0] = 0.5;
-            }
 
-            if (par1nbtTagCompound.hasKey("centerCoordsSize[1]"))
-            {
-                centerCoordsSize[1] = par1nbtTagCompound.getFloat("centerCoordsSize[1]");
-            }
+            if (tagCompound.hasKey("centerCoordsSize[1]"))
+                centerCoordsSize[1] = tagCompound.getFloat("centerCoordsSize[1]");
             else
-            {
                 centerCoordsSize[1] = 0.5;
-            }
 
-            if (par1nbtTagCompound.hasKey("centerCoordsSize[2]"))
-            {
-                centerCoordsSize[2] = par1nbtTagCompound.getFloat("centerCoordsSize[2]");
-            }
+            if (tagCompound.hasKey("centerCoordsSize[2]"))
+                centerCoordsSize[2] = tagCompound.getFloat("centerCoordsSize[2]");
             else
-            {
                 centerCoordsSize[2] = 0.5;
-            }
         }
 
-        if (par1nbtTagCompound.hasKey("parentCoords"))
-        {
-            this.parentCoords = IvNBTHelper.readIntArrayFixedSize("parentCoords", 3, par1nbtTagCompound);
-        }
+        if (tagCompound.hasKey("parentCoords"))
+            this.parentCoords = BlockPositions.fromIntArray(IvNBTHelper.readIntArrayFixedSize("parentCoords", 3, tagCompound));
         else
-        {
             this.parentCoords = null;
-        }
 
-        if (par1nbtTagCompound.hasKey("childCoords"))
+        if (tagCompound.hasKey("childCoords"))
         {
-            int[] childCoordsCut = par1nbtTagCompound.getIntArray("childCoords");
-            childCoords = new int[childCoordsCut.length / 3][3];
+            int[] childCoordsCut = tagCompound.getIntArray("childCoords");
+            childCoords = new BlockPos[childCoordsCut.length / 3];
             for (int i = 0; i < childCoords.length; i++)
-            {
-                childCoords[i][0] = childCoordsCut[i * 3];
-                childCoords[i][1] = childCoordsCut[i * 3 + 1];
-                childCoords[i][2] = childCoordsCut[i * 3 + 2];
-            }
+                childCoords[i] = new BlockPos(childCoordsCut[i * 3], childCoordsCut[i * 3 + 1], childCoordsCut[i * 3 + 2]);
         }
         else if (parentCoords == null)
-        {
-            childCoords = new int[0][0];
-        }
+            childCoords = new BlockPos[0];
 
-        multiblockInvalid = par1nbtTagCompound.getBoolean("multiblockInvalid");
+        multiblockInvalid = tagCompound.getBoolean("multiblockInvalid");
     }
 
     @Override
@@ -286,18 +223,16 @@ public class IvTileEntityMultiBlock extends TileEntity
         IvNBTHelper.writeDoubleArray("multiBlockSize", centerCoordsSize, par1nbtTagCompound);
 
         if (this.parentCoords != null)
-        {
-            par1nbtTagCompound.setIntArray("parentCoords", parentCoords);
-        }
+            par1nbtTagCompound.setIntArray("parentCoords", BlockPositions.toIntArray(parentCoords));
 
         if (childCoords != null)
         {
             int[] childCoordsCut = new int[childCoords.length * 3];
             for (int i = 0; i < childCoords.length; i++)
             {
-                childCoordsCut[i * 3] = childCoords[i][0];
-                childCoordsCut[i * 3 + 1] = childCoords[i][1];
-                childCoordsCut[i * 3 + 2] = childCoords[i][2];
+                childCoordsCut[i * 3] = childCoords[i].getX();
+                childCoordsCut[i * 3 + 1] = childCoords[i].getY();
+                childCoordsCut[i * 3 + 2] = childCoords[i].getZ();
             }
 
             par1nbtTagCompound.setIntArray("childCoords", childCoordsCut);
@@ -313,7 +248,7 @@ public class IvTileEntityMultiBlock extends TileEntity
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
     {
-        readFromNBT(pkt.func_148857_g());
+        readFromNBT(pkt.getNbtCompound());
     }
 
     public IvRaytraceableAxisAlignedBox getInterpolatedRotatedBox(Object userInfo, double x, double y, double z, double width, double height, double depth, double x1, double y1, double z1, double width1, double height1, double depth1, float fraction)
@@ -357,7 +292,7 @@ public class IvTileEntityMultiBlock extends TileEntity
     public AxisAlignedBB getBoxAroundCenter(double width, double height, double length)
     {
         double[] center = getActiveCenterCoords();
-        return AxisAlignedBB.getBoundingBox(center[0] - width, center[1] - height, center[2] - length, center[0] + width, center[1] + height, center[2] + length);
+        return AxisAlignedBB.fromBounds(center[0] - width, center[1] - height, center[2] - length, center[0] + width, center[1] + height, center[2] + length);
     }
 
     @Override

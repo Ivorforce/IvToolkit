@@ -30,6 +30,7 @@ import ivorius.ivtoolkit.models.utils.MathUtils;
 import ivorius.ivtoolkit.models.utils.MatrixMathUtils;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector4f;
@@ -51,7 +52,7 @@ public class ModelRenderer
 
     public static void renderModelDirectly(Model model)
     {
-        Tessellator tessellator = Tessellator.instance;
+        WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
 
         model.calculateTransforms();
 
@@ -66,7 +67,7 @@ public class ModelRenderer
 
                 for (NodePart nodePart : node.parts)
                 {
-                    renderNodePart(tessellator, nodePart);
+                    renderNodePart(renderer, nodePart);
                 }
 
                 GL11.glPopMatrix();
@@ -74,7 +75,7 @@ public class ModelRenderer
         }
     }
 
-    private static void renderNodePart(Tessellator tessellator, NodePart nodePart)
+    private static void renderNodePart(WorldRenderer renderer, NodePart nodePart)
     {
         MeshPart meshPart = nodePart.meshPart;
         Material material = nodePart.material;
@@ -137,7 +138,7 @@ public class ModelRenderer
                 boneWeightAttributes.add(attribute);
         }
 
-        tessellator.startDrawing(meshPart.primitiveType);
+        renderer.startDrawing(meshPart.primitiveType);
         for (int i = meshPart.indexOffset; i < meshPart.numVertices + meshPart.indexOffset; i++)
         {
             int vertexIndex = indexBuf.get(i) * vertexLengthInFloats;
@@ -147,11 +148,11 @@ public class ModelRenderer
                 if (textureCoordAttr != null)
                 {
                     int textureIndex = vertexIndex + (textureCoordAttr.offset >> 2);
-                    tessellator.setTextureUV(MathUtils.mix(texture.minU(), texture.maxU(), vertexBuf.get(textureIndex)),
+                    renderer.setTextureUV(MathUtils.mix(texture.minU(), texture.maxU(), vertexBuf.get(textureIndex)),
                             MathUtils.mix(texture.minV(), texture.maxV(), vertexBuf.get(textureIndex + 1)));
                 }
                 else if (uvs != null)
-                    tessellator.setTextureUV(uvs[i * 2], uvs[i * 2 + 1]);
+                    renderer.setTextureUV(uvs[i * 2], uvs[i * 2 + 1]);
             }
 
             int posIndex = vertexIndex + (posAttr.offset >> 2);
@@ -164,12 +165,12 @@ public class ModelRenderer
                 buildMatrix(TEMP_MATRIX, boneWeightAttributes, vertexBuf, vertexIndex, bones);
                 TEMP_VEC.set(vertexX, vertexY, vertexZ, 1.0f);
                 Matrix4f.transform(TEMP_MATRIX, TEMP_VEC, TEMP_VEC);
-                tessellator.addVertex(TEMP_VEC.x, TEMP_VEC.y, TEMP_VEC.z);
+                renderer.addVertex(TEMP_VEC.x, TEMP_VEC.y, TEMP_VEC.z);
             }
             else
-                tessellator.addVertex(vertexX, vertexY, vertexZ);
+                renderer.addVertex(vertexX, vertexY, vertexZ);
         }
-        tessellator.draw();
+        Tessellator.getInstance().draw();
 
         if (texture == null)
             GL11.glEnable(GL11.GL_TEXTURE_2D);

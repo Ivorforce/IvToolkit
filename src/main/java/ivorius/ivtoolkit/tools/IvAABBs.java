@@ -17,21 +17,22 @@
 package ivorius.ivtoolkit.tools;
 
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 
 /**
  * Created by lukas on 14.10.14.
  */
 public class IvAABBs
 {
-    public static AxisAlignedBB intersection(AxisAlignedBB bb, int x, int y, int z)
+    public static AxisAlignedBB intersection(AxisAlignedBB bb, BlockPos pos)
     {
-        return AxisAlignedBB.getBoundingBox(Math.max(bb.minX, x), Math.max(bb.minY, y), Math.max(bb.minZ, z),
-                Math.min(bb.maxX, x + 1), Math.min(bb.maxY, y + 1), Math.min(bb.maxZ, z + 1));
+        return AxisAlignedBB.fromBounds(Math.max(bb.minX, pos.getX()), Math.max(bb.minY, pos.getY()), Math.max(bb.minZ, pos.getZ()),
+                Math.min(bb.maxX, pos.getX() + 1), Math.min(bb.maxY, pos.getY() + 1), Math.min(bb.maxZ, pos.getZ() + 1));
     }
 
-    public static AxisAlignedBB boundsIntersection(AxisAlignedBB bb, int x, int y, int z)
+    public static AxisAlignedBB boundsIntersection(AxisAlignedBB bb, BlockPos pos)
     {
-        return AxisAlignedBB.getBoundingBox(Math.max(bb.minX - x, 0), Math.max(bb.minY - y, 0), Math.max(bb.minZ - z, 0),
-                Math.min(bb.maxX - x, 1), Math.min(bb.maxY - y, 1), Math.min(bb.maxZ - z, 1));
+        return AxisAlignedBB.fromBounds(Math.max(bb.minX - pos.getX(), 0), Math.max(bb.minY - pos.getY(), 0), Math.max(bb.minZ - pos.getZ(), 0),
+                Math.min(bb.maxX - pos.getX(), 1), Math.min(bb.maxY - pos.getY(), 1), Math.min(bb.maxZ - pos.getZ(), 1));
     }
 }

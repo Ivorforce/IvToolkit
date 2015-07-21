@@ -57,7 +57,7 @@ public class IvTileEntityRotatable extends TileEntity
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
     {
-        readFromNBT(pkt.func_148857_g());
+        readFromNBT(pkt.getNbtCompound());
     }
 
     public IvRaytraceableAxisAlignedBox getInterpolatedRotatedBox(Object userInfo, double x, double y, double z, double width, double height, double depth, double x1, double y1, double z1, double width1, double height1, double depth1, float fraction)
@@ -75,12 +75,12 @@ public class IvTileEntityRotatable extends TileEntity
 
     public IvRaytraceableAxisAlignedBox getRotatedBox(Object userInfo, double x, double y, double z, double width, double height, double depth)
     {
-        return IvMultiBlockHelper.getRotatedBox(userInfo, x, y, z, width, height, depth, getDirection(), new double[]{xCoord + 0.5, yCoord + 0.5, zCoord + 0.5});
+        return IvMultiBlockHelper.getRotatedBox(userInfo, x, y, z, width, height, depth, getDirection(), new double[]{getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5});
     }
 
     public AxisAlignedBB getRotatedBB(double x, double y, double z, double width, double height, double depth)
     {
-        return IvMultiBlockHelper.getRotatedBB(x, y, z, width, height, depth, getDirection(), new double[]{xCoord + 0.5, yCoord + 0.5, zCoord + 0.5});
+        return IvMultiBlockHelper.getRotatedBB(x, y, z, width, height, depth, getDirection(), new double[]{getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5});
     }
 
     public Vector3f getRotatedVector(Vector3f vector3f)

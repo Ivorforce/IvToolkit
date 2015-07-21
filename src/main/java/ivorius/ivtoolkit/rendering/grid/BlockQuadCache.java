@@ -17,10 +17,10 @@
 package ivorius.ivtoolkit.rendering.grid;
 
 import com.google.common.base.Function;
-import ivorius.ivtoolkit.blocks.BlockCoord;
 import ivorius.ivtoolkit.blocks.IvBlockCollection;
 import net.minecraft.block.Block;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -36,13 +36,13 @@ public class BlockQuadCache
 
         final int[] size = {blockCollection.width, blockCollection.height, blockCollection.length};
 
-        return GridQuadCache.createQuadCache(size, scale, new Function<Pair<BlockCoord, ForgeDirection>, Object>()
+        return GridQuadCache.createQuadCache(size, scale, new Function<Pair<BlockPos, EnumFacing>, Object>()
         {
             @Nullable
             @Override
-            public Object apply(Pair<BlockCoord, ForgeDirection> input)
+            public Object apply(Pair<BlockPos, EnumFacing> input)
             {
-                Block block = blockCollection.getBlock(input.getLeft());
+                Block block = blockCollection.getBlockState(input.getLeft()).getBlock();
                 return block.isOpaqueCube() && blockCollection.shouldRenderSide(input.getLeft(), input.getRight())
                         ? handle
                         : null;

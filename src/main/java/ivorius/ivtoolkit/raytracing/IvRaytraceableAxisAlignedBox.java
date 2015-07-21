@@ -16,7 +16,7 @@
 
 package ivorius.ivtoolkit.raytracing;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.util.List;
 
@@ -40,12 +40,12 @@ public class IvRaytraceableAxisAlignedBox extends IvRaytraceableObject
         this.depth = depth;
 
         this.surfaces = new IvRaytraceableAxisAlignedSurface[6];
-        this.surfaces[0] = new IvRaytraceableAxisAlignedSurface(userInfo, ForgeDirection.WEST, y, z, 0, height, depth, x);
-        this.surfaces[1] = new IvRaytraceableAxisAlignedSurface(userInfo, ForgeDirection.EAST, y, z, 0, height, depth, x + width);
-        this.surfaces[2] = new IvRaytraceableAxisAlignedSurface(userInfo, ForgeDirection.DOWN, y, z, width, 0, depth, x);
-        this.surfaces[3] = new IvRaytraceableAxisAlignedSurface(userInfo, ForgeDirection.UP, y + height, z, width, 0, depth, x);
-        this.surfaces[4] = new IvRaytraceableAxisAlignedSurface(userInfo, ForgeDirection.NORTH, y, z, width, height, 0, x);
-        this.surfaces[5] = new IvRaytraceableAxisAlignedSurface(userInfo, ForgeDirection.SOUTH, y, z + depth, width, height, 0, x);
+        this.surfaces[0] = new IvRaytraceableAxisAlignedSurface(userInfo, EnumFacing.WEST, y, z, 0, height, depth, x);
+        this.surfaces[1] = new IvRaytraceableAxisAlignedSurface(userInfo, EnumFacing.EAST, y, z, 0, height, depth, x + width);
+        this.surfaces[2] = new IvRaytraceableAxisAlignedSurface(userInfo, EnumFacing.DOWN, y, z, width, 0, depth, x);
+        this.surfaces[3] = new IvRaytraceableAxisAlignedSurface(userInfo, EnumFacing.UP, y + height, z, width, 0, depth, x);
+        this.surfaces[4] = new IvRaytraceableAxisAlignedSurface(userInfo, EnumFacing.NORTH, y, z, width, height, 0, x);
+        this.surfaces[5] = new IvRaytraceableAxisAlignedSurface(userInfo, EnumFacing.SOUTH, y, z + depth, width, height, 0, x);
     }
 
     public double getX()

@@ -16,6 +16,9 @@
 
 package ivorius.ivtoolkit.blocks;
 
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import ivorius.ivtoolkit.raytracing.IvRaytraceableAxisAlignedBox;
 import ivorius.ivtoolkit.raytracing.IvRaytraceableObject;
 import ivorius.ivtoolkit.raytracing.IvRaytracedIntersection;
@@ -23,45 +26,40 @@ import ivorius.ivtoolkit.raytracing.IvRaytracer;
 import ivorius.ivtoolkit.tools.MCRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.*;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 /**
  * Created by lukas on 11.02.14.
  */
-public class IvBlockCollection implements Iterable<BlockCoord>
+public class IvBlockCollection
 {
-    private final Block[] blocks;
-    private final byte[] metas;
+    private final IBlockState[] blockStates;
     public final int width;
     public final int height;
     public final int length;
 
     public IvBlockCollection(int width, int height, int length)
     {
-        this(airArray(width, height, length), new byte[width * height * length], width, height, length);
+        this(airArray(width, height, length), width, height, length);
     }
 
-    private static Block[] airArray(int width, int height, int length)
+    private static IBlockState[] airArray(int width, int height, int length)
     {
-        Block[] blocks = new Block[width * height * length];
-        Arrays.fill(blocks, Blocks.air);
+        IBlockState[] blocks = new IBlockState[width * height * length];
+        Arrays.fill(blocks, Blocks.air.getDefaultState());
         return blocks;
     }
 
-    public IvBlockCollection(Block[] blocks, byte[] metas, int width, int height, int length)
+    public IvBlockCollection(IBlockState[] blockStates, int width, int height, int length)
     {
-        if (blocks.length != width * height * length || metas.length != blocks.length)
-            throw new IllegalArgumentException();
-
-        this.blocks = blocks;
-        this.metas = metas;
+        this.blockStates = blockStates;
         this.width = width;
         this.height = height;
         this.length = length;
@@ -73,14 +71,18 @@ public class IvBlockCollection implements Iterable<BlockCoord>
         height = compound.getInteger("height");
         length = compound.getInteger("length");
 
-        metas = compound.getByteArray("metadata");
-
         IvBlockMapper mapper = new IvBlockMapper(compound, "mapping", registry);
-        blocks = mapper.createBlocksFromNBT(compound.getCompoundTag("blocks"));
+        Block[] blocks = mapper.createBlocksFromNBT(compound.getCompoundTag("blocks"));
+        byte[] metas = compound.getByteArray("metadata");
+
         if (blocks.length != width * height * length)
-        {
             throw new RuntimeException("Block collection length is " + blocks.length + " but should be " + width + " * " + height + " * " + length);
-        }
+        if (metas.length != width * height * length)
+            throw new RuntimeException("Block collection length is " + metas.length + " but should be " + width + " * " + height + " * " + length);
+
+        blockStates = new IBlockState[width * height * length];
+        for (int i = 0; i < blockStates.length; i++)
+            blockStates[i] = blocks[i].getStateFromMeta(metas[i]);
     }
 
     public int getWidth()
@@ -98,71 +100,43 @@ public class IvBlockCollection implements Iterable<BlockCoord>
         return length;
     }
 
-    public Block getBlock(BlockCoord coord)
+    public IBlockState getBlockState(BlockPos coord)
     {
         if (!hasCoord(coord))
-            return Blocks.air;
+            return Blocks.air.getDefaultState();
 
-        Block block = blocks[indexFromCoord(coord)];
-        return block != null ? block : Blocks.air;
+        IBlockState block = blockStates[indexFromCoord(coord)];
+        return block != null ? block : Blocks.air.getDefaultState();
     }
 
-    public byte getMetadata(BlockCoord coord)
+    public void setBlockState(BlockPos coord, IBlockState state)
     {
-        if (!hasCoord(coord))
-            return 0;
-
-        return metas[indexFromCoord(coord)];
-    }
-
-    public void setBlockAndMetadata(BlockCoord coord, Block block, byte meta)
-    {
-        if (block == null)
+        if (state == null)
             throw new NullPointerException();
 
         if (!hasCoord(coord))
             return;
 
         int index = indexFromCoord(coord);
-        blocks[index] = block;
-        metas[index] = meta;
+        blockStates[index] = state;
     }
 
-    public void setBlock(BlockCoord coord, Block block)
+    private int indexFromCoord(BlockPos coord)
     {
-        if (block == null)
-            throw new NullPointerException();
-
-        if (!hasCoord(coord))
-            return;
-
-        blocks[indexFromCoord(coord)] = block;
+        return ((coord.getZ() * height) + coord.getY()) * width + coord.getX();
     }
 
-    public void setMetadata(BlockCoord coord, byte meta)
+    public boolean hasCoord(BlockPos coord)
     {
-        if (!hasCoord(coord))
-            return;
-
-        metas[indexFromCoord(coord)] = meta;
+        return coord.getX() >= 0 && coord.getX() < width && coord.getY() >= 0 && coord.getY() < height && coord.getZ() >= 0 && coord.getZ() < length;
     }
 
-    private int indexFromCoord(BlockCoord coord)
+    public boolean shouldRenderSide(BlockPos coord, EnumFacing side)
     {
-        return ((coord.z * height) + coord.y) * width + coord.x;
-    }
+        BlockPos sideCoord = coord.add(side.getFrontOffsetX(), side.getFrontOffsetY(), side.getFrontOffsetZ());
 
-    public boolean hasCoord(BlockCoord coord)
-    {
-        return coord.x >= 0 && coord.x < width && coord.y >= 0 && coord.y < height && coord.z >= 0 && coord.z < length;
-    }
-
-    public boolean shouldRenderSide(BlockCoord coord, ForgeDirection side)
-    {
-        BlockCoord sideCoord = coord.add(side.offsetX, side.offsetY, side.offsetZ);
-
-        Block block = getBlock(sideCoord);
-        return !block.isOpaqueCube();
+        IBlockState block = getBlockState(sideCoord);
+        return !block.getBlock().isOpaqueCube();
     }
 
     public MovingObjectPosition rayTrace(Vec3 position, Vec3 direction)
@@ -172,44 +146,44 @@ public class IvBlockCollection implements Iterable<BlockCoord>
 
         if (intersection != null)
         {
-            position = Vec3.createVectorHelper(intersection.getX(), intersection.getY(), intersection.getZ());
-            BlockCoord curCoord = new BlockCoord(MathHelper.floor_double(position.xCoord), MathHelper.floor_double(position.yCoord), MathHelper.floor_double(position.zCoord));
-            ForgeDirection hitSide = ((ForgeDirection) intersection.getHitInfo()).getOpposite();
+            position = new Vec3(intersection.getX(), intersection.getY(), intersection.getZ());
+            BlockPos curCoord = new BlockPos(MathHelper.floor_double(position.xCoord), MathHelper.floor_double(position.yCoord), MathHelper.floor_double(position.zCoord));
+            EnumFacing hitSide = ((EnumFacing) intersection.getHitInfo()).getOpposite();
 
             while (hasCoord(curCoord))
             {
-                if (getBlock(curCoord).getMaterial() != Material.air)
-                    return new MovingObjectPosition(curCoord.x, curCoord.y, curCoord.z, hitSide.getOpposite().ordinal(), position);
+                if (getBlockState(curCoord).getBlock().getMaterial() != Material.air)
+                    return new MovingObjectPosition(position, hitSide.getOpposite(), new BlockPos(curCoord.getX(), curCoord.getY(), curCoord.getZ()));
 
                 hitSide = getExitSide(position, direction);
 
-                if (hitSide.offsetX != 0)
+                if (hitSide.getFrontOffsetX() != 0)
                 {
-                    double offX = hitSide.offsetX > 0 ? 1.0001 : -0.0001;
-                    double dirLength = ((curCoord.x + offX) - position.xCoord) / direction.xCoord;
-                    position = Vec3.createVectorHelper(curCoord.x + offX, position.yCoord + direction.yCoord * dirLength, position.zCoord + direction.zCoord * dirLength);
+                    double offX = hitSide.getFrontOffsetX() > 0 ? 1.0001 : -0.0001;
+                    double dirLength = ((curCoord.getX() + offX) - position.xCoord) / direction.xCoord;
+                    position = new Vec3(curCoord.getX() + offX, position.yCoord + direction.yCoord * dirLength, position.zCoord + direction.zCoord * dirLength);
                 }
-                else if (hitSide.offsetY != 0)
+                else if (hitSide.getFrontOffsetY() != 0)
                 {
-                    double offY = hitSide.offsetY > 0 ? 1.0001 : -0.0001;
-                    double dirLength = ((curCoord.y + offY) - position.yCoord) / direction.yCoord;
-                    position = Vec3.createVectorHelper(position.xCoord + direction.xCoord * dirLength, curCoord.y + offY, position.zCoord + direction.zCoord * dirLength);
+                    double offY = hitSide.getFrontOffsetY() > 0 ? 1.0001 : -0.0001;
+                    double dirLength = ((curCoord.getY() + offY) - position.yCoord) / direction.yCoord;
+                    position = new Vec3(position.xCoord + direction.xCoord * dirLength, curCoord.getY() + offY, position.zCoord + direction.zCoord * dirLength);
                 }
                 else
                 {
-                    double offZ = hitSide.offsetZ > 0 ? 1.0001 : -0.0001;
-                    double dirLength = ((curCoord.z + offZ) - position.zCoord) / direction.zCoord;
-                    position = Vec3.createVectorHelper(position.xCoord + direction.xCoord * dirLength, position.yCoord + direction.yCoord * dirLength, curCoord.z + offZ);
+                    double offZ = hitSide.getFrontOffsetZ() > 0 ? 1.0001 : -0.0001;
+                    double dirLength = ((curCoord.getZ() + offZ) - position.zCoord) / direction.zCoord;
+                    position = new Vec3(position.xCoord + direction.xCoord * dirLength, position.yCoord + direction.yCoord * dirLength, curCoord.getZ() + offZ);
                 }
 
-                curCoord = curCoord.add(hitSide.offsetX, hitSide.offsetY, hitSide.offsetZ);
+                curCoord = curCoord.add(hitSide.getFrontOffsetX(), hitSide.getFrontOffsetY(), hitSide.getFrontOffsetZ());
             }
         }
 
         return null;
     }
 
-    private ForgeDirection getExitSide(Vec3 position, Vec3 direction)
+    private EnumFacing getExitSide(Vec3 position, Vec3 direction)
     {
         double innerX = ((position.xCoord % 1.0) + 1.0) % 1.0;
         double innerY = ((position.yCoord % 1.0) + 1.0) % 1.0;
@@ -220,18 +194,16 @@ public class IvBlockCollection implements Iterable<BlockCoord>
         double zDist = direction.zCoord > 0.0 ? ((1.0 - innerZ) / direction.zCoord) : (innerZ / -direction.zCoord);
 
         if (xDist < yDist && xDist < zDist)
-            return direction.xCoord > 0.0 ? ForgeDirection.EAST : ForgeDirection.WEST;
+            return direction.xCoord > 0.0 ? EnumFacing.EAST : EnumFacing.WEST;
         else if (yDist < zDist)
-            return direction.yCoord > 0.0 ? ForgeDirection.UP : ForgeDirection.DOWN;
+            return direction.yCoord > 0.0 ? EnumFacing.UP : EnumFacing.DOWN;
         else
-            return direction.zCoord > 0.0 ? ForgeDirection.SOUTH : ForgeDirection.NORTH;
+            return direction.zCoord > 0.0 ? EnumFacing.SOUTH : EnumFacing.NORTH;
     }
 
     public int getBlockMultiplicity()
     {
-        Set<Block> blockSet = new HashSet<>();
-        Collections.addAll(blockSet, blocks);
-        return blockSet.size();
+        return new ImmutableSet.Builder<>().addAll(Arrays.asList(blockStates)).build().size();
     }
 
     public NBTTagCompound createTagCompound()
@@ -243,11 +215,23 @@ public class IvBlockCollection implements Iterable<BlockCoord>
         compound.setInteger("height", height);
         compound.setInteger("length", length);
 
+        byte[] metas = new byte[blockStates.length];
+        for (int i = 0; i < metas.length; i++)
+            metas[i] = (byte) blockStates[i].getBlock().getMetaFromState(blockStates[i]);
         compound.setByteArray("metadata", metas);
 
-        mapper.addMapping(blocks);
+        List<Block> blockList = Lists.transform(Arrays.asList(blockStates), new Function<IBlockState, Block>()
+        {
+            @Nullable
+            @Override
+            public Block apply(IBlockState s)
+            {
+                return s.getBlock();
+            }
+        });
+        mapper.addMapping(blockList);
         compound.setTag("mapping", mapper.createTagList());
-        compound.setTag("blocks", mapper.createNBTForBlocks(blocks));
+        compound.setTag("blocks", mapper.createNBTForBlocks(blockList));
         return compound;
     }
 
@@ -272,8 +256,7 @@ public class IvBlockCollection implements Iterable<BlockCoord>
         if (height != that.height) return false;
         if (length != that.length) return false;
         if (width != that.width) return false;
-        if (!Arrays.equals(blocks, that.blocks)) return false;
-        if (!Arrays.equals(metas, that.metas)) return false;
+        if (!Arrays.equals(blockStates, that.blockStates)) return false;
 
         return true;
     }
@@ -281,22 +264,15 @@ public class IvBlockCollection implements Iterable<BlockCoord>
     @Override
     public int hashCode()
     {
-        int result = Arrays.hashCode(blocks);
-        result = 31 * result + Arrays.hashCode(metas);
+        int result = Arrays.hashCode(blockStates);
         result = 31 * result + width;
         result = 31 * result + height;
         result = 31 * result + length;
         return result;
     }
 
-    @Override
-    public Iterator<BlockCoord> iterator()
-    {
-        return new BlockAreaIterator(BlockCoord.ZERO, new BlockCoord(width - 1, height - 1, length - 1));
-    }
-
     public BlockArea area()
     {
-        return new BlockArea(BlockCoord.ZERO, new BlockCoord(width - 1, height - 1, length - 1));
+        return new BlockArea(BlockPos.ORIGIN, new BlockPos(width - 1, height - 1, length - 1));
     }
 }

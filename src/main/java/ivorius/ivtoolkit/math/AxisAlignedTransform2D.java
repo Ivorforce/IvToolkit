@@ -16,11 +16,10 @@
 
 package ivorius.ivtoolkit.math;
 
-import ivorius.ivtoolkit.blocks.BlockCoord;
 import net.minecraft.block.Block;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 /**
  * Created by lukas on 08.06.14.
@@ -132,39 +131,20 @@ public class AxisAlignedTransform2D
         return rotation == 1 || rotation == 2;
     }
 
-    public BlockCoord apply(BlockCoord position, int[] size)
+    public BlockPos apply(BlockPos position, int[] size)
     {
-        int positionX = mirrorX ? size[0] - 1 - position.x : position.x;
+        int positionX = mirrorX ? size[0] - 1 - position.getX() : position.getX();
 
         switch (rotation)
         {
             case 0:
-                return new BlockCoord(positionX, position.y, position.z);
+                return new BlockPos(positionX, position.getY(), position.getZ());
             case 1:
-                return new BlockCoord(size[2] - 1 - position.z, position.y, positionX);
+                return new BlockPos(size[2] - 1 - position.getZ(), position.getY(), positionX);
             case 2:
-                return new BlockCoord(size[0] - 1 - positionX, position.y, size[2] - 1 - position.z);
+                return new BlockPos(size[0] - 1 - positionX, position.getY(), size[2] - 1 - position.getZ());
             case 3:
-                return new BlockCoord(position.z, position.y, size[0] - 1 - positionX);
-            default:
-                throw new InternalError();
-        }
-    }
-
-    public ChunkCoordinates apply(ChunkCoordinates position, int[] size)
-    {
-        int positionX = mirrorX ? size[0] - 1 - position.posX : position.posX;
-
-        switch (rotation)
-        {
-            case 0:
-                return new ChunkCoordinates(positionX, position.posY, position.posZ);
-            case 1:
-                return new ChunkCoordinates(size[2] - 1 - position.posZ, position.posY, positionX);
-            case 2:
-                return new ChunkCoordinates(size[0] - 1 - positionX, position.posY, size[2] - 1 - position.posZ);
-            case 3:
-                return new ChunkCoordinates(position.posZ, position.posY, size[0] - 1 - positionX);
+                return new BlockPos(position.getZ(), position.getY(), size[0] - 1 - positionX);
             default:
                 throw new InternalError();
         }
@@ -227,10 +207,10 @@ public class AxisAlignedTransform2D
         }
     }
 
-    public void rotateBlock(World world, BlockCoord coord, Block block)
+    public void rotateBlock(World world, BlockPos coord, Block block)
     {
         for (int i = 0; i < rotation; i++)
-            block.rotateBlock(world, coord.x, coord.y, coord.z, ForgeDirection.UP);
+            block.rotateBlock(world, coord, EnumFacing.UP);
     }
 
     @Override

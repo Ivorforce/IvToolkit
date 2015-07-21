@@ -16,12 +16,12 @@
 
 package ivorius.ivtoolkit.tools;
 
-import cpw.mods.fml.common.event.FMLInterModComms;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 import org.apache.logging.log4j.Logger;
 
 /**

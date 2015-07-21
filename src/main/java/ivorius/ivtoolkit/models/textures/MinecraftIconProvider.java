@@ -18,7 +18,7 @@
 
 package ivorius.ivtoolkit.models.textures;
 
-import net.minecraft.util.IIcon;
+import ivorius.ivtoolkit.rendering.grid.Icon;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Map;
@@ -29,10 +29,10 @@ import java.util.Map;
 public class MinecraftIconProvider implements TextureProvider
 {
     private ResourceLocation texture;
-    private Map<String, IIcon> specialIconMap;
-    private IIcon defaultIcon;
+    private Map<String, Icon> specialIconMap;
+    private Icon defaultIcon;
 
-    public MinecraftIconProvider(ResourceLocation texture, Map<String, IIcon> specialIconMap, IIcon defaultIcon)
+    public MinecraftIconProvider(ResourceLocation texture, Map<String, Icon> specialIconMap, Icon defaultIcon)
     {
         this.texture = texture;
         this.specialIconMap = specialIconMap;
@@ -49,12 +49,12 @@ public class MinecraftIconProvider implements TextureProvider
         this.texture = texture;
     }
 
-    public Map<String, IIcon> getSpecialIconMap()
+    public Map<String, Icon> getSpecialIconMap()
     {
         return specialIconMap;
     }
 
-    public void setSpecialIconMap(Map<String, IIcon> specialIconMap)
+    public void setSpecialIconMap(Map<String, Icon> specialIconMap)
     {
         this.specialIconMap = specialIconMap;
     }
@@ -62,9 +62,9 @@ public class MinecraftIconProvider implements TextureProvider
     @Override
     public Texture provideTexture(String textureName)
     {
-        IIcon icon;
+        Icon icon;
 
-        IIcon specialIcon = specialIconMap.get(textureName);
+        Icon specialIcon = specialIconMap.get(textureName);
         icon = specialIcon != null ? specialIcon : defaultIcon;
 
         Texture tex = new MinecraftTextureProvider.Texture(texture);

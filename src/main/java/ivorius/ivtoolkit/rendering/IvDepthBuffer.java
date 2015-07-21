@@ -60,16 +60,16 @@ public class IvDepthBuffer
         {
             depthTextureIndex = genDefaultDepthTexture(textureWidth, textureHeight);
 
-            depthFB = OpenGlHelper.func_153165_e();
-            OpenGlHelper.func_153171_g(OpenGlHelper.field_153198_e, depthFB);
+            depthFB = OpenGlHelper.glGenFramebuffers();
+            OpenGlHelper.glBindFramebuffer(OpenGlHelper.GL_FRAMEBUFFER, depthFB);
 
-            OpenGlHelper.func_153188_a(OpenGlHelper.field_153198_e, OpenGlHelper.field_153201_h, GL_TEXTURE_2D, depthTextureIndex, 0);
+            OpenGlHelper.glFramebufferTexture2D(OpenGlHelper.GL_FRAMEBUFFER, OpenGlHelper.GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTextureIndex, 0);
 
             glDrawBuffer(GL_NONE);
             glReadBuffer(GL_NONE);
 
-            int status = OpenGlHelper.func_153167_i(OpenGlHelper.field_153198_e);
-            if (status != OpenGlHelper.field_153202_i)
+            int status = OpenGlHelper.glCheckFramebufferStatus(OpenGlHelper.GL_FRAMEBUFFER);
+            if (status != OpenGlHelper.GL_FRAMEBUFFER_COMPLETE)
             {
                 logger.error("Depth FBO failed setting up! (" + getFramebufferStatusString(status) + ")");
             }
@@ -111,7 +111,7 @@ public class IvDepthBuffer
         }
         if (depthFB > 0)
         {
-            OpenGlHelper.func_153174_h(depthFB);
+            OpenGlHelper.glDeleteFramebuffers(depthFB);
             depthFB = 0;
         }
     }
@@ -131,7 +131,7 @@ public class IvDepthBuffer
         if (isAllocated())
         {
             bindTextureForDestination();
-            OpenGlHelper.func_153171_g(OpenGlHelper.field_153198_e, depthFB);
+            OpenGlHelper.glBindFramebuffer(OpenGlHelper.GL_FRAMEBUFFER, depthFB);
             glDrawBuffer(GL_NONE);
             glReadBuffer(GL_NONE);
         }
@@ -141,13 +141,13 @@ public class IvDepthBuffer
     {
         if (isAllocated())
         {
-            OpenGlHelper.func_153171_g(OpenGlHelper.field_153198_e, 0);
+            OpenGlHelper.glBindFramebuffer(OpenGlHelper.GL_FRAMEBUFFER, 0);
             glDrawBuffer(GL_BACK);
             glReadBuffer(GL_BACK);
 
             if (parentFB > 0) // Binds buffers itself? Anyway, calling the draw and read buffer functions causes invalid operation
             {
-                OpenGlHelper.func_153171_g(OpenGlHelper.field_153198_e, parentFB);
+                OpenGlHelper.glBindFramebuffer(OpenGlHelper.GL_FRAMEBUFFER, parentFB);
             }
         }
     }

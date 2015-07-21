@@ -27,7 +27,7 @@ public class IvMultiBlockRenderHelper
     {
         double[] center = tileEntity.getActiveCenterCoords();
 
-        GL11.glTranslated(renderX + center[0] - tileEntity.xCoord, renderY + center[1] - tileEntity.yCoord, renderZ + center[2] - tileEntity.zCoord);
+        GL11.glTranslated(renderX + center[0] - tileEntity.getPos().getX(), renderY + center[1] - tileEntity.getPos().getY(), renderZ + center[2] - tileEntity.getPos().getZ());
         GL11.glRotatef(-90.0f * tileEntity.direction + 180.0f, 0.0f, 1.0f, 0.0f);
     }
 }

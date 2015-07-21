@@ -16,18 +16,20 @@
 
 package ivorius.ivtoolkit.network;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import ivorius.ivtoolkit.blocks.BlockPositions;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 /**
  * Created by lukas on 01.07.14.
  */
 public class PacketTileEntityData implements IMessage
 {
-    private int x, y, z;
+    private BlockPos pos;
     private String context;
     private ByteBuf payload;
 
@@ -35,11 +37,9 @@ public class PacketTileEntityData implements IMessage
     {
     }
 
-    public PacketTileEntityData(int x, int y, int z, String context, ByteBuf payload)
+    public PacketTileEntityData(BlockPos pos, String context, ByteBuf payload)
     {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.pos = pos;
         this.context = context;
         this.payload = payload;
     }
@@ -48,37 +48,17 @@ public class PacketTileEntityData implements IMessage
     {
         ByteBuf buf = Unpooled.buffer();
         entity.writeUpdateData(buf, context, params);
-        return new PacketTileEntityData(entity.xCoord, entity.yCoord, entity.zCoord, context, buf);
+        return new PacketTileEntityData(entity.getPos(), context, buf);
     }
 
-    public int getX()
+    public BlockPos getPos()
     {
-        return x;
+        return pos;
     }
 
-    public void setX(int x)
+    public void setPos(BlockPos pos)
     {
-        this.x = x;
-    }
-
-    public int getY()
-    {
-        return y;
-    }
-
-    public void setY(int y)
-    {
-        this.y = y;
-    }
-
-    public int getZ()
-    {
-        return z;
-    }
-
-    public void setZ(int z)
-    {
-        this.z = z;
+        this.pos = pos;
     }
 
     public String getContext()
@@ -104,9 +84,7 @@ public class PacketTileEntityData implements IMessage
     @Override
     public void fromBytes(ByteBuf buf)
     {
-        x = buf.readInt();
-        y = buf.readInt();
-        z = buf.readInt();
+        pos = BlockPositions.readFromBuffer(buf);
         context = ByteBufUtils.readUTF8String(buf);
         payload = IvPacketHelper.readByteBuffer(buf);
     }
@@ -114,9 +92,7 @@ public class PacketTileEntityData implements IMessage
     @Override
     public void toBytes(ByteBuf buf)
     {
-        buf.writeInt(x);
-        buf.writeInt(y);
-        buf.writeInt(z);
+        BlockPositions.writeToBuffer(pos, buf);
         ByteBufUtils.writeUTF8String(buf, context);
         IvPacketHelper.writeByteBuffer(buf, payload);
     }

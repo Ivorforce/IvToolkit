@@ -16,16 +16,13 @@
 
 package ivorius.ivtoolkit.tools;
 
+import com.google.common.base.Predicate;
 import ivorius.ivtoolkit.IvToolkitCoreContainer;
 import ivorius.ivtoolkit.blocks.BlockArea;
-import ivorius.ivtoolkit.blocks.BlockCoord;
+import ivorius.ivtoolkit.blocks.BlockPositions;
 import ivorius.ivtoolkit.blocks.IvBlockCollection;
-import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
 import net.minecraft.block.Block;
-import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityHanging;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -33,7 +30,8 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
@@ -65,21 +63,20 @@ public class IvWorldData
         blockCollection = new IvBlockCollection(size[0], size[1], size[2]);
 
         tileEntities = new ArrayList<>();
-        for (BlockCoord worldCoord : blockArea)
+        for (BlockPos worldCoord : blockArea)
         {
-            BlockCoord dataCoord = worldCoord.subtract(blockArea.getLowerCorner());
+            BlockPos dataCoord = worldCoord.subtract(blockArea.getLowerCorner());
 
-            blockCollection.setBlock(dataCoord, world.getBlock(worldCoord.x, worldCoord.y, worldCoord.z));
-            blockCollection.setMetadata(dataCoord, (byte) world.getBlockMetadata(worldCoord.x, worldCoord.y, worldCoord.z));
+            blockCollection.setBlockState(dataCoord, world.getBlockState(worldCoord));
 
-            TileEntity tileEntity = world.getTileEntity(worldCoord.x, worldCoord.y, worldCoord.z);
+            TileEntity tileEntity = world.getTileEntity(worldCoord);
             if (tileEntity != null)
                 tileEntities.add(tileEntity);
         }
 
         if (captureEntities)
         {
-            entities = world.getEntitiesWithinAABBExcludingEntity(null, blockArea.asAxisAlignedBB(), new EntitySelectorSaveable());
+            entities = world.getEntitiesWithinAABB(null, blockArea.asAxisAlignedBB(), saveableEntityPredicate());
         }
         else
         {
@@ -121,131 +118,23 @@ public class IvWorldData
         }
     }
 
-    public NBTTagCompound createTagCompound(BlockCoord referenceCoord)
+    public static Predicate<Entity> saveableEntityPredicate()
     {
-        NBTTagCompound compound = new NBTTagCompound();
-
-        compound.setTag("blockCollection", blockCollection.createTagCompound());
-
-        NBTTagList teList = new NBTTagList();
-        for (TileEntity tileEntity : tileEntities)
+        return new Predicate<Entity>()
         {
-            NBTTagCompound teCompound = new NBTTagCompound();
-
-            moveTileEntityForGeneration(tileEntity, referenceCoord.invert());
-            tileEntity.writeToNBT(teCompound);
-            moveTileEntityForGeneration(tileEntity, referenceCoord);
-
-            recursivelyInjectIDFixTags(teCompound);
-            teList.appendTag(teCompound);
-        }
-        compound.setTag("tileEntities", teList);
-
-        NBTTagList entityList = new NBTTagList();
-        for (Entity entity : entities)
-        {
-            NBTTagCompound entityCompound = new NBTTagCompound();
-
-            moveEntityForGeneration(entity, referenceCoord.invert());
-            entity.writeToNBTOptional(entityCompound);
-            moveEntityForGeneration(entity, referenceCoord);
-
-            recursivelyInjectIDFixTags(entityCompound);
-            entityList.appendTag(entityCompound);
-        }
-        compound.setTag("entities", entityList);
-
-        return compound;
-    }
-
-    public static void moveTileEntityForGeneration(TileEntity tileEntity, BlockCoord coord)
-    {
-        if (tileEntity instanceof Movable)
-            ((Movable) tileEntity).move(coord.x, coord.y, coord.z);
-        else
-        {
-            tileEntity.xCoord += coord.x;
-            tileEntity.yCoord += coord.y;
-            tileEntity.zCoord += coord.z;
-        }
-    }
-
-    public static void setTileEntityPosForGeneration(TileEntity tileEntity, BlockCoord coord)
-    {
-        moveTileEntityForGeneration(tileEntity, coord.subtract(new BlockCoord(tileEntity)));
-    }
-
-    public static void transformTileEntityPosForGeneration(TileEntity tileEntity, AxisAlignedTransform2D transform, int[] size)
-    {
-        if (tileEntity instanceof Transformable)
-            ((Transformable) tileEntity).transform(transform.getRotation(), transform.isMirrorX(), size);
-        else
-            setTileEntityPosForGeneration(tileEntity, transform.apply(new BlockCoord(tileEntity), size));
-    }
-
-    public static void moveEntityForGeneration(Entity entity, BlockCoord coord)
-    {
-        if (entity instanceof Movable)
-            ((Movable) entity).move(coord.x, coord.y, coord.z);
-        else
-        {
-            entity.setPosition(entity.posX + coord.x, entity.posY + coord.y, entity.posZ + coord.z);
-
-            if (entity instanceof EntityHanging)
+            @Override
+            public boolean apply(Entity entity)
             {
-                EntityHanging entityHanging = (EntityHanging) entity;
-                entityHanging.field_146063_b += coord.x;
-                entityHanging.field_146064_c += coord.y;
-                entityHanging.field_146062_d += coord.z;
-                entityHanging.setDirection(entityHanging.hangingDirection);
+                return !(entity instanceof EntityPlayer);
             }
-
-            if (entity instanceof EntityCreature)
-            {
-                EntityCreature entityCreature = (EntityCreature) entity;
-                ChunkCoordinates homePosition = entityCreature.getHomePosition();
-
-                EntityCreatureAccessor.setHomePosition(entityCreature, homePosition.posX + coord.x, homePosition.posY + coord.y, homePosition.posZ + coord.z);
-            }
-        }
-    }
-
-    public static void transformEntityPosForGeneration(Entity entity, AxisAlignedTransform2D transform, int[] size)
-    {
-        if (entity instanceof Transformable)
-            ((Transformable) entity).transform(transform.getRotation(), transform.isMirrorX(), size);
-        else
-        {
-            double[] newEntityPos = transform.apply(new double[]{entity.posX, entity.posY, entity.posZ}, size);
-            entity.setPosition(newEntityPos[0], newEntityPos[1], newEntityPos[2]);
-
-            if (entity instanceof EntityHanging)
-            {
-                EntityHanging entityHanging = (EntityHanging) entity;
-                BlockCoord hangingCoord = new BlockCoord(entityHanging.field_146063_b, entityHanging.field_146064_c, entityHanging.field_146062_d);
-                BlockCoord newHangingCoord = transform.apply(hangingCoord, size);
-                entityHanging.field_146063_b = newHangingCoord.x;
-                entityHanging.field_146064_c = newHangingCoord.y;
-                entityHanging.field_146062_d = newHangingCoord.z;
-                entityHanging.setDirection(entityHanging.hangingDirection);
-            }
-
-            if (entity instanceof EntityCreature)
-            {
-                EntityCreature entityCreature = (EntityCreature) entity;
-                ChunkCoordinates homePosition = entityCreature.getHomePosition();
-                ChunkCoordinates newHomePosition = transform.apply(homePosition, size);
-
-                EntityCreatureAccessor.setHomePosition(entityCreature, newHomePosition.posX, newHomePosition.posY, newHomePosition.posZ);
-            }
-        }
+        };
     }
 
     public static void recursivelyInjectIDFixTags(NBTTagCompound compound)
     {
         injectIDFixTags(compound);
 
-        for (Object key : compound.func_150296_c())
+        for (Object key : compound.getKeySet())
         {
             String keyString = (String) key;
             NBTBase innerCompound = compound.getTag(keyString);
@@ -263,7 +152,7 @@ public class IvWorldData
 
     public static void recursivelyInjectIDFixTags(NBTTagList list)
     {
-        int tagType = list.func_150303_d();
+        int tagType = list.getTagType();
         switch (tagType)
         {
             case Constants.NBT.TAG_COMPOUND:
@@ -300,10 +189,6 @@ public class IvWorldData
     {
         NBTTagList list = new NBTTagList();
 
-        // Most likely an ItemStack
-        if (hasPrimitive(compound, "id") && hasPrimitive(compound, "Count") && hasPrimitive(compound, "Damage"))
-            addItemTag(compound.getInteger("id"), list, "id");
-
         injectTEBlockFixTags(compound, "vanishingTileEntity", list, "BlockID");
         injectTEBlockFixTags(compound, "fenceGateTileEntity", list, "camoBlock");
         injectTEBlockFixTags(compound, "mixedBlockTileEntity", list, "block1", "block2");
@@ -315,32 +200,12 @@ public class IvWorldData
         }
     }
 
-    public static void addItemTag(int itemID, NBTTagList tagList, String tagDest)
-    {
-        Item item = Item.getItemById(itemID);
-        if (item != null)
-        {
-            String stringID = Item.itemRegistry.getNameForObject(item);
-
-            NBTTagCompound idCompound = new NBTTagCompound();
-            idCompound.setString("type", "item");
-            idCompound.setString("tagDest", tagDest);
-            idCompound.setString("itemID", stringID);
-
-            tagList.appendTag(idCompound);
-        }
-        else
-        {
-            IvToolkitCoreContainer.logger.warn("Failed to apply item tag for structure with ID '" + itemID + "'");
-        }
-    }
-
     public static void addBlockTag(int blockID, NBTTagList tagList, String tagDest)
     {
         Block block = Block.getBlockById(blockID);
         if (block != null)
         {
-            String stringID = Block.blockRegistry.getNameForObject(block);
+            String stringID = Block.blockRegistry.getNameForObject(block).toString();
 
             NBTTagCompound idCompound = new NBTTagCompound();
             idCompound.setString("type", "block");
@@ -360,7 +225,7 @@ public class IvWorldData
         applyIDFixTags(compound, registry);
         compound.removeTag(ID_FIX_TAG_KEY);
 
-        for (Object key : compound.func_150296_c())
+        for (Object key : compound.getKeySet())
         {
             String keyString = (String) key;
             NBTBase innerCompound = compound.getTag(keyString);
@@ -378,7 +243,7 @@ public class IvWorldData
 
     public static void recursivelyApplyIDFixTags(NBTTagList list, MCRegistry registry)
     {
-        int tagType = list.func_150303_d();
+        int tagType = list.getTagType();
         switch (tagType)
         {
             case Constants.NBT.TAG_COMPOUND:
@@ -416,20 +281,20 @@ public class IvWorldData
             {
                 String dest = fixTag.getString("tagDest");
                 String stringID = fixTag.getString("itemID");
-                Item item = registry.itemFromID(stringID);
+                Item item = registry.itemFromID(new ResourceLocation(stringID));
                 if (item != null)
                     compound.setInteger(dest, Item.getIdFromItem(item));
                 else
                     IvToolkitCoreContainer.logger.warn("Failed to fix item tag from structure with ID '" + stringID + "'");
 
-                registry.modifyItemStackCompound(compound, stringID);
+                registry.modifyItemStackCompound(compound, new ResourceLocation(stringID));
                 break;
             }
             case "block":
             {
                 String dest = fixTag.getString("tagDest");
                 String stringID = fixTag.getString("blockID");
-                Block block = registry.blockFromID(stringID);
+                Block block = registry.blockFromID(new ResourceLocation(stringID));
                 if (block != null)
                     compound.setInteger(dest, Block.getIdFromBlock(block));
                 else
@@ -442,12 +307,42 @@ public class IvWorldData
         }
     }
 
-    public static class EntitySelectorSaveable implements IEntitySelector
+    public NBTTagCompound createTagCompound(BlockPos referenceCoord)
     {
-        @Override
-        public boolean isEntityApplicable(Entity entity)
+        BlockPos invertedReference = BlockPositions.invert(referenceCoord);
+
+        NBTTagCompound compound = new NBTTagCompound();
+
+        compound.setTag("blockCollection", blockCollection.createTagCompound());
+
+        NBTTagList teList = new NBTTagList();
+        for (TileEntity tileEntity : tileEntities)
         {
-            return !(entity instanceof EntityPlayer);
+            NBTTagCompound teCompound = new NBTTagCompound();
+
+            Mover.moveTileEntityForGeneration(tileEntity, invertedReference);
+            tileEntity.writeToNBT(teCompound);
+            Mover.moveTileEntityForGeneration(tileEntity, referenceCoord);
+
+            recursivelyInjectIDFixTags(teCompound);
+            teList.appendTag(teCompound);
         }
+        compound.setTag("tileEntities", teList);
+
+        NBTTagList entityList = new NBTTagList();
+        for (Entity entity : entities)
+        {
+            NBTTagCompound entityCompound = new NBTTagCompound();
+
+            Mover.moveEntityForGeneration(entity, invertedReference);
+            entity.writeToNBTOptional(entityCompound);
+            Mover.moveEntityForGeneration(entity, referenceCoord);
+
+            recursivelyInjectIDFixTags(entityCompound);
+            entityList.appendTag(entityCompound);
+        }
+        compound.setTag("entities", entityList);
+
+        return compound;
     }
 }

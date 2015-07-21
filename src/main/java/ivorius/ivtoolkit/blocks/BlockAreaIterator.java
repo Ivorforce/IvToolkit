@@ -16,28 +16,30 @@
 
 package ivorius.ivtoolkit.blocks;
 
+import net.minecraft.util.BlockPos;
+
 import java.util.Iterator;
 
 /**
  * Created by lukas on 09.06.14.
  */
-public class BlockAreaIterator implements Iterator<BlockCoord>
+public class BlockAreaIterator implements Iterator<BlockPos>
 {
-    private BlockCoord lower;
-    private BlockCoord higher;
+    private BlockPos lower;
+    private BlockPos higher;
 
     private int curX;
     private int curY;
     private int curZ;
 
-    public BlockAreaIterator(BlockCoord lower, BlockCoord higher)
+    public BlockAreaIterator(BlockPos lower, BlockPos higher)
     {
         this.lower = lower;
         this.higher = higher;
 
-        curX = lower.x;
-        curY = lower.y;
-        curZ = lower.z;
+        curX = lower.getX();
+        curY = lower.getY();
+        curZ = lower.getZ();
     }
 
     public BlockAreaIterator(BlockArea area)
@@ -48,24 +50,24 @@ public class BlockAreaIterator implements Iterator<BlockCoord>
     @Override
     public boolean hasNext()
     {
-        return curX <= higher.x && curY <= higher.y && curZ <= higher.z;
+        return curX <= higher.getX() && curY <= higher.getY() && curZ <= higher.getZ();
     }
 
     @Override
-    public BlockCoord next()
+    public BlockPos next()
     {
-        BlockCoord retVal = hasNext() ? new BlockCoord(curX, curY, curZ) : null;
+        BlockPos retVal = hasNext() ? new BlockPos(curX, curY, curZ) : null;
 
         curX ++;
 
-        if (curX > higher.x)
+        if (curX > higher.getX())
         {
-            curX = lower.x;
+            curX = lower.getX();
             curY ++;
 
-            if (curY > higher.y)
+            if (curY > higher.getY())
             {
-                curY = lower.y;
+                curY = lower.getY();
                 curZ ++;
             }
         }

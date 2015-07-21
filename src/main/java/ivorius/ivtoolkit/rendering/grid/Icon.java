@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Lukas Tenbrink
+ * Copyright 2015 Lukas Tenbrink
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,22 +14,33 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit.tools;
-
-import net.minecraft.util.BlockPos;
+package ivorius.ivtoolkit.rendering.grid;
 
 /**
- * Implement this if your TileEntity or Entity needs special treatment when being moved.
+ * Created by lukas on 21.07.15.
  */
-public interface Movable
+public class Icon
 {
-    /**
-     * Moves the object by the specified amount.
-     * Note that implementing this will delete default moving functionality, so you need to do that yourself.
-     *
-     * @param x The distance to move on the x-axis.
-     * @param y The distance to move on the y-axis.
-     * @param z The distance to move on the z-axis.
-     */
-    void move(BlockPos pos);
+    private float minU, maxU;
+    private float minV, maxV;
+
+    public float getMinU()
+    {
+        return minU;
+    }
+
+    public float getMaxU()
+    {
+        return maxU;
+    }
+
+    public float getMinV()
+    {
+        return minV;
+    }
+
+    public float getMaxV()
+    {
+        return maxV;
+    }
 }

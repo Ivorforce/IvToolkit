@@ -71,10 +71,10 @@ public class IvShaderInstance
         try
         {
             if (vertexShaderCode != null)
-                vertShader = createShader(vertexShaderCode, OpenGlHelper.field_153209_q);
+                vertShader = createShader(vertexShaderCode, OpenGlHelper.GL_VERTEX_SHADER);
 
             if (fragmentShaderCode != null)
-                fragShader = createShader(fragmentShaderCode, OpenGlHelper.field_153210_r);
+                fragShader = createShader(fragmentShaderCode, OpenGlHelper.GL_FRAGMENT_SHADER);
         }
         catch (Exception exc)
         {
@@ -82,27 +82,27 @@ public class IvShaderInstance
             return;
         }
 
-        shaderID = OpenGlHelper.func_153183_d();
+        shaderID = OpenGlHelper.glCreateProgram();
 
         if (vertShader > 0)
         {
-            OpenGlHelper.func_153178_b(shaderID, vertShader);
-            OpenGlHelper.func_153180_a(vertShader);
+            OpenGlHelper.glAttachShader(shaderID, vertShader);
+            OpenGlHelper.glDeleteShader(vertShader);
         }
 
         if (fragShader > 0)
         {
-            OpenGlHelper.func_153178_b(shaderID, fragShader);
-            OpenGlHelper.func_153180_a(fragShader);
+            OpenGlHelper.glAttachShader(shaderID, fragShader);
+            OpenGlHelper.glDeleteShader(fragShader);
         }
 
-        OpenGlHelper.func_153179_f(shaderID);
-        if (OpenGlHelper.func_153175_a(shaderID, OpenGlHelper.field_153207_o) == GL11.GL_FALSE)
-            logger.error(OpenGlHelper.func_153166_e(shaderID, 0x8000));
+        OpenGlHelper.glLinkProgram(shaderID);
+        if (OpenGlHelper.glGetProgrami(shaderID, OpenGlHelper.GL_LINK_STATUS) == GL11.GL_FALSE)
+            logger.error(OpenGlHelper.glGetProgramInfoLog(shaderID, 0x8000));
 
         IvOpenGLHelper.glValidateProgram(shaderID);
-        if (OpenGlHelper.func_153175_a(shaderID, IvOpenGLHelper.GL_VALIDATE_STATUS) == GL11.GL_FALSE)
-            logger.error(OpenGlHelper.func_153166_e(shaderID, 0x8000));
+        if (OpenGlHelper.glGetProgrami(shaderID, IvOpenGLHelper.GL_VALIDATE_STATUS) == GL11.GL_FALSE)
+            logger.error(OpenGlHelper.glGetProgramInfoLog(shaderID, 0x8000));
     }
 
     private int createShader(String shaderCode, int shaderType) throws Exception
@@ -110,7 +110,7 @@ public class IvShaderInstance
         int shader = 0;
         try
         {
-            shader = OpenGlHelper.func_153195_b(shaderType);
+            shader = OpenGlHelper.glCreateShader(shaderType);
 
             if (shader == 0)
                 return 0;
@@ -120,12 +120,12 @@ public class IvShaderInstance
             shaderCodeBuf.put(shaderCodeBytes);
             shaderCodeBuf.position(0);
 
-            OpenGlHelper.func_153169_a(shader, shaderCodeBuf);
-            OpenGlHelper.func_153170_c(shader);
+            OpenGlHelper.glShaderSource(shader, shaderCodeBuf);
+            OpenGlHelper.glCompileShader(shader);
 
-            if (OpenGlHelper.func_153157_c(shader, OpenGlHelper.field_153208_p) == GL11.GL_FALSE)
+            if (OpenGlHelper.glGetShaderi(shader, OpenGlHelper.GL_COMPILE_STATUS) == GL11.GL_FALSE)
             {
-                throw new RuntimeException("Error creating shader: " + OpenGlHelper.func_153166_e(shader, 0x8000));
+                throw new RuntimeException("Error creating shader: " + OpenGlHelper.glGetProgramInfoLog(shader, 0x8000));
             }
 
             return shader;
@@ -133,7 +133,7 @@ public class IvShaderInstance
         catch (Exception exc)
         {
             if (shader != 0)
-                OpenGlHelper.func_153180_a(shader);
+                OpenGlHelper.glDeleteShader(shader);
 
             throw new RuntimeException(exc);
         }
@@ -147,7 +147,7 @@ public class IvShaderInstance
         }
 
         shaderActive = true;
-        OpenGlHelper.func_153161_d(shaderID);
+        OpenGlHelper.glUseProgram(shaderID);
 
         return true;
     }
@@ -159,7 +159,7 @@ public class IvShaderInstance
             return;
         }
 
-        OpenGlHelper.func_153161_d(0);
+        OpenGlHelper.glUseProgram(0);
         shaderActive = false;
     }
 
@@ -187,16 +187,16 @@ public class IvShaderInstance
         switch (typeLength)
         {
             case 1:
-                OpenGlHelper.func_153181_a(getUniformLocation(key), intBuffer);
+                OpenGlHelper.glUniform1(getUniformLocation(key), intBuffer);
                 break;
             case 2:
-                OpenGlHelper.func_153182_b(getUniformLocation(key), intBuffer);
+                OpenGlHelper.glUniform2(getUniformLocation(key), intBuffer);
                 break;
             case 3:
-                OpenGlHelper.func_153192_c(getUniformLocation(key), intBuffer);
+                OpenGlHelper.glUniform3(getUniformLocation(key), intBuffer);
                 break;
             case 4:
-                OpenGlHelper.func_153162_d(getUniformLocation(key), intBuffer);
+                OpenGlHelper.glUniform4(getUniformLocation(key), intBuffer);
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -224,16 +224,16 @@ public class IvShaderInstance
         switch (typeLength)
         {
             case 1:
-                OpenGlHelper.func_153168_a(getUniformLocation(key), floatBuffer);
+                OpenGlHelper.glUniform1(getUniformLocation(key), floatBuffer);
                 break;
             case 2:
-                OpenGlHelper.func_153177_b(getUniformLocation(key), floatBuffer);
+                OpenGlHelper.glUniform2(getUniformLocation(key), floatBuffer);
                 break;
             case 3:
-                OpenGlHelper.func_153191_c(getUniformLocation(key), floatBuffer);
+                OpenGlHelper.glUniform3(getUniformLocation(key), floatBuffer);
                 break;
             case 4:
-                OpenGlHelper.func_153159_d(getUniformLocation(key), floatBuffer);
+                OpenGlHelper.glUniform4(getUniformLocation(key), floatBuffer);
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -266,13 +266,13 @@ public class IvShaderInstance
         switch (width)
         {
             case 2:
-                OpenGlHelper.func_153173_a(getUniformLocation(key), false, floatBuffer);
+                OpenGlHelper.glUniformMatrix2(getUniformLocation(key), false, floatBuffer);
                 break;
             case 3:
-                OpenGlHelper.func_153189_b(getUniformLocation(key), false, floatBuffer);
+                OpenGlHelper.glUniformMatrix3(getUniformLocation(key), false, floatBuffer);
                 break;
             default:
-                OpenGlHelper.func_153160_c(getUniformLocation(key), false, floatBuffer);
+                OpenGlHelper.glUniformMatrix4(getUniformLocation(key), false, floatBuffer);
                 break;
         }
 
@@ -285,7 +285,7 @@ public class IvShaderInstance
             return 0;
 
         if (!uniformLocations.containsKey(key))
-            uniformLocations.put(key, OpenGlHelper.func_153194_a(shaderID, key));
+            uniformLocations.put(key, OpenGlHelper.glGetUniformLocation(shaderID, key));
 
         return uniformLocations.get(key);
     }
@@ -297,7 +297,7 @@ public class IvShaderInstance
 
         if (shaderID > 0)
         {
-            OpenGlHelper.func_153187_e(shaderID);
+            OpenGlHelper.glDeleteProgram(shaderID);
             shaderID = 0;
         }
 
