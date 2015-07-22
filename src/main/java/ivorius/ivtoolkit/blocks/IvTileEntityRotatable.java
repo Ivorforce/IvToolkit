@@ -19,33 +19,53 @@ package ivorius.ivtoolkit.blocks;
 
 import ivorius.ivtoolkit.math.IvMathHelper;
 import ivorius.ivtoolkit.raytracing.IvRaytraceableAxisAlignedBox;
+import ivorius.ivtoolkit.tools.EnumFacingHelper;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.common.util.Constants;
 import org.lwjgl.util.vector.Vector3f;
 
 public class IvTileEntityRotatable extends TileEntity
 {
-    public int direction;
+    public EnumFacing facing;
 
     @Override
-    public void readFromNBT(NBTTagCompound par1nbtTagCompound)
+    public void readFromNBT(NBTTagCompound tagCompound)
     {
-        super.readFromNBT(par1nbtTagCompound);
+        super.readFromNBT(tagCompound);
 
-        direction = par1nbtTagCompound.getInteger("direction");
+        if (tagCompound.hasKey("direction", Constants.NBT.TAG_INT)) // Legacy
+        {
+            switch (tagCompound.getInteger("direction"))
+            {
+                case 0:
+                    facing = EnumFacing.SOUTH;
+                case 1:
+                    facing = EnumFacing.WEST;
+                case 2:
+                    facing = EnumFacing.NORTH;
+                case 3:
+                    facing = EnumFacing.EAST;
+                default:
+                    facing = EnumFacing.SOUTH;
+            }
+        }
+        else
+            facing = EnumFacingHelper.byName(tagCompound.getString("facing"), EnumFacing.SOUTH);
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound par1nbtTagCompound)
+    public void writeToNBT(NBTTagCompound tagCompound)
     {
-        super.writeToNBT(par1nbtTagCompound);
+        super.writeToNBT(tagCompound);
 
-        par1nbtTagCompound.setInteger("direction", direction);
+        tagCompound.setString("facing", facing.getName());
     }
 
     @Override
@@ -75,26 +95,26 @@ public class IvTileEntityRotatable extends TileEntity
 
     public IvRaytraceableAxisAlignedBox getRotatedBox(Object userInfo, double x, double y, double z, double width, double height, double depth)
     {
-        return IvMultiBlockHelper.getRotatedBox(userInfo, x, y, z, width, height, depth, getDirection(), new double[]{getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5});
+        return IvMultiBlockHelper.getRotatedBox(userInfo, x, y, z, width, height, depth, getFacing(), new double[]{getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5});
     }
 
     public AxisAlignedBB getRotatedBB(double x, double y, double z, double width, double height, double depth)
     {
-        return IvMultiBlockHelper.getRotatedBB(x, y, z, width, height, depth, getDirection(), new double[]{getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5});
+        return IvMultiBlockHelper.getRotatedBB(x, y, z, width, height, depth, getFacing(), new double[]{getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5});
     }
 
     public Vector3f getRotatedVector(Vector3f vector3f)
     {
-        return IvMultiBlockHelper.getRotatedVector(vector3f, getDirection());
+        return IvMultiBlockHelper.getRotatedVector(vector3f, getFacing());
     }
 
     public Vec3 getRotatedVector(Vec3 vec3)
     {
-        return IvMultiBlockHelper.getRotatedVector(vec3, getDirection());
+        return IvMultiBlockHelper.getRotatedVector(vec3, getFacing());
     }
 
-    public int getDirection()
+    public EnumFacing getFacing()
     {
-        return direction;
+        return facing;
     }
 }

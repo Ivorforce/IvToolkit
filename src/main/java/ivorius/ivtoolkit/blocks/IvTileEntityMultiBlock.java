@@ -20,6 +20,7 @@ package ivorius.ivtoolkit.blocks;
 import ivorius.ivtoolkit.math.IvMathHelper;
 import ivorius.ivtoolkit.math.IvVecMathHelper;
 import ivorius.ivtoolkit.raytracing.IvRaytraceableAxisAlignedBox;
+import ivorius.ivtoolkit.tools.EnumFacingHelper;
 import ivorius.ivtoolkit.tools.IvNBTHelper;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -29,7 +30,9 @@ import net.minecraft.server.gui.IUpdatePlayerListBox;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.common.util.Constants;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.util.List;
@@ -38,7 +41,7 @@ public class IvTileEntityMultiBlock extends TileEntity implements IUpdatePlayerL
 {
     public BlockPos parentCoords;
     public BlockPos[] childCoords;
-    public int direction;
+    public EnumFacing facing;
 
     public double[] centerCoords = new double[]{0.5, 0.5, 0.5};
     public double[] centerCoordsSize = new double[]{0.5, 0.5, 0.5};
@@ -151,7 +154,24 @@ public class IvTileEntityMultiBlock extends TileEntity implements IUpdatePlayerL
     {
         super.readFromNBT(tagCompound);
 
-        direction = tagCompound.getInteger("direction");
+        if (tagCompound.hasKey("direction", Constants.NBT.TAG_INT)) // Legacy
+        {
+            switch (tagCompound.getInteger("direction"))
+            {
+                case 0:
+                    facing = EnumFacing.SOUTH;
+                case 1:
+                    facing = EnumFacing.WEST;
+                case 2:
+                    facing = EnumFacing.NORTH;
+                case 3:
+                    facing = EnumFacing.EAST;
+                default:
+                    facing = EnumFacing.SOUTH;
+            }
+        }
+        else
+            facing = EnumFacingHelper.byName(tagCompound.getString("facing"), EnumFacing.SOUTH);
 
         centerCoords = IvNBTHelper.readDoubleArray("multiBlockCenter", tagCompound);
         if (centerCoords == null) // Legacy
@@ -161,17 +181,17 @@ public class IvTileEntityMultiBlock extends TileEntity implements IUpdatePlayerL
             if (tagCompound.hasKey("centerCoords[0]"))
                 centerCoords[0] = tagCompound.getDouble("centerCoords[0]") - getPos().getX();
             else
-                centerCoords[0] = 0.5f;
+                centerCoords[0] = 0.5;
 
             if (tagCompound.hasKey("centerCoords[1]"))
                 centerCoords[1] = tagCompound.getDouble("centerCoords[1]") - getPos().getY();
             else
-                centerCoords[1] = 0.5f;
+                centerCoords[1] = 0.5;
 
             if (tagCompound.hasKey("centerCoords[2]"))
                 centerCoords[2] = tagCompound.getDouble("centerCoords[2]") - getPos().getZ();
             else
-                centerCoords[2] = 0.5f;
+                centerCoords[2] = 0.5;
         }
 
         centerCoordsSize = IvNBTHelper.readDoubleArray("multiBlockSize", tagCompound);
@@ -213,17 +233,17 @@ public class IvTileEntityMultiBlock extends TileEntity implements IUpdatePlayerL
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound par1nbtTagCompound)
+    public void writeToNBT(NBTTagCompound tagCompound)
     {
-        super.writeToNBT(par1nbtTagCompound);
+        super.writeToNBT(tagCompound);
 
-        par1nbtTagCompound.setInteger("direction", direction);
+        tagCompound.setString("facing", facing.getName());
 
-        IvNBTHelper.writeDoubleArray("multiBlockCenter", centerCoords, par1nbtTagCompound);
-        IvNBTHelper.writeDoubleArray("multiBlockSize", centerCoordsSize, par1nbtTagCompound);
+        IvNBTHelper.writeDoubleArray("multiBlockCenter", centerCoords, tagCompound);
+        IvNBTHelper.writeDoubleArray("multiBlockSize", centerCoordsSize, tagCompound);
 
         if (this.parentCoords != null)
-            par1nbtTagCompound.setIntArray("parentCoords", BlockPositions.toIntArray(parentCoords));
+            tagCompound.setIntArray("parentCoords", BlockPositions.toIntArray(parentCoords));
 
         if (childCoords != null)
         {
@@ -235,7 +255,7 @@ public class IvTileEntityMultiBlock extends TileEntity implements IUpdatePlayerL
                 childCoordsCut[i * 3 + 2] = childCoords[i].getZ();
             }
 
-            par1nbtTagCompound.setIntArray("childCoords", childCoordsCut);
+            tagCompound.setIntArray("childCoords", childCoordsCut);
         }
     }
 
@@ -266,27 +286,27 @@ public class IvTileEntityMultiBlock extends TileEntity implements IUpdatePlayerL
 
     public IvRaytraceableAxisAlignedBox getRotatedBox(Object userInfo, double x, double y, double z, double width, double height, double depth)
     {
-        return IvMultiBlockHelper.getRotatedBox(userInfo, x, y, z, width, height, depth, getDirection(), getActiveCenterCoords());
+        return IvMultiBlockHelper.getRotatedBox(userInfo, x, y, z, width, height, depth, getFacing(), getActiveCenterCoords());
     }
 
     public AxisAlignedBB getRotatedBB(double x, double y, double z, double width, double height, double depth)
     {
-        return IvMultiBlockHelper.getRotatedBB(x, y, z, width, height, depth, getDirection(), getActiveCenterCoords());
+        return IvMultiBlockHelper.getRotatedBB(x, y, z, width, height, depth, getFacing(), getActiveCenterCoords());
     }
 
     public Vector3f getRotatedVector(Vector3f vector3f)
     {
-        return IvMultiBlockHelper.getRotatedVector(vector3f, getDirection());
+        return IvMultiBlockHelper.getRotatedVector(vector3f, getFacing());
     }
 
     public Vec3 getRotatedVector(Vec3 vec3)
     {
-        return IvMultiBlockHelper.getRotatedVector(vec3, getDirection());
+        return IvMultiBlockHelper.getRotatedVector(vec3, getFacing());
     }
 
-    public int getDirection()
+    public EnumFacing getFacing()
     {
-        return direction;
+        return facing;
     }
 
     public AxisAlignedBB getBoxAroundCenter(double width, double height, double length)

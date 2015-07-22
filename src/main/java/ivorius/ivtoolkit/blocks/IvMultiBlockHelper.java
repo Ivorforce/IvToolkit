@@ -42,7 +42,7 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
     private World world;
     private IBlockState blockState;
 
-    private int direction;
+    private EnumFacing direction;
     private double[] center;
     private double[] size;
 
@@ -51,7 +51,7 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
 
     }
 
-    public boolean beginPlacing(List<BlockPos> positions, World world, BlockPos pos, EnumFacing blockSide, ItemStack itemStack, EntityPlayer player, IBlockState state, int direction)
+    public boolean beginPlacing(List<BlockPos> positions, World world, BlockPos pos, EnumFacing blockSide, ItemStack itemStack, EntityPlayer player, IBlockState state, EnumFacing direction)
     {
         List<BlockPos> validLocations = IvMultiBlockHelper.getBestPlacement(positions, world, pos, blockSide, itemStack, player, state);
 
@@ -61,7 +61,7 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
         return beginPlacing(validLocations, world, state, direction);
     }
 
-    public boolean beginPlacing(List<BlockPos> validLocations, World world, IBlockState state, int direction)
+    public boolean beginPlacing(List<BlockPos> validLocations, World world, IBlockState state, EnumFacing direction)
     {
         this.world = world;
         this.parentTileEntity = null;
@@ -108,7 +108,7 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
                 tileEntityMB.becomeChild(parentTileEntity);
             }
 
-            tileEntityMB.direction = direction;
+            tileEntityMB.facing = direction;
             tileEntityMB.centerCoords = new double[]{center[0] - pos.getX(), center[1] - pos.getY(), center[2] - pos.getZ()};
             tileEntityMB.centerCoordsSize = size;
 
@@ -293,22 +293,22 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
         return returnList;
     }
 
-    public static IvRaytraceableAxisAlignedBox getRotatedBox(Object userInfo, double x, double y, double z, double width, double height, double depth, int direction, double[] centerCoords)
+    public static IvRaytraceableAxisAlignedBox getRotatedBox(Object userInfo, double x, double y, double z, double width, double height, double depth, EnumFacing direction, double[] centerCoords)
     {
         IvRaytraceableAxisAlignedBox box = null;
 
         switch (direction)
         {
-            case 0:
+            case SOUTH:
                 box = new IvRaytraceableAxisAlignedBox(userInfo, centerCoords[0] - x - width, centerCoords[1] + y, centerCoords[2] + z, width, height, depth);
                 break;
-            case 1:
+            case WEST:
                 box = new IvRaytraceableAxisAlignedBox(userInfo, centerCoords[0] - z - depth, centerCoords[1] + y, centerCoords[2] - x - width, depth, height, width);
                 break;
-            case 2:
+            case NORTH:
                 box = new IvRaytraceableAxisAlignedBox(userInfo, centerCoords[0] + x, centerCoords[1] + y, centerCoords[2] - z - depth, width, height, depth);
                 break;
-            case 3:
+            case EAST:
                 box = new IvRaytraceableAxisAlignedBox(userInfo, centerCoords[0] + z, centerCoords[1] + y, centerCoords[2] + x, depth, height, width);
                 break;
         }
@@ -316,22 +316,22 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
         return box;
     }
 
-    public static AxisAlignedBB getRotatedBB(double x, double y, double z, double width, double height, double depth, int direction, double[] centerCoords)
+    public static AxisAlignedBB getRotatedBB(double x, double y, double z, double width, double height, double depth, EnumFacing direction, double[] centerCoords)
     {
         AxisAlignedBB box = null;
 
         switch (direction)
         {
-            case 0:
+            case SOUTH:
                 box = getBBWithLengths(centerCoords[0] + x, centerCoords[1] + y, centerCoords[2] + z, width, height, depth);
                 break;
-            case 1:
+            case WEST:
                 box = getBBWithLengths(centerCoords[0] - z - depth, centerCoords[1] + y, centerCoords[2] + x, depth, height, width);
                 break;
-            case 2:
+            case NORTH:
                 box = getBBWithLengths(centerCoords[0] - x - width, centerCoords[1] + y, centerCoords[2] - z - depth, width, height, depth);
                 break;
-            case 3:
+            case EAST:
                 box = getBBWithLengths(centerCoords[0] + z, centerCoords[1] + y, centerCoords[2] - x - width, depth, height, width);
                 break;
         }
@@ -339,34 +339,34 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
         return box;
     }
 
-    public static Vector3f getRotatedVector(Vector3f vector3f, int rotation)
+    public static Vector3f getRotatedVector(Vector3f vector3f, EnumFacing rotation)
     {
         switch (rotation)
         {
-            case 0:
+            case SOUTH:
                 return new Vector3f(vector3f.x, vector3f.y, vector3f.z);
-            case 1:
+            case WEST:
                 return new Vector3f(-vector3f.z, vector3f.y, vector3f.x);
-            case 2:
+            case NORTH:
                 return new Vector3f(-vector3f.x, vector3f.y, -vector3f.z);
-            case 3:
+            case EAST:
                 return new Vector3f(vector3f.z, vector3f.y, -vector3f.x);
         }
 
         return null;
     }
 
-    public static Vec3 getRotatedVector(Vec3 vec3, int rotation)
+    public static Vec3 getRotatedVector(Vec3 vec3, EnumFacing rotation)
     {
         switch (rotation)
         {
-            case 0:
+            case SOUTH:
                 return new Vec3(vec3.xCoord, vec3.yCoord, vec3.zCoord);
-            case 1:
+            case WEST:
                 return new Vec3(-vec3.zCoord, vec3.yCoord, vec3.xCoord);
-            case 2:
+            case NORTH:
                 return new Vec3(-vec3.xCoord, vec3.yCoord, -vec3.zCoord);
-            case 3:
+            case EAST:
                 return new Vec3(vec3.zCoord, vec3.yCoord, -vec3.xCoord);
         }
 
