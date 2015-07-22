@@ -271,20 +271,20 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
         return distX * distX + distY * distY + distZ * distZ;
     }
 
-    public static List<BlockPos> getRotatedPositions(List<BlockPos> positions, int rotation)
+    public static List<BlockPos> getRotatedPositions(List<BlockPos> positions, EnumFacing facing)
     {
         ArrayList<BlockPos> returnList = new ArrayList<>(positions.size());
 
         for (BlockPos position : positions)
         {
-            switch (rotation)
+            switch (facing)
             {
-                case 0:
-                case 2:
+                case NORTH:
+                case SOUTH:
                     returnList.add(position);
                     break;
-                case 1:
-                case 3:
+                case WEST:
+                case EAST:
                     returnList.add(new BlockPos(position.getZ(), position.getY(), position.getX()));
                     break;
             }
@@ -339,9 +339,9 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
         return box;
     }
 
-    public static Vector3f getRotatedVector(Vector3f vector3f, EnumFacing rotation)
+    public static Vector3f getRotatedVector(Vector3f vector3f, EnumFacing facing)
     {
-        switch (rotation)
+        switch (facing)
         {
             case SOUTH:
                 return new Vector3f(vector3f.x, vector3f.y, vector3f.z);
@@ -356,9 +356,9 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
         return null;
     }
 
-    public static Vec3 getRotatedVector(Vec3 vec3, EnumFacing rotation)
+    public static Vec3 getRotatedVector(Vec3 vec3, EnumFacing facing)
     {
-        switch (rotation)
+        switch (facing)
         {
             case SOUTH:
                 return new Vec3(vec3.xCoord, vec3.yCoord, vec3.zCoord);
@@ -378,14 +378,14 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
         return AxisAlignedBB.fromBounds(x, y, z, x + width, y + height, z + depth);
     }
 
-    public static int getRotation(Entity entity)
+    public static EnumFacing getRotation(Entity entity)
     {
-        return MathHelper.floor_double((entity.rotationYaw * 4F) / 360F + 0.5D) & 3;
+        return entity.getHorizontalFacing();
     }
 
-    public static List<BlockPos> getRotatedPositions(int rotation, int width, int height, int length)
+    public static List<BlockPos> getRotatedPositions(EnumFacing facing, int width, int height, int length)
     {
-        boolean affectsX = (rotation == 0) || (rotation == 2);
+        boolean affectsX = (facing == EnumFacing.SOUTH) || (facing == EnumFacing.NORTH);
         return getPositions(affectsX ? width : length, height, affectsX ? length : width);
     }
 
