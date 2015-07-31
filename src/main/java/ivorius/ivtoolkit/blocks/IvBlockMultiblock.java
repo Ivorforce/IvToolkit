@@ -28,7 +28,7 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public abstract class IvBlockMultiblock extends BlockContainer
+public abstract class IvBlockMultiblock extends Block
 {
     protected IvBlockMultiblock(Material par2Material)
     {
