@@ -37,7 +37,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import java.util.List;
 
-public class IvTileEntityMultiBlock extends TileEntity implements IUpdatePlayerListBox
+public class IvTileEntityMultiBlock extends TileEntity
 {
     public BlockPos parentCoords;
     public BlockPos[] childCoords;
@@ -49,25 +49,6 @@ public class IvTileEntityMultiBlock extends TileEntity implements IUpdatePlayerL
     public boolean multiblockInvalid;
 
     public IvTileEntityMultiBlock()
-    {
-
-    }
-
-    @Override
-    public void update()
-    {
-        if (isParent())
-            updateEntityParent();
-        else
-            updateEntityChild();
-    }
-
-    public void updateEntityParent()
-    {
-
-    }
-
-    public void updateEntityChild()
     {
 
     }
