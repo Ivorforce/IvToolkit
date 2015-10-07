@@ -56,7 +56,7 @@ public class MazePredicateMany<M extends MazeComponent<C>, C> implements MazePre
     @Override
     public boolean isDirtyConnection(final MazeRoom dest, final MazeRoom source, final C c)
     {
-        return Iterables.any(predicates, new Predicate<MazePredicate<M, C>>()
+        return Iterables.all(predicates, new Predicate<MazePredicate<M, C>>()
         {
             @Override
             public boolean apply(MazePredicate<M, C> p)
