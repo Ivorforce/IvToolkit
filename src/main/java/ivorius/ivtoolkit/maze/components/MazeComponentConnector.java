@@ -18,7 +18,8 @@ package ivorius.ivtoolkit.maze.components;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.*;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import ivorius.ivtoolkit.IvToolkitCoreContainer;
 import ivorius.ivtoolkit.random.WeightedSelector;
 import org.apache.commons.lang3.tuple.Triple;
@@ -31,25 +32,51 @@ import java.util.*;
  */
 public class MazeComponentConnector
 {
+    @Deprecated
     public static <M extends WeightedMazeComponent<C>, C> List<ShiftedMazeComponent<M, C>> randomlyConnect(MorphingMazeComponent<C> morphingComponent, List<M> components,
-                                                                    ConnectionStrategy<C> connectionStrategy, final MazeComponentPlacementStrategy<M, C> placementStrategy, Random random)
+                                                                                                           ConnectionStrategy<C> connectionStrategy, final MazeComponentPlacementStrategy<M, C> placementStrategy, Random random)
+    {
+        return randomlyConnect(morphingComponent, components, connectionStrategy, new MazePredicate<M, C>()
+        {
+            @Override
+            public boolean canPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
+            {
+                return placementStrategy.canPlace(component);
+            }
+
+            @Override
+            public void willPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
+            {
+
+            }
+
+            @Override
+            public boolean isDirtyConnection(MazeRoom dest, MazeRoom source, C c)
+            {
+                return placementStrategy.shouldContinue(dest, source, c);
+            }
+        }, random);
+    }
+
+    public static <M extends WeightedMazeComponent<C>, C> List<ShiftedMazeComponent<M, C>> randomlyConnect(MorphingMazeComponent<C> maze, List<M> components,
+                                                                                                           ConnectionStrategy<C> connectionStrategy, final MazePredicate<M, C> predicate, Random random)
     {
         ImmutableList.Builder<ShiftedMazeComponent<M, C>> result = new ImmutableList.Builder<>();
         Deque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack = new ArrayDeque<>();
 
         Predicate<ShiftedMazeComponent<M, C>> componentPredicate = Predicates.and(
-                MazeComponents.compatibilityPredicate(morphingComponent, connectionStrategy),
-                MazeComponentPlacementStrategies.placeable(placementStrategy));
+                MazeComponents.compatibilityPredicate(maze, connectionStrategy),
+                MazePredicates.placeable(maze, predicate));
         WeightedSelector.WeightFunction<ShiftedMazeComponent<M, C>> weightFunction = getWeightFunction();
 
-        addAllExits(placementStrategy, exitStack, morphingComponent.exits().entrySet());
+        addAllExits(predicate, exitStack, maze.exits().entrySet());
 
         while (exitStack.size() > 0)
         {
             Triple<MazeRoom, MazeRoomConnection, C> triple = exitStack.removeLast();
             MazeRoom room = triple.getLeft();
 
-            if (morphingComponent.rooms().contains(room))
+            if (maze.rooms().contains(room))
                 continue; // Has been filled while queued
 
             MazeRoomConnection exit = triple.getMiddle();
@@ -60,17 +87,19 @@ public class MazeComponentConnector
             if (placeable.size() == 0)
             {
                 IvToolkitCoreContainer.logger.warn("Did not find fitting component for maze!");
-                IvToolkitCoreContainer.logger.warn("Suggested: X with exits " + FluentIterable.from(morphingComponent.exits().entrySet()).filter(entryConnectsTo(room)));
+                IvToolkitCoreContainer.logger.warn("Suggested: X with exits " + FluentIterable.from(maze.exits().entrySet()).filter(entryConnectsTo(room)));
                 continue;
             }
 
             ShiftedMazeComponent<M, C> selected = WeightedSelector.canSelect(placeable, weightFunction)
-                ? WeightedSelector.select(random, placeable, weightFunction)
-                : placeable.get(random.nextInt(placeable.size())); // All weight 0 = select at random
+                    ? WeightedSelector.select(random, placeable, weightFunction)
+                    : placeable.get(random.nextInt(placeable.size())); // All weight 0 = select at random
 
-            addAllExits(placementStrategy, exitStack, selected.exits().entrySet());
+            predicate.willPlace(maze, selected);
 
-            morphingComponent.add(selected);
+            addAllExits(predicate, exitStack, selected.exits().entrySet());
+
+            maze.add(selected);
             result.add(selected);
         }
 
@@ -89,16 +118,16 @@ public class MazeComponentConnector
         };
     }
 
-    private static <M extends WeightedMazeComponent<C>, C> void addAllExits(MazeComponentPlacementStrategy<M, C> placementStrategy, Deque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack, Set<Map.Entry<MazeRoomConnection, C>> entries)
+    private static <M extends WeightedMazeComponent<C>, C> void addAllExits(MazePredicate<M, C> placementStrategy, Deque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack, Set<Map.Entry<MazeRoomConnection, C>> entries)
     {
         for (Map.Entry<MazeRoomConnection, C> exit : entries)
         {
             MazeRoomConnection connection = exit.getKey();
             C c = exit.getValue();
 
-            if (placementStrategy.shouldContinue(connection.getLeft(), connection.getRight(), c))
+            if (placementStrategy.isDirtyConnection(connection.getLeft(), connection.getRight(), c))
                 exitStack.add(Triple.of(connection.getLeft(), connection, c));
-            if (placementStrategy.shouldContinue(connection.getRight(), connection.getLeft(), c))
+            if (placementStrategy.isDirtyConnection(connection.getRight(), connection.getLeft(), c))
                 exitStack.add(Triple.of(connection.getRight(), connection, c));
         }
     }

@@ -16,22 +16,14 @@
 
 package ivorius.ivtoolkit.maze.components;
 
-import com.google.common.base.Predicate;
-
 /**
- * Created by lukas on 15.04.15.
+ * Created by lukas on 30.09.15.
  */
-public class MazeComponentPlacementStrategies
+public interface MazePredicate<M extends MazeComponent<C>, C>
 {
-    public static <M extends MazeComponent<C>, C> Predicate<ShiftedMazeComponent<M, C>> placeable(final MazeComponentPlacementStrategy<M, C> strategy)
-    {
-        return new Predicate<ShiftedMazeComponent<M, C>>()
-        {
-            @Override
-            public boolean apply(ShiftedMazeComponent<M, C> input)
-            {
-                return strategy.canPlace(input);
-            }
-        };
-    }
+    boolean canPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component);
+
+    void willPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component);
+
+    boolean isDirtyConnection(MazeRoom dest, MazeRoom source, C c);
 }
