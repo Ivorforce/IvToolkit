@@ -19,6 +19,8 @@ package ivorius.ivtoolkit.maze.components;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,11 +28,17 @@ import java.util.List;
  */
 public class MazePredicateMany<M extends MazeComponent<C>, C> implements MazePredicate<M, C>
 {
-    private final List<MazePredicate<M, C>> predicates;
+    private final List<MazePredicate<M, C>> predicates = new ArrayList<>();
 
     public MazePredicateMany(List<MazePredicate<M, C>> predicates)
     {
-        this.predicates = predicates;
+        this.predicates.addAll(predicates);
+    }
+
+    @SafeVarargs
+    public MazePredicateMany(MazePredicate<M, C>... predicates)
+    {
+        Collections.addAll(this.predicates, predicates);
     }
 
     @Override
