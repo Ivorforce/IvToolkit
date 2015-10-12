@@ -21,6 +21,8 @@ import com.google.common.collect.Collections2;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Random;
 
 public class WeightedSelector
@@ -61,17 +63,27 @@ public class WeightedSelector
 
     public static <T extends Item> T selectItem(Random rand, Collection<T> items, double totalWeight)
     {
+        return selectItem(rand, items, totalWeight, false);
+    }
+
+    public static <T extends Item> T selectItem(Random rand, Collection<T> items, double totalWeight, boolean remove)
+    {
         if (items.size() == 0)
             throw new IndexOutOfBoundsException();
 
         double random = rand.nextDouble() * totalWeight;
         T last = null;
-        for (T t : items)
+        for (Iterator<T> iterator = items.iterator(); iterator.hasNext(); )
         {
+            T t = iterator.next();
             last = t;
             random -= t.getWeight();
             if (random <= 0.0)
+            {
+                if (remove)
+                    iterator.remove();
                 return t;
+            }
         }
 
         return last;
@@ -102,7 +114,7 @@ public class WeightedSelector
         double getWeight();
     }
 
-    public static class SimpleItem<T> implements Item
+    public static class SimpleItem<T> implements Item, Comparable<Item>
     {
         protected final double weight;
         protected final T item;
@@ -175,11 +187,26 @@ public class WeightedSelector
                     ", item=" + item +
                     '}';
         }
+
+        @Override
+        public int compareTo(Item o)
+        {
+            return Double.compare(weight, o.getWeight());
+        }
     }
 
     public interface WeightFunction<T>
     {
         double apply(T item);
+    }
+
+    public static class ItemComparator implements Comparator<Item>
+    {
+        @Override
+        public int compare(Item o1, Item o2)
+        {
+            return Double.compare(o1.getWeight(), o2.getWeight());
+        }
     }
 }
 
