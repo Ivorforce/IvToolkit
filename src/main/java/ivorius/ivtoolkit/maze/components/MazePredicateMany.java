@@ -62,6 +62,12 @@ public class MazePredicateMany<M extends MazeComponent<C>, C> implements MazePre
     }
 
     @Override
+    public void didUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
+    {
+
+    }
+
+    @Override
     public boolean isDirtyConnection(final MazeRoom dest, final MazeRoom source, final C c)
     {
         return Iterables.all(predicates, new Predicate<MazePredicate<M, C>>()
