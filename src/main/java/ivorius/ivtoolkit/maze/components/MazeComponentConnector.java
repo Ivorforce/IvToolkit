@@ -20,6 +20,9 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
 import ivorius.ivtoolkit.IvToolkitCoreContainer;
 import ivorius.ivtoolkit.random.WeightedSelector;
 import org.apache.commons.lang3.tuple.Triple;
@@ -32,6 +35,8 @@ import java.util.*;
  */
 public class MazeComponentConnector
 {
+    public static int INFINITE_REVERSES = -1;
+
     @Deprecated
     public static <M extends WeightedMazeComponent<C>, C> List<ShiftedMazeComponent<M, C>> randomlyConnect(MorphingMazeComponent<C> morphingComponent, List<M> components,
                                                                                                            ConnectionStrategy<C> connectionStrategy, final MazeComponentPlacementStrategy<M, C> placementStrategy, Random random)
@@ -51,18 +56,27 @@ public class MazeComponentConnector
             }
 
             @Override
+            public void didUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
+            {
+
+            }
+
+            @Override
             public boolean isDirtyConnection(MazeRoom dest, MazeRoom source, C c)
             {
                 return placementStrategy.shouldContinue(dest, source, c);
             }
-        }, random);
+        }, random, 0);
     }
 
     public static <M extends WeightedMazeComponent<C>, C> List<ShiftedMazeComponent<M, C>> randomlyConnect(MorphingMazeComponent<C> maze, List<M> components,
-                                                                                                           ConnectionStrategy<C> connectionStrategy, final MazePredicate<M, C> predicate, Random random)
+                                                                                                           ConnectionStrategy<C> connectionStrategy, final MazePredicate<M, C> predicate, Random random, int reverses)
     {
-        ImmutableList.Builder<ShiftedMazeComponent<M, C>> result = new ImmutableList.Builder<>();
-        Deque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack = new ArrayDeque<>();
+        List<ReverseInfo<C>> placeOrder = new ArrayList<>();
+        ReverseInfo<C> reversing = null;
+
+        List<ShiftedMazeComponent<M, C>> result = new ArrayList<>();
+        ArrayDeque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack = new ArrayDeque<>();
 
         Predicate<ShiftedMazeComponent<M, C>> componentPredicate = Predicates.and(
                 MazeComponents.compatibilityPredicate(maze, connectionStrategy),
@@ -73,6 +87,23 @@ public class MazeComponentConnector
 
         while (exitStack.size() > 0)
         {
+            if (reversing == null)
+            {
+                // Backing Up
+                reversing = new ReverseInfo<>();
+                reversing.exitStack = exitStack.clone();
+                reversing.maze = maze.copy();
+                reversing.triedIndices = new TIntArrayList();
+            }
+            else
+            {
+                // Reversing
+                exitStack = reversing.exitStack.clone(); // TODO Do a more efficient DIFF approach
+                maze = reversing.maze.copy(); // TODO Do a more efficient DIFF approach
+
+                result.remove(result.size() - 1);
+            }
+
             Triple<MazeRoom, MazeRoomConnection, C> triple = exitStack.removeLast();
             MazeRoom room = triple.getLeft();
 
@@ -82,28 +113,57 @@ public class MazeComponentConnector
             MazeRoomConnection exit = triple.getMiddle();
             C connection = triple.getRight();
 
-            List<ShiftedMazeComponent<M, C>> placeable = FluentIterable.from(components).transformAndConcat(MazeComponents.<M, C>shiftAllFunction(exit, connection, connectionStrategy)).filter(componentPredicate).toList();
+            List<ShiftedMazeComponent<M, C>> placeable = Lists.newArrayList(FluentIterable.from(components).transformAndConcat(MazeComponents.<M, C>shiftAllFunction(exit, connection, connectionStrategy)).filter(componentPredicate).toList());
+
+            ShiftedMazeComponent<M, C> unplacing = null;
+            for (int i = 0; i < reversing.triedIndices.size(); i++)
+                unplacing = placeable.remove(reversing.triedIndices.get(i));
+            if (unplacing != null)
+                predicate.didUnplace(maze, unplacing);
 
             if (placeable.size() == 0)
             {
-                IvToolkitCoreContainer.logger.warn("Did not find fitting component for maze!");
-                IvToolkitCoreContainer.logger.warn("Suggested: X with exits " + FluentIterable.from(maze.exits().entrySet()).filter(entryConnectsTo(room)));
+                if (reverses == 0)
+                {
+                    IvToolkitCoreContainer.logger.warn("Did not find fitting component for maze!");
+                    IvToolkitCoreContainer.logger.warn("Suggested: X with exits " + FluentIterable.from(maze.exits().entrySet()).filter(entryConnectsTo(room)));
+
+                    reversing = null;
+                }
+                else
+                {
+                    if (reverses > 0) reverses --;
+
+                    if (placeOrder.size() == 0)
+                    {
+                        IvToolkitCoreContainer.logger.warn("Maze is not completable!");
+                        IvToolkitCoreContainer.logger.warn("Switching to flawed mode.");
+                        reverses = -1;
+                    }
+
+                    reversing = placeOrder.remove(placeOrder.size() - 1);
+                }
+
                 continue;
             }
 
-            ShiftedMazeComponent<M, C> selected = WeightedSelector.canSelect(placeable, weightFunction)
+            ShiftedMazeComponent<M, C> placing = WeightedSelector.canSelect(placeable, weightFunction)
                     ? WeightedSelector.select(random, placeable, weightFunction)
                     : placeable.get(random.nextInt(placeable.size())); // All weight 0 = select at random
 
-            predicate.willPlace(maze, selected);
+            reversing.triedIndices.add(placeable.indexOf(placing));
 
-            addAllExits(predicate, exitStack, selected.exits().entrySet());
+            // Placing
+            predicate.willPlace(maze, placing);
+            addAllExits(predicate, exitStack, placing.exits().entrySet());
+            maze.add(placing);
+            result.add(placing);
 
-            maze.add(selected);
-            result.add(selected);
+            placeOrder.add(reversing);
+            reversing = null;
         }
 
-        return result.build();
+        return ImmutableList.<ShiftedMazeComponent<M, C>>builder().addAll(result).build();
     }
 
     private static Predicate<Map.Entry<MazeRoomConnection, ?>> entryConnectsTo(final MazeRoom finalRoom)
@@ -142,5 +202,13 @@ public class MazeComponentConnector
                 return item.getComponent().getWeight();
             }
         };
+    }
+
+    private static class ReverseInfo<C>
+    {
+        public TIntList triedIndices;
+
+        public MorphingMazeComponent<C> maze;
+        public ArrayDeque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack;
     }
 }

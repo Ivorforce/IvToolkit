@@ -16,10 +16,10 @@
 
 package ivorius.ivtoolkit.maze.components;
 
-import com.google.common.base.Predicates;
-import com.google.common.collect.Maps;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by lukas on 15.04.15.
@@ -60,5 +60,11 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
         for (Map.Entry<MazeRoomConnection, C> entry : component.exits().entrySet())
             if (exits.remove(entry.getKey()) == null)
                 exits.put(entry.getKey(), entry.getValue());
+    }
+
+    @Override
+    public MorphingMazeComponent<C> copy()
+    {
+        return new SetMazeComponent<>(rooms, exits);
     }
 }
