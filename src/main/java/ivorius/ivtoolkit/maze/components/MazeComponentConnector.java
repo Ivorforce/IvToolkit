@@ -85,6 +85,7 @@ public class MazeComponentConnector
 
         addAllExits(predicate, exitStack, maze.exits().entrySet());
 
+        selection:
         while (exitStack.size() > 0)
         {
             if (reversing == null)
@@ -104,12 +105,15 @@ public class MazeComponentConnector
                 result.remove(result.size() - 1);
             }
 
-            Triple<MazeRoom, MazeRoomConnection, C> triple = exitStack.removeLast();
+            Triple<MazeRoom, MazeRoomConnection, C> triple;
+
+            while (maze.rooms().contains((triple = exitStack.removeLast()).getLeft()))
+            {
+                if (exitStack.size() == 0)
+                    break selection;
+            }; // Has been filled while queued
+
             MazeRoom room = triple.getLeft();
-
-            if (maze.rooms().contains(room))
-                continue; // Has been filled while queued
-
             MazeRoomConnection exit = triple.getMiddle();
             C connection = triple.getRight();
 
