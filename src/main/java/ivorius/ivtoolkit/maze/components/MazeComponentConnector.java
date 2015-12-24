@@ -85,13 +85,12 @@ public class MazeComponentConnector
 
         addAllExits(predicate, exitStack, maze.exits().entrySet());
 
-        selection:
         while (exitStack.size() > 0)
         {
-            while (maze.rooms().contains(exitStack.peekLast().getLeft())) // Has been filled while queued
+            if (maze.rooms().contains(exitStack.peekLast().getLeft()))
             {
-                if (exitStack.size() == 0)
-                    break selection;
+                exitStack.removeLast(); // Skip: Has been filled while queued
+                continue;
             }
 
             if (reversing == null)
