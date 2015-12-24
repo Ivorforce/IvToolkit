@@ -88,6 +88,12 @@ public class MazeComponentConnector
         selection:
         while (exitStack.size() > 0)
         {
+            while (maze.rooms().contains(exitStack.peekLast().getLeft())) // Has been filled while queued
+            {
+                if (exitStack.size() == 0)
+                    break selection;
+            }
+
             if (reversing == null)
             {
                 // Backing Up
@@ -105,19 +111,17 @@ public class MazeComponentConnector
                 result.remove(result.size() - 1);
             }
 
-            Triple<MazeRoom, MazeRoomConnection, C> triple;
-
-            while (maze.rooms().contains((triple = exitStack.removeLast()).getLeft()))
-            {
-                if (exitStack.size() == 0)
-                    break selection;
-            }; // Has been filled while queued
-
+            Triple<MazeRoom, MazeRoomConnection, C> triple = exitStack.getLast();
             MazeRoom room = triple.getLeft();
             MazeRoomConnection exit = triple.getMiddle();
             C connection = triple.getRight();
 
-            List<ShiftedMazeComponent<M, C>> placeable = Lists.newArrayList(FluentIterable.from(components).transformAndConcat(MazeComponents.<M, C>shiftAllFunction(exit, connection, connectionStrategy)).filter(componentPredicate).toList());
+            List<ShiftedMazeComponent<M, C>> placeable = Lists.newArrayList(
+                    FluentIterable.from(components)
+                            .transformAndConcat(MazeComponents.<M, C>shiftAllFunction(exit, connection, connectionStrategy))
+                            .filter(componentPredicate)
+                            .toList()
+            );
 
             ShiftedMazeComponent<M, C> unplacing = null;
             for (int i = 0; i < reversing.triedIndices.size(); i++)
@@ -136,7 +140,7 @@ public class MazeComponentConnector
                 }
                 else
                 {
-                    if (reverses > 0) reverses --;
+                    if (reverses > 0) reverses--;
 
                     if (placeOrder.size() == 0)
                     {
@@ -151,11 +155,19 @@ public class MazeComponentConnector
                 continue;
             }
 
-            ShiftedMazeComponent<M, C> placing = WeightedSelector.canSelect(placeable, weightFunction)
-                    ? WeightedSelector.select(random, placeable, weightFunction)
-                    : placeable.get(random.nextInt(placeable.size())); // All weight 0 = select at random
+            ShiftedMazeComponent<M, C> placing;
+            if (WeightedSelector.canSelect(placeable, weightFunction))
+            {
+                placing = WeightedSelector.select(random, placeable, weightFunction);
+                reversing.triedIndices.add(placeable.indexOf(placing));
+            }
+            else
+            {
+                int index = random.nextInt(placeable.size()); // All weight = 0 -> select at random
+                placing = placeable.get(index);
+                reversing.triedIndices.add(index);
+            }
 
-            reversing.triedIndices.add(placeable.indexOf(placing));
 
             // Placing
             predicate.willPlace(maze, placing);
