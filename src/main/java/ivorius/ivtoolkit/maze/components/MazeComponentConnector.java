@@ -87,14 +87,14 @@ public class MazeComponentConnector
 
         while (exitStack.size() > 0)
         {
-            if (maze.rooms().contains(exitStack.peekLast().getLeft()))
-            {
-                exitStack.removeLast(); // Skip: Has been filled while queued
-                continue;
-            }
-
             if (reversing == null)
             {
+                if (maze.rooms().contains(exitStack.peekLast().getLeft()))
+                {
+                    exitStack.removeLast(); // Skip: Has been filled while queued
+                    continue;
+                }
+
                 // Backing Up
                 reversing = new ReverseInfo<>();
                 reversing.exitStack = exitStack.clone();
@@ -109,7 +109,7 @@ public class MazeComponentConnector
                 result.remove(result.size() - 1);
             }
 
-            Triple<MazeRoom, MazeRoomConnection, C> triple = exitStack.getLast();
+            Triple<MazeRoom, MazeRoomConnection, C> triple = exitStack.removeLast();
             MazeRoom room = triple.getLeft();
             MazeRoomConnection exit = triple.getMiddle();
             C connection = triple.getRight();
