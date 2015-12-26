@@ -99,7 +99,6 @@ public class MazeComponentConnector
                 reversing = new ReverseInfo<>();
                 reversing.exitStack = exitStack.clone();
                 reversing.maze = maze.copy();
-                reversing.triedIndices = new TIntArrayList();
             }
             else
             {
@@ -121,6 +120,9 @@ public class MazeComponentConnector
                             .filter(componentPredicate)
                             .toList()
             );
+
+            if (reversing.triedIndices.size() > placeable.size())
+                throw new RuntimeException("Maze component selection not static.");
 
             ShiftedMazeComponent<M, C> unplacing = null;
             for (int i = 0; i < reversing.triedIndices.size(); i++)
@@ -221,7 +223,7 @@ public class MazeComponentConnector
 
     private static class ReverseInfo<C>
     {
-        public TIntList triedIndices;
+        public final TIntList triedIndices = new TIntArrayList();
 
         public MorphingMazeComponent<C> maze;
         public ArrayDeque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack;
