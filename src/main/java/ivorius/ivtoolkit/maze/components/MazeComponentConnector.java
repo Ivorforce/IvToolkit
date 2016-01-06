@@ -104,7 +104,7 @@ public class MazeComponentConnector
             {
                 // Reversing
                 exitStack = reversing.exitStack.clone(); // TODO Do a more efficient DIFF approach
-                maze = reversing.maze.copy(); // TODO Do a more efficient DIFF approach
+                maze.set(reversing.maze); // TODO Do a more efficient DIFF approach
 
                 result.remove(result.size() - 1);
             }

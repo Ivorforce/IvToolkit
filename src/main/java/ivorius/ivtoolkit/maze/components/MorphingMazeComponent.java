@@ -23,5 +23,7 @@ public interface MorphingMazeComponent<C> extends MazeComponent<C>
 {
     void add(MazeComponent<C> component);
 
+    void set(MazeComponent<C> component);
+
     MorphingMazeComponent<C> copy();
 }

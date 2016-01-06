@@ -63,6 +63,16 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
     }
 
     @Override
+    public void set(MazeComponent<C> component)
+    {
+        rooms.clear();
+        rooms.addAll(component.rooms());
+
+        exits.clear();
+        exits.putAll(component.exits());
+    }
+
+    @Override
     public MorphingMazeComponent<C> copy()
     {
         return new SetMazeComponent<>(rooms, exits);
