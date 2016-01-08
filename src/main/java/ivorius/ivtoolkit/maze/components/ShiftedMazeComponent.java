@@ -18,6 +18,7 @@ package ivorius.ivtoolkit.maze.components;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
@@ -31,13 +32,30 @@ public class ShiftedMazeComponent<M extends MazeComponent<C>, C> implements Maze
 
     private final ImmutableSet<MazeRoom> rooms;
     private final ImmutableMap<MazeRoomConnection, C> exits;
+    private final Set<Pair<MazeRoom, MazeRoom>> reachability;
 
+    @Deprecated
     public ShiftedMazeComponent(M component, MazeRoom shift, ImmutableSet<MazeRoom> rooms, ImmutableMap<MazeRoomConnection, C> exits)
     {
         this.component = component;
         this.shift = shift;
         this.rooms = rooms;
         this.exits = exits;
+
+        ImmutableSet.Builder<Pair<MazeRoom, MazeRoom>> builder = ImmutableSet.builder();
+        for (MazeRoom left : rooms)
+            for (MazeRoom right : rooms)
+                builder.add(Pair.of(left, right));
+        this.reachability = builder.build();
+    }
+
+    public ShiftedMazeComponent(M component, MazeRoom shift, ImmutableSet<MazeRoom> rooms, ImmutableMap<MazeRoomConnection, C> exits, Set<Pair<MazeRoom, MazeRoom>> reachability)
+    {
+        this.component = component;
+        this.shift = shift;
+        this.rooms = rooms;
+        this.exits = exits;
+        this.reachability = reachability;
     }
 
     public M getComponent()
@@ -60,5 +78,11 @@ public class ShiftedMazeComponent<M extends MazeComponent<C>, C> implements Maze
     public Map<MazeRoomConnection, C> exits()
     {
         return exits;
+    }
+
+    @Override
+    public Set<Pair<MazeRoom, MazeRoom>> reachability()
+    {
+        return reachability;
     }
 }

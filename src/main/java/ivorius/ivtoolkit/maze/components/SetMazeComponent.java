@@ -16,10 +16,9 @@
 
 package ivorius.ivtoolkit.maze.components;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.*;
 
 /**
  * Created by lukas on 15.04.15.
@@ -28,15 +27,27 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
 {
     public final Set<MazeRoom> rooms = new HashSet<>();
     public final Map<MazeRoomConnection, C> exits = new HashMap<>();
+    public final Set<Pair<MazeRoom, MazeRoom>> reachability = new HashSet<>();
 
     public SetMazeComponent()
     {
     }
 
+    @Deprecated
     public SetMazeComponent(Set<MazeRoom> rooms, Map<MazeRoomConnection, C> exits)
+    {
+        this(rooms, exits, Collections.<Pair<MazeRoom,MazeRoom>>emptySet());
+
+        for (MazeRoom left : rooms)
+            for (MazeRoom right : rooms)
+                reachability.add(Pair.of(left, right));
+    }
+
+    public SetMazeComponent(Set<MazeRoom> rooms, Map<MazeRoomConnection, C> exits, Set<Pair<MazeRoom, MazeRoom>> reachability)
     {
         this.rooms.addAll(rooms);
         this.exits.putAll(exits);
+        this.reachability.addAll(reachability);
     }
 
     @Override
@@ -52,6 +63,12 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
     }
 
     @Override
+    public Set<Pair<MazeRoom, MazeRoom>> reachability()
+    {
+        return reachability;
+    }
+
+    @Override
     public void add(MazeComponent<C> component)
     {
         rooms.addAll(component.rooms());
@@ -60,6 +77,8 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
         for (Map.Entry<MazeRoomConnection, C> entry : component.exits().entrySet())
             if (exits.remove(entry.getKey()) == null)
                 exits.put(entry.getKey(), entry.getValue());
+
+        reachability.addAll(component.reachability());
     }
 
     @Override
@@ -70,11 +89,14 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
 
         exits.clear();
         exits.putAll(component.exits());
+
+        reachability.clear();
+        reachability.addAll(component.reachability());
     }
 
     @Override
     public MorphingMazeComponent<C> copy()
     {
-        return new SetMazeComponent<>(rooms, exits);
+        return new SetMazeComponent<>(rooms, exits, reachability);
     }
 }

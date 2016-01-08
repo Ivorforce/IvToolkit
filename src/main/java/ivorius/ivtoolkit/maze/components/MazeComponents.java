@@ -22,6 +22,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -95,7 +96,15 @@ public class MazeComponents
             {
                 return component.exits().get(input != null ? input.sub(shift) : null);
             }
-        }));
+        }), FluentIterable.from(component.reachability()).transform(new Function<Pair<MazeRoom, MazeRoom>, Pair<MazeRoom, MazeRoom>>()
+        {
+            @Nullable
+            @Override
+            public Pair<MazeRoom, MazeRoom> apply(Pair<MazeRoom, MazeRoom> input)
+            {
+                return input != null ? Pair.of(input.getLeft().add(shift), input.getRight().add(shift)) : null;
+            }
+        }).toSet());
     }
 
     public static <C> Predicate<MazeComponent<C>> compatibilityPredicate(final MazeComponent<C> component, final ConnectionStrategy<C> strategy)

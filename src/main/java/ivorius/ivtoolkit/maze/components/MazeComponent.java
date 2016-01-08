@@ -16,6 +16,8 @@
 
 package ivorius.ivtoolkit.maze.components;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -27,4 +29,6 @@ public interface MazeComponent<C>
     Set<MazeRoom> rooms();
 
     Map<MazeRoomConnection, C> exits();
+
+    Set<Pair<MazeRoom, MazeRoom>> reachability();
 }
