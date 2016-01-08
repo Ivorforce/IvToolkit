@@ -96,11 +96,11 @@ public class MazeComponents
             {
                 return component.exits().get(input != null ? input.sub(shift) : null);
             }
-        }), FluentIterable.from(component.reachability()).transform(new Function<Pair<MazeRoom, MazeRoom>, Pair<MazeRoom, MazeRoom>>()
+        }), FluentIterable.from(component.reachability()).transform(new Function<Pair<MazeRoomConnection, MazeRoomConnection>, Pair<MazeRoomConnection, MazeRoomConnection>>()
         {
             @Nullable
             @Override
-            public Pair<MazeRoom, MazeRoom> apply(Pair<MazeRoom, MazeRoom> input)
+            public Pair<MazeRoomConnection, MazeRoomConnection> apply(Pair<MazeRoomConnection, MazeRoomConnection> input)
             {
                 return input != null ? Pair.of(input.getLeft().add(shift), input.getRight().add(shift)) : null;
             }

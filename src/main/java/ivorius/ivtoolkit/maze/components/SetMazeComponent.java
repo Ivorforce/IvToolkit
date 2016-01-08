@@ -27,7 +27,7 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
 {
     public final Set<MazeRoom> rooms = new HashSet<>();
     public final Map<MazeRoomConnection, C> exits = new HashMap<>();
-    public final Set<Pair<MazeRoom, MazeRoom>> reachability = new HashSet<>();
+    public final Set<Pair<MazeRoomConnection, MazeRoomConnection>> reachability = new HashSet<>();
 
     public SetMazeComponent()
     {
@@ -36,14 +36,14 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
     @Deprecated
     public SetMazeComponent(Set<MazeRoom> rooms, Map<MazeRoomConnection, C> exits)
     {
-        this(rooms, exits, Collections.<Pair<MazeRoom,MazeRoom>>emptySet());
+        this(rooms, exits, Collections.<Pair<MazeRoomConnection,MazeRoomConnection>>emptySet());
 
-        for (MazeRoom left : rooms)
-            for (MazeRoom right : rooms)
+        for (MazeRoomConnection left : exits.keySet())
+            for (MazeRoomConnection right : exits.keySet())
                 reachability.add(Pair.of(left, right));
     }
 
-    public SetMazeComponent(Set<MazeRoom> rooms, Map<MazeRoomConnection, C> exits, Set<Pair<MazeRoom, MazeRoom>> reachability)
+    public SetMazeComponent(Set<MazeRoom> rooms, Map<MazeRoomConnection, C> exits, Set<Pair<MazeRoomConnection, MazeRoomConnection>> reachability)
     {
         this.rooms.addAll(rooms);
         this.exits.putAll(exits);
@@ -63,7 +63,7 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
     }
 
     @Override
-    public Set<Pair<MazeRoom, MazeRoom>> reachability()
+    public Set<Pair<MazeRoomConnection, MazeRoomConnection>> reachability()
     {
         return reachability;
     }

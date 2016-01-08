@@ -32,7 +32,7 @@ public class ShiftedMazeComponent<M extends MazeComponent<C>, C> implements Maze
 
     private final ImmutableSet<MazeRoom> rooms;
     private final ImmutableMap<MazeRoomConnection, C> exits;
-    private final Set<Pair<MazeRoom, MazeRoom>> reachability;
+    private final Set<Pair<MazeRoomConnection, MazeRoomConnection>> reachability;
 
     @Deprecated
     public ShiftedMazeComponent(M component, MazeRoom shift, ImmutableSet<MazeRoom> rooms, ImmutableMap<MazeRoomConnection, C> exits)
@@ -42,14 +42,14 @@ public class ShiftedMazeComponent<M extends MazeComponent<C>, C> implements Maze
         this.rooms = rooms;
         this.exits = exits;
 
-        ImmutableSet.Builder<Pair<MazeRoom, MazeRoom>> builder = ImmutableSet.builder();
-        for (MazeRoom left : rooms)
-            for (MazeRoom right : rooms)
+        ImmutableSet.Builder<Pair<MazeRoomConnection, MazeRoomConnection>> builder = ImmutableSet.builder();
+        for (MazeRoomConnection left : exits.keySet())
+            for (MazeRoomConnection right : exits.keySet())
                 builder.add(Pair.of(left, right));
         this.reachability = builder.build();
     }
 
-    public ShiftedMazeComponent(M component, MazeRoom shift, ImmutableSet<MazeRoom> rooms, ImmutableMap<MazeRoomConnection, C> exits, Set<Pair<MazeRoom, MazeRoom>> reachability)
+    public ShiftedMazeComponent(M component, MazeRoom shift, ImmutableSet<MazeRoom> rooms, ImmutableMap<MazeRoomConnection, C> exits, Set<Pair<MazeRoomConnection, MazeRoomConnection>> reachability)
     {
         this.component = component;
         this.shift = shift;
@@ -81,7 +81,7 @@ public class ShiftedMazeComponent<M extends MazeComponent<C>, C> implements Maze
     }
 
     @Override
-    public Set<Pair<MazeRoom, MazeRoom>> reachability()
+    public Set<Pair<MazeRoomConnection, MazeRoomConnection>> reachability()
     {
         return reachability;
     }

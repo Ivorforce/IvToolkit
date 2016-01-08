@@ -30,5 +30,5 @@ public interface MazeComponent<C>
 
     Map<MazeRoomConnection, C> exits();
 
-    Set<Pair<MazeRoom, MazeRoom>> reachability();
+    Set<Pair<MazeRoomConnection, MazeRoomConnection>> reachability();
 }
