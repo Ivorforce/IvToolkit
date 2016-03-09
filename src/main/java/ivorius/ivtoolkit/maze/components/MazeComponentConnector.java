@@ -147,10 +147,11 @@ public class MazeComponentConnector
                     {
                         IvToolkitCoreContainer.logger.warn("Maze is not completable!");
                         IvToolkitCoreContainer.logger.warn("Switching to flawed mode.");
-                        reverses = -1;
+                        reverses = 0;
+                        reversing = null;
                     }
-
-                    reversing = placeOrder.remove(placeOrder.size() - 1);
+                    else
+                        reversing = placeOrder.remove(placeOrder.size() - 1);
                 }
 
                 continue;
