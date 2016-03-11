@@ -227,7 +227,7 @@ public class IvWorldData
                 entityHanging.field_146063_b = newHangingCoord.x;
                 entityHanging.field_146064_c = newHangingCoord.y;
                 entityHanging.field_146062_d = newHangingCoord.z;
-                entityHanging.setDirection(entityHanging.hangingDirection);
+                entityHanging.setDirection(transform.apply(entityHanging.hangingDirection));
             }
 
             if (entity instanceof EntityCreature)
