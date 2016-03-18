@@ -28,7 +28,11 @@ import java.util.List;
  */
 public class MazePredicateMany<M extends MazeComponent<C>, C> implements MazePredicate<M, C>
 {
-    private final List<MazePredicate<M, C>> predicates = new ArrayList<>();
+    public final List<MazePredicate<M, C>> predicates = new ArrayList<>();
+
+    public MazePredicateMany()
+    {
+    }
 
     public MazePredicateMany(List<MazePredicate<M, C>> predicates)
     {
@@ -64,7 +68,8 @@ public class MazePredicateMany<M extends MazeComponent<C>, C> implements MazePre
     @Override
     public void didUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
     {
-
+        for (MazePredicate<M, C> predicate : predicates)
+            predicate.didUnplace(maze, component);
     }
 
     @Override
