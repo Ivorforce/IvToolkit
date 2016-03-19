@@ -95,4 +95,36 @@ public class MazeRoomConnection extends Pair<MazeRoom, MazeRoom>
     {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        MazeRoomConnection that = (MazeRoomConnection) o;
+
+        if (left != null ? !left.equals(that.left) : that.left != null) return false;
+        return right != null ? right.equals(that.right) : that.right == null;
+
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + (left != null ? left.hashCode() : 0);
+        result = 31 * result + (right != null ? right.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "MazeRoomConnection{" +
+                "left=" + left +
+                ", right=" + right +
+                '}';
+    }
 }
