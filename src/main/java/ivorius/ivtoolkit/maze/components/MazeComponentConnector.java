@@ -186,14 +186,7 @@ public class MazeComponentConnector
 
     private static Predicate<Map.Entry<MazeRoomConnection, ?>> entryConnectsTo(final MazeRoom finalRoom)
     {
-        return new Predicate<Map.Entry<MazeRoomConnection, ?>>()
-        {
-            @Override
-            public boolean apply(@Nullable Map.Entry<MazeRoomConnection, ?> input)
-            {
-                return input != null && (input.getKey().has(finalRoom));
-            }
-        };
+        return input -> input != null && (input.getKey().has(finalRoom));
     }
 
     private static <M extends WeightedMazeComponent<C>, C> void addAllExits(MazePredicate<M, C> placementStrategy, Deque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack, Set<Map.Entry<MazeRoomConnection, C>> entries)
@@ -212,14 +205,7 @@ public class MazeComponentConnector
 
     private static <M extends WeightedMazeComponent<C>, C> WeightedSelector.WeightFunction<ShiftedMazeComponent<M, C>> getWeightFunction()
     {
-        return new WeightedSelector.WeightFunction<ShiftedMazeComponent<M, C>>()
-        {
-            @Override
-            public double apply(ShiftedMazeComponent<M, C> item)
-            {
-                return item.getComponent().getWeight();
-            }
-        };
+        return item -> item.getComponent().getWeight();
     }
 
     private static class ReverseInfo<C>

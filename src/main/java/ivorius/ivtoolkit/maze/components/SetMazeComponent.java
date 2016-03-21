@@ -74,9 +74,7 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
         rooms.addAll(component.rooms());
 
         // Remove all solved connections, and add the ones still open from the other component
-        for (Map.Entry<MazeRoomConnection, C> entry : component.exits().entrySet())
-            if (exits.remove(entry.getKey()) == null)
-                exits.put(entry.getKey(), entry.getValue());
+        component.exits().entrySet().stream().filter(entry -> exits.remove(entry.getKey()) == null).forEach(entry -> exits.put(entry.getKey(), entry.getValue()));
 
         reachability.addAll(component.reachability());
     }

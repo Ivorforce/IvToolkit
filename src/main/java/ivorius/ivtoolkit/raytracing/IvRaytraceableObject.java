@@ -135,9 +135,6 @@ public abstract class IvRaytraceableObject
 
     public void drawOutlines()
     {
-        for (IvRaytraceableObject object : this.containedObjects)
-        {
-            object.drawOutlines();
-        }
+        this.containedObjects.forEach(IvRaytraceableObject::drawOutlines);
     }
 }

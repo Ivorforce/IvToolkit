@@ -32,6 +32,7 @@ import net.minecraft.world.WorldServer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by lukas on 02.07.14.
@@ -101,13 +102,7 @@ public class IvNetworkHelperServer
         PlayerManager playerManager = server.getPlayerManager();
 
         List<EntityPlayerMP> players = server.playerEntities;
-        for (EntityPlayerMP player : players)
-        {
-            if (playerManager.isPlayerWatchingChunk(player, chunkX, chunkZ))
-            {
-                playersWatching.add(player);
-            }
-        }
+        playersWatching.addAll(players.stream().filter(player -> playerManager.isPlayerWatchingChunk(player, chunkX, chunkZ)).collect(Collectors.toList()));
 
         return playersWatching;
     }

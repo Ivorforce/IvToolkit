@@ -168,7 +168,7 @@ public class IvBlockCollection implements Iterable<BlockCoord>
     public MovingObjectPosition rayTrace(Vec3 position, Vec3 direction)
     {
         IvRaytraceableAxisAlignedBox containingBox = new IvRaytraceableAxisAlignedBox(null, 0.001, 0.001, 0.001, width - 0.002, height - 0.002, length - 0.002);
-        IvRaytracedIntersection intersection = IvRaytracer.getFirstIntersection(Arrays.<IvRaytraceableObject>asList(containingBox), position.xCoord, position.yCoord, position.zCoord, direction.xCoord, direction.yCoord, direction.zCoord);
+        IvRaytracedIntersection intersection = IvRaytracer.getFirstIntersection(Collections.<IvRaytraceableObject>singletonList(containingBox), position.xCoord, position.yCoord, position.zCoord, direction.xCoord, direction.yCoord, direction.zCoord);
 
         if (intersection != null)
         {

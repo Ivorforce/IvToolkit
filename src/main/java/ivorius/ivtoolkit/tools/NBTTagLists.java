@@ -57,8 +57,7 @@ public class NBTTagLists
     public static NBTTagList writeCompounds(List<NBTTagCompound> list)
     {
         NBTTagList tagList = new NBTTagList();
-        for (NBTTagCompound compound : list)
-            tagList.appendTag(compound);
+        list.forEach(tagList::appendTag);
         return tagList;
     }
 

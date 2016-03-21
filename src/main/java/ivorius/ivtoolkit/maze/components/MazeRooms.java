@@ -48,15 +48,10 @@ public class MazeRooms
     public static Set<MazeRoomConnection> neighbors(final MazeRoom room, TIntSet dimensions)
     {
         final ImmutableSet.Builder<MazeRoomConnection> set = ImmutableSet.builder();
-        dimensions.forEach(new TIntProcedure()
-        {
-            @Override
-            public boolean execute(int value)
-            {
-                set.add(new MazeRoomConnection(room, room.addInDimension(value, 1)));
-                set.add(new MazeRoomConnection(room, room.addInDimension(value, -1)));
-                return true;
-            }
+        dimensions.forEach(value -> {
+            set.add(new MazeRoomConnection(room, room.addInDimension(value, 1)));
+            set.add(new MazeRoomConnection(room, room.addInDimension(value, -1)));
+            return true;
         });
         return set.build();
     }

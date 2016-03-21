@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Created by lukas on 25.02.14.
@@ -37,7 +38,7 @@ public class IvToolkitCoreContainer extends DummyModContainer
         super(new ModMetadata());
 
         ModMetadata myMeta = super.getMetadata();
-        myMeta.authorList = Arrays.asList("Ivorius");
+        myMeta.authorList = Collections.singletonList("Ivorius");
         myMeta.description = "Uncategorized framework";
         myMeta.modId = IvToolkit.MODID;
         myMeta.version = IvToolkit.VERSION;

@@ -109,14 +109,7 @@ public class MazeComponents
 
     public static <C> Predicate<MazeComponent<C>> compatibilityPredicate(final MazeComponent<C> component, final ConnectionStrategy<C> strategy)
     {
-        return new Predicate<MazeComponent<C>>()
-        {
-            @Override
-            public boolean apply(@Nullable MazeComponent<C> input)
-            {
-                return componentsCompatible(component, input, strategy);
-            }
-        };
+        return input -> componentsCompatible(component, input, strategy);
     }
 
     public static <C> boolean componentsCompatible(final MazeComponent<C> existing, final MazeComponent<C> add, final ConnectionStrategy<C> strategy)
@@ -131,13 +124,6 @@ public class MazeComponents
 
     public static <C> boolean allExitsCompatible(final MazeComponent<C> existing, final MazeComponent<C> add, final ConnectionStrategy<C> strategy)
     {
-        return Iterables.all(add.exits().entrySet(), new Predicate<Map.Entry<MazeRoomConnection, C>>()
-        {
-            @Override
-            public boolean apply(@Nullable Map.Entry<MazeRoomConnection, C> input)
-            {
-                return input == null || strategy.connect(input.getKey(), existing.exits().get(input.getKey()), input.getValue());
-            }
-        });
+        return add.exits().entrySet().stream().allMatch(input -> input == null || strategy.connect(input.getKey(), existing.exits().get(input.getKey()), input.getValue()));
     }
 }

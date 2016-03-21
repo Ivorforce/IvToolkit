@@ -48,14 +48,7 @@ public class MazePredicateMany<M extends MazeComponent<C>, C> implements MazePre
     @Override
     public boolean canPlace(final MorphingMazeComponent<C> maze, final ShiftedMazeComponent<M, C> component)
     {
-        return Iterables.all(predicates, new Predicate<MazePredicate<M, C>>()
-        {
-            @Override
-            public boolean apply(MazePredicate<M, C> p)
-            {
-                return p.canPlace(maze, component);
-            }
-        });
+        return predicates.stream().allMatch(p -> p.canPlace(maze, component));
     }
 
     @Override
@@ -75,13 +68,6 @@ public class MazePredicateMany<M extends MazeComponent<C>, C> implements MazePre
     @Override
     public boolean isDirtyConnection(final MazeRoom dest, final MazeRoom source, final C c)
     {
-        return Iterables.all(predicates, new Predicate<MazePredicate<M, C>>()
-        {
-            @Override
-            public boolean apply(MazePredicate<M, C> p)
-            {
-                return p.isDirtyConnection(dest, source, c);
-            }
-        });
+        return predicates.stream().allMatch(p -> p.isDirtyConnection(dest, source, c));
     }
 }

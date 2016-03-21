@@ -25,13 +25,6 @@ public class MazePredicates
 {
     public static <M extends MazeComponent<C>, C> Predicate<ShiftedMazeComponent<M, C>> placeable(final MorphingMazeComponent<C> maze, final MazePredicate<M, C> strategy)
     {
-        return new Predicate<ShiftedMazeComponent<M, C>>()
-        {
-            @Override
-            public boolean apply(ShiftedMazeComponent<M, C> input)
-            {
-                return strategy.canPlace(maze, input);
-            }
-        };
+        return input -> strategy.canPlace(maze, input);
     }
 }
