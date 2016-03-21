@@ -17,23 +17,26 @@
 package ivorius.ivtoolkit;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+import ivorius.ivtoolkit.tools.JavaCompatibility;
 
 import java.util.Map;
 
 /**
  * Created by lukas on 21.02.14.
  */
-@IFMLLoadingPlugin.Name(value = IvToolkitLoadingPlugin.NAME)
+@IFMLLoadingPlugin.Name(value = "IvToolkit")
 @IFMLLoadingPlugin.TransformerExclusions(value = {"ivorius.ivtoolkit.asm."})
+// warning! This class is compiled separately from all other classes
+// this means: this class cannot reference anything else and nobody else can reference this
+// this is because this class is compiled for Java 6 to enable the warning message
 public class IvToolkitLoadingPlugin implements IFMLLoadingPlugin
 {
-    public static final String NAME = "IvToolkit";
-    public static final String VERSION = "1.2.1";
-    public static final String MODID = "ivtoolkit";
-
     @Override
     public String[] getASMTransformerClass()
     {
+        // must do this here, because constructor is too early for FMLCommonHandler
+        JavaCompatibility.requireJava8(true);
+
         return new String[]{};
     }
 
