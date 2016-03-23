@@ -25,6 +25,10 @@ public interface MazePredicate<M extends MazeComponent<C>, C>
 
     void willPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component);
 
+    void didPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component);
+
+    void willUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component);
+
     void didUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component);
 
     boolean isDirtyConnection(MazeRoom dest, MazeRoom source, C c);

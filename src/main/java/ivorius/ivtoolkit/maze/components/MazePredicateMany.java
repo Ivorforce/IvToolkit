@@ -54,15 +54,25 @@ public class MazePredicateMany<M extends MazeComponent<C>, C> implements MazePre
     @Override
     public void willPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
     {
-        for (MazePredicate<M, C> predicate : predicates)
-            predicate.willPlace(maze, component);
+        predicates.forEach(p -> p.willPlace(maze, component));
+    }
+
+    @Override
+    public void didPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
+    {
+        predicates.forEach(p -> p.didPlace(maze, component));
+    }
+
+    @Override
+    public void willUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
+    {
+        predicates.forEach(p -> p.willUnplace(maze, component));
     }
 
     @Override
     public void didUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
     {
-        for (MazePredicate<M, C> predicate : predicates)
-            predicate.didUnplace(maze, component);
+        predicates.forEach(p -> p.didUnplace(maze, component));
     }
 
     @Override

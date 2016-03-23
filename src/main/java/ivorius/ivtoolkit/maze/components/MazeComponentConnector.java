@@ -56,6 +56,18 @@ public class MazeComponentConnector
             }
 
             @Override
+            public void didPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
+            {
+
+            }
+
+            @Override
+            public void willUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
+            {
+
+            }
+
+            @Override
             public void didUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
             {
 
@@ -72,8 +84,8 @@ public class MazeComponentConnector
     public static <M extends WeightedMazeComponent<C>, C> List<ShiftedMazeComponent<M, C>> randomlyConnect(MorphingMazeComponent<C> maze, List<M> components,
                                                                                                            ConnectionStrategy<C> connectionStrategy, final MazePredicate<M, C> predicate, Random random, int reverses)
     {
-        List<ReverseInfo<C>> placeOrder = new ArrayList<>();
-        ReverseInfo<C> reversing = null;
+        List<ReverseInfo<M, C>> placeOrder = new ArrayList<>();
+        ReverseInfo<M, C> reversing = null;
 
         List<ShiftedMazeComponent<M, C>> result = new ArrayList<>();
         ArrayDeque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack = new ArrayDeque<>();
@@ -103,8 +115,12 @@ public class MazeComponentConnector
             else
             {
                 // Reversing
+                predicate.willUnplace(maze, reversing.placed);
+
                 exitStack = reversing.exitStack.clone(); // TODO Do a more efficient DIFF approach
                 maze.set(reversing.maze); // TODO Do a more efficient DIFF approach
+
+                predicate.didUnplace(maze, reversing.placed);
 
                 result.remove(result.size() - 1);
             }
@@ -124,11 +140,8 @@ public class MazeComponentConnector
             if (reversing.triedIndices.size() > placeable.size())
                 throw new RuntimeException("Maze component selection not static.");
 
-            ShiftedMazeComponent<M, C> unplacing = null;
             for (int i = 0; i < reversing.triedIndices.size(); i++)
-                unplacing = placeable.remove(reversing.triedIndices.get(i));
-            if (unplacing != null)
-                predicate.didUnplace(maze, unplacing);
+                placeable.remove(reversing.triedIndices.get(i));
 
             if (placeable.size() == 0)
             {
@@ -169,13 +182,16 @@ public class MazeComponentConnector
                 placing = placeable.get(index);
                 reversing.triedIndices.add(index);
             }
-
+            reversing.placed = placing;
 
             // Placing
             predicate.willPlace(maze, placing);
+
             addAllExits(predicate, exitStack, placing.exits().entrySet());
             maze.add(placing);
             result.add(placing);
+
+            predicate.didPlace(maze, placing);
 
             placeOrder.add(reversing);
             reversing = null;
@@ -208,11 +224,12 @@ public class MazeComponentConnector
         return item -> item.getComponent().getWeight();
     }
 
-    private static class ReverseInfo<C>
+    private static class ReverseInfo<M extends WeightedMazeComponent<C>, C>
     {
         public final TIntList triedIndices = new TIntArrayList();
 
         public MorphingMazeComponent<C> maze;
         public ArrayDeque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack;
+        public ShiftedMazeComponent<M, C> placed;
     }
 }
