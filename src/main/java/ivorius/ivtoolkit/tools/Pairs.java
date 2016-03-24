@@ -41,28 +41,12 @@ public class Pairs
 
     public static <T> Function<Pair<T, T>, T> rightFunction()
     {
-        return new Function<Pair<T, T>, T>()
-        {
-            @Nullable
-            @Override
-            public T apply(@Nullable Pair<T, T> input)
-            {
-                return input.getRight();
-            }
-        };
+        return input -> input.getRight();
     }
 
     public static <T> Function<Pair<T, T>, T> leftFunction()
     {
-        return new Function<Pair<T, T>, T>()
-        {
-            @Nullable
-            @Override
-            public T apply(@Nullable Pair<T, T> input)
-            {
-                return input.getLeft();
-            }
-        };
+        return input -> input.getLeft();
     }
 
     public static <L, R> Iterable<Pair<L, R>> pairLeft(final L left, Iterable<R> right)

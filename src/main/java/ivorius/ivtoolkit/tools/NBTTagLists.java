@@ -38,15 +38,7 @@ public class NBTTagLists
 
     public static List<NBTTagCompound> compounds(final NBTTagList list)
     {
-        return Lists.transform(Ranges.rangeList(0, list.tagCount()), new Function<Integer, NBTTagCompound>()
-        {
-            @Nullable
-            @Override
-            public NBTTagCompound apply(Integer input)
-            {
-                return list.getCompoundTagAt(input);
-            }
-        });
+        return Lists.transform(Ranges.rangeList(0, list.tagCount()), input -> list.getCompoundTagAt(input));
     }
 
     public static void writeCompoundsTo(NBTTagCompound compound, String key, List<NBTTagCompound> list)
@@ -68,15 +60,7 @@ public class NBTTagLists
 
     public static List<int[]> intArrays(final NBTTagList list)
     {
-        return Lists.transform(Ranges.rangeList(0, list.tagCount()), new Function<Integer, int[]>()
-        {
-            @Nullable
-            @Override
-            public int[] apply(Integer input)
-            {
-                return list.func_150306_c(input);
-            }
-        });
+        return Lists.transform(Ranges.rangeList(0, list.tagCount()), input -> list.func_150306_c(input));
     }
 
     public static void writeIntArraysTo(NBTTagCompound compound, String key, List<int[]> list)

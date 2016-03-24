@@ -16,15 +16,11 @@
 
 package ivorius.ivtoolkit.maze.components;
 
-import com.google.common.base.Predicate;
+import java.util.function.Predicate;
 
 /**
  * Created by lukas on 15.04.15.
  */
 public class MazePredicates
 {
-    public static <M extends MazeComponent<C>, C> Predicate<ShiftedMazeComponent<M, C>> placeable(final MorphingMazeComponent<C> maze, final MazePredicate<M, C> strategy)
-    {
-        return input -> strategy.canPlace(maze, input);
-    }
 }

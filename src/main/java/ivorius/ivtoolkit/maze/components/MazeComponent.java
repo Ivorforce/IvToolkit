@@ -16,6 +16,7 @@
 
 package ivorius.ivtoolkit.maze.components;
 
+import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Map;
@@ -30,5 +31,5 @@ public interface MazeComponent<C>
 
     Map<MazeRoomConnection, C> exits();
 
-    Set<Pair<MazeRoomConnection, MazeRoomConnection>> reachability();
+    Multimap<MazeRoomConnection, MazeRoomConnection> reachability();
 }

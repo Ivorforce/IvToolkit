@@ -16,8 +16,7 @@
 
 package ivorius.ivtoolkit.maze.components;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.*;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -32,7 +31,7 @@ public class ShiftedMazeComponent<M extends MazeComponent<C>, C> implements Maze
 
     private final ImmutableSet<MazeRoom> rooms;
     private final ImmutableMap<MazeRoomConnection, C> exits;
-    private final Set<Pair<MazeRoomConnection, MazeRoomConnection>> reachability;
+    private final ImmutableMultimap<MazeRoomConnection, MazeRoomConnection> reachability;
 
     @Deprecated
     public ShiftedMazeComponent(M component, MazeRoom shift, ImmutableSet<MazeRoom> rooms, ImmutableMap<MazeRoomConnection, C> exits)
@@ -42,14 +41,12 @@ public class ShiftedMazeComponent<M extends MazeComponent<C>, C> implements Maze
         this.rooms = rooms;
         this.exits = exits;
 
-        ImmutableSet.Builder<Pair<MazeRoomConnection, MazeRoomConnection>> builder = ImmutableSet.builder();
-        for (MazeRoomConnection left : exits.keySet())
-            for (MazeRoomConnection right : exits.keySet())
-                builder.add(Pair.of(left, right));
+        ImmutableSetMultimap.Builder<MazeRoomConnection, MazeRoomConnection> builder = ImmutableSetMultimap.builder();
+        SetMazeComponent.connectAll(exits.keySet(), builder);
         this.reachability = builder.build();
     }
 
-    public ShiftedMazeComponent(M component, MazeRoom shift, ImmutableSet<MazeRoom> rooms, ImmutableMap<MazeRoomConnection, C> exits, Set<Pair<MazeRoomConnection, MazeRoomConnection>> reachability)
+    public ShiftedMazeComponent(M component, MazeRoom shift, ImmutableSet<MazeRoom> rooms, ImmutableMap<MazeRoomConnection, C> exits, ImmutableMultimap<MazeRoomConnection, MazeRoomConnection> reachability)
     {
         this.component = component;
         this.shift = shift;
@@ -81,7 +78,7 @@ public class ShiftedMazeComponent<M extends MazeComponent<C>, C> implements Maze
     }
 
     @Override
-    public Set<Pair<MazeRoomConnection, MazeRoomConnection>> reachability()
+    public Multimap<MazeRoomConnection, MazeRoomConnection> reachability()
     {
         return reachability;
     }

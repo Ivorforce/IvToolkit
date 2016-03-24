@@ -16,6 +16,10 @@
 
 package ivorius.ivtoolkit.maze.components;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
@@ -27,7 +31,7 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
 {
     public final Set<MazeRoom> rooms = new HashSet<>();
     public final Map<MazeRoomConnection, C> exits = new HashMap<>();
-    public final Set<Pair<MazeRoomConnection, MazeRoomConnection>> reachability = new HashSet<>();
+    public final Multimap<MazeRoomConnection, MazeRoomConnection> reachability = HashMultimap.create();
 
     public SetMazeComponent()
     {
@@ -36,18 +40,41 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
     @Deprecated
     public SetMazeComponent(Set<MazeRoom> rooms, Map<MazeRoomConnection, C> exits)
     {
-        this(rooms, exits, Collections.<Pair<MazeRoomConnection,MazeRoomConnection>>emptySet());
-
-        for (MazeRoomConnection left : exits.keySet())
-            for (MazeRoomConnection right : exits.keySet())
-                reachability.add(Pair.of(left, right));
+        this(rooms, exits, HashMultimap.create());
+        connectAll(exits.keySet(), reachability);
     }
 
-    public SetMazeComponent(Set<MazeRoom> rooms, Map<MazeRoomConnection, C> exits, Set<Pair<MazeRoomConnection, MazeRoomConnection>> reachability)
+    public static void connectAll(Set<MazeRoomConnection> exits, Multimap<MazeRoomConnection, MazeRoomConnection> reachability)
+    {
+        // Transitive, so one in both direction is enough
+        List<MazeRoomConnection> connections = Lists.newArrayList(exits);
+        for (int i = 1; i < connections.size(); i++)
+        {
+            MazeRoomConnection left = connections.get(i - 1);
+            MazeRoomConnection right = connections.get(i);
+            reachability.put(left, right);
+            reachability.put(right, left);
+        }
+    }
+
+    public static void connectAll(Set<MazeRoomConnection> exits, ImmutableMultimap.Builder<MazeRoomConnection, MazeRoomConnection> reachability)
+    {
+        // Transitive, so one in both direction is enough
+        List<MazeRoomConnection> connections = Lists.newArrayList(exits);
+        for (int i = 1; i < connections.size(); i++)
+        {
+            MazeRoomConnection left = connections.get(i - 1);
+            MazeRoomConnection right = connections.get(i);
+            reachability.put(left, right);
+            reachability.put(right, left);
+        }
+    }
+
+    public SetMazeComponent(Set<MazeRoom> rooms, Map<MazeRoomConnection, C> exits, Multimap<MazeRoomConnection, MazeRoomConnection> reachability)
     {
         this.rooms.addAll(rooms);
         this.exits.putAll(exits);
-        this.reachability.addAll(reachability);
+        this.reachability.putAll(reachability);
     }
 
     @Override
@@ -63,7 +90,7 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
     }
 
     @Override
-    public Set<Pair<MazeRoomConnection, MazeRoomConnection>> reachability()
+    public Multimap<MazeRoomConnection, MazeRoomConnection> reachability()
     {
         return reachability;
     }
@@ -76,7 +103,7 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
         // Remove all solved connections, and add the ones still open from the other component
         component.exits().entrySet().stream().filter(entry -> exits.remove(entry.getKey()) == null).forEach(entry -> exits.put(entry.getKey(), entry.getValue()));
 
-        reachability.addAll(component.reachability());
+        reachability.putAll(component.reachability());
     }
 
     @Override
@@ -89,7 +116,7 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
         exits.putAll(component.exits());
 
         reachability.clear();
-        reachability.addAll(component.reachability());
+        reachability.putAll(component.reachability());
     }
 
     @Override

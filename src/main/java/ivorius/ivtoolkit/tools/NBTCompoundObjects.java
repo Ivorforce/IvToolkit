@@ -32,28 +32,12 @@ public class NBTCompoundObjects
 {
     public static <T extends NBTCompoundObject> Function<NBTTagCompound, T> readFunction(final Class<T> tClass)
     {
-        return new Function<NBTTagCompound, T>()
-        {
-            @Nullable
-            @Override
-            public T apply(NBTTagCompound input)
-            {
-                return read(input, tClass);
-            }
-        };
+        return input -> read(input, tClass);
     }
 
     public static Function<? extends NBTCompoundObject, NBTTagCompound> writeFunction()
     {
-        return new Function<NBTCompoundObject, NBTTagCompound>()
-        {
-            @Nullable
-            @Override
-            public NBTTagCompound apply(@Nullable NBTCompoundObject input)
-            {
-                return write(input);
-            }
-        };
+        return (Function<NBTCompoundObject, NBTTagCompound>) input -> write(input);
     }
 
     public static void writeListTo(NBTTagCompound compound, String key, Iterable<? extends NBTCompoundObject> objects)

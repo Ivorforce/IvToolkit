@@ -132,15 +132,7 @@ public class WeightedSelector
 
         public static <T> Collection<SimpleItem<T>> apply(Collection<T> items, final WeightFunction<T> weightFunction)
         {
-            return Collections2.transform(items, new Function<T, SimpleItem<T>>()
-            {
-                @Nullable
-                @Override
-                public SimpleItem<T> apply(@Nullable T input)
-                {
-                    return new SimpleItem<T>(weightFunction.apply(input), input);
-                }
-            });
+            return Collections2.transform(items, input -> new SimpleItem<T>(weightFunction.apply(input), input));
         }
 
         public T getItem()

@@ -28,27 +28,11 @@ public class MazeRooms
 {
     public static Function<MazeRoom, NBTTagIntArray> toNBT()
     {
-        return new Function<MazeRoom, NBTTagIntArray>()
-        {
-            @Nullable
-            @Override
-            public NBTTagIntArray apply(MazeRoom input)
-            {
-                return input.storeInNBT();
-            }
-        };
+        return input -> input.storeInNBT();
     }
 
     public static Function<NBTTagIntArray, MazeRoom> fromNBT()
     {
-        return new Function<NBTTagIntArray, MazeRoom>()
-        {
-            @Nullable
-            @Override
-            public MazeRoom apply(@Nullable NBTTagIntArray input)
-            {
-                return new MazeRoom(input);
-            }
-        };
+        return input -> new MazeRoom(input);
     }
 }

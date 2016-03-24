@@ -16,9 +16,6 @@
 
 package ivorius.ivtoolkit.maze.components;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import gnu.trove.list.TIntList;
@@ -27,8 +24,9 @@ import ivorius.ivtoolkit.IvToolkitCoreContainer;
 import ivorius.ivtoolkit.random.WeightedSelector;
 import org.apache.commons.lang3.tuple.Triple;
 
-import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Created by lukas on 15.04.15.
@@ -90,9 +88,7 @@ public class MazeComponentConnector
         List<ShiftedMazeComponent<M, C>> result = new ArrayList<>();
         ArrayDeque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack = new ArrayDeque<>();
 
-        Predicate<ShiftedMazeComponent<M, C>> componentPredicate = Predicates.and(
-                MazeComponents.compatibilityPredicate(maze, connectionStrategy),
-                MazePredicates.placeable(maze, predicate));
+        Predicate<ShiftedMazeComponent<M, C>> componentPredicate = ((Predicate<ShiftedMazeComponent<M, C>>) MazeComponents.compatibilityPredicate(maze, connectionStrategy)).and(input -> predicate.canPlace(maze, input));
         WeightedSelector.WeightFunction<ShiftedMazeComponent<M, C>> weightFunction = getWeightFunction();
 
         addAllExits(predicate, exitStack, maze.exits().entrySet());
@@ -131,10 +127,8 @@ public class MazeComponentConnector
             C connection = triple.getRight();
 
             List<ShiftedMazeComponent<M, C>> placeable = Lists.newArrayList(
-                    FluentIterable.from(components)
-                            .transformAndConcat(MazeComponents.<M, C>shiftAllFunction(exit, connection, connectionStrategy))
-                            .filter(componentPredicate)
-                            .toList()
+                    components.stream().flatMap(MazeComponents.shiftAllFunction(exit, connection, connectionStrategy))
+                            .filter(componentPredicate).collect(Collectors.toList())
             );
 
             if (reversing.triedIndices.size() > placeable.size())
@@ -148,7 +142,7 @@ public class MazeComponentConnector
                 if (reverses == 0)
                 {
                     IvToolkitCoreContainer.logger.warn("Did not find fitting component for maze!");
-                    IvToolkitCoreContainer.logger.warn("Suggested: X with exits " + FluentIterable.from(maze.exits().entrySet()).filter(entryConnectsTo(room)));
+                    IvToolkitCoreContainer.logger.warn("Suggested: X with exits " + maze.exits().entrySet().stream().filter(entryConnectsTo(room)));
 
                     reversing = null;
                 }

@@ -28,27 +28,11 @@ public class MazePaths
 {
     public static Function<MazePath, NBTTagCompound> toNBT()
     {
-        return new Function<MazePath, NBTTagCompound>()
-        {
-            @Nullable
-            @Override
-            public NBTTagCompound apply(MazePath input)
-            {
-                return input.storeInNBT();
-            }
-        };
+        return input -> input.storeInNBT();
     }
 
     public static Function<NBTTagCompound, MazePath> fromNBT()
     {
-        return new Function<NBTTagCompound, MazePath>()
-        {
-            @Nullable
-            @Override
-            public MazePath apply(@Nullable NBTTagCompound input)
-            {
-                return new MazePath(input);
-            }
-        };
+        return input -> new MazePath(input);
     }
 }
