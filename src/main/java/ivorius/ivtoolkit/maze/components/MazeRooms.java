@@ -45,18 +45,18 @@ public class MazeRooms
         return new MazeRoom(roomPosition);
     }
 
-    public static Set<MazeRoomConnection> neighbors(final MazeRoom room, TIntSet dimensions)
+    public static Set<MazePassage> neighbors(final MazeRoom room, TIntSet dimensions)
     {
-        final ImmutableSet.Builder<MazeRoomConnection> set = ImmutableSet.builder();
+        final ImmutableSet.Builder<MazePassage> set = ImmutableSet.builder();
         dimensions.forEach(value -> {
-            set.add(new MazeRoomConnection(room, room.addInDimension(value, 1)));
-            set.add(new MazeRoomConnection(room, room.addInDimension(value, -1)));
+            set.add(new MazePassage(room, room.addInDimension(value, 1)));
+            set.add(new MazePassage(room, room.addInDimension(value, -1)));
             return true;
         });
         return set.build();
     }
 
-    public static Set<MazeRoomConnection> neighbors(MazeRoom room)
+    public static Set<MazePassage> neighbors(MazeRoom room)
     {
         return neighbors(room, new TIntHashSet(Ranges.to(room.getDimensions())));
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Lukas Tenbrink
+ * Copyright 2016 Lukas Tenbrink
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,13 +16,16 @@
 
 package ivorius.ivtoolkit.maze.components;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
 
 /**
- * Created by lukas on 15.04.15.
+ * Created by lukas on 16.04.15.
  */
-public interface ConnectionStrategy<T>
+public class MazePassages
 {
-    boolean connect(@Nonnull MazePassage connection, @Nullable T a, @Nullable T b);
+    public static MazePassage rotated(MazePassage connection, AxisAlignedTransform2D transform, int[] size)
+    {
+        return new MazePassage(MazeRooms.rotated(connection.getSource(), transform, size),
+                MazeRooms.rotated(connection.getDest(), transform, size));
+    }
 }

@@ -29,10 +29,10 @@ import java.util.stream.Stream;
  */
 public class MazeComponents
 {
-    public static <M extends MazeComponent<C>, C> Function<M, Stream<ShiftedMazeComponent<M, C>>> shiftAllFunction(final MazeRoomConnection connection, final C connector, final ConnectionStrategy<C> strategy)
+    public static <M extends MazeComponent<C>, C> Function<M, Stream<ShiftedMazeComponent<M, C>>> shiftAllFunction(final MazePassage connection, final C connector, final ConnectionStrategy<C> strategy)
     {
         return component -> component.exits().entrySet().stream().map(entry -> {
-            MazeRoom dist = entry.getKey().distance(connection);
+            MazeRoom dist = entry.getKey().reverseDistance(connection);
             if (dist != null && strategy.connect(connection, connector, entry.getValue()))
                 return shift(component, dist);
             return null;
@@ -65,6 +65,6 @@ public class MazeComponents
 
     public static <C> boolean allExitsCompatible(final MazeComponent<C> existing, final MazeComponent<C> add, final ConnectionStrategy<C> strategy)
     {
-        return add.exits().entrySet().stream().allMatch(input -> input == null || strategy.connect(input.getKey(), existing.exits().get(input.getKey()), input.getValue()));
+        return add.exits().entrySet().stream().allMatch(input -> strategy.connect(input.getKey(), existing.exits().get(input.getKey().reverse()), input.getValue()));
     }
 }

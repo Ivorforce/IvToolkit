@@ -30,23 +30,23 @@ public class ShiftedMazeComponent<M extends MazeComponent<C>, C> implements Maze
     private final MazeRoom shift;
 
     private final ImmutableSet<MazeRoom> rooms;
-    private final ImmutableMap<MazeRoomConnection, C> exits;
-    private final ImmutableMultimap<MazeRoomConnection, MazeRoomConnection> reachability;
+    private final ImmutableMap<MazePassage, C> exits;
+    private final ImmutableMultimap<MazePassage, MazePassage> reachability;
 
     @Deprecated
-    public ShiftedMazeComponent(M component, MazeRoom shift, ImmutableSet<MazeRoom> rooms, ImmutableMap<MazeRoomConnection, C> exits)
+    public ShiftedMazeComponent(M component, MazeRoom shift, ImmutableSet<MazeRoom> rooms, ImmutableMap<MazePassage, C> exits)
     {
         this.component = component;
         this.shift = shift;
         this.rooms = rooms;
         this.exits = exits;
 
-        ImmutableSetMultimap.Builder<MazeRoomConnection, MazeRoomConnection> builder = ImmutableSetMultimap.builder();
+        ImmutableSetMultimap.Builder<MazePassage, MazePassage> builder = ImmutableSetMultimap.builder();
         SetMazeComponent.connectAll(exits.keySet(), builder);
         this.reachability = builder.build();
     }
 
-    public ShiftedMazeComponent(M component, MazeRoom shift, ImmutableSet<MazeRoom> rooms, ImmutableMap<MazeRoomConnection, C> exits, ImmutableMultimap<MazeRoomConnection, MazeRoomConnection> reachability)
+    public ShiftedMazeComponent(M component, MazeRoom shift, ImmutableSet<MazeRoom> rooms, ImmutableMap<MazePassage, C> exits, ImmutableMultimap<MazePassage, MazePassage> reachability)
     {
         this.component = component;
         this.shift = shift;
@@ -72,13 +72,13 @@ public class ShiftedMazeComponent<M extends MazeComponent<C>, C> implements Maze
     }
 
     @Override
-    public Map<MazeRoomConnection, C> exits()
+    public Map<MazePassage, C> exits()
     {
         return exits;
     }
 
     @Override
-    public Multimap<MazeRoomConnection, MazeRoomConnection> reachability()
+    public Multimap<MazePassage, MazePassage> reachability()
     {
         return reachability;
     }

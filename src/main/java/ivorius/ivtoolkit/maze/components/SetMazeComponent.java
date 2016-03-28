@@ -30,47 +30,47 @@ import java.util.*;
 public class SetMazeComponent<C> implements MorphingMazeComponent<C>
 {
     public final Set<MazeRoom> rooms = new HashSet<>();
-    public final Map<MazeRoomConnection, C> exits = new HashMap<>();
-    public final Multimap<MazeRoomConnection, MazeRoomConnection> reachability = HashMultimap.create();
+    public final Map<MazePassage, C> exits = new HashMap<>();
+    public final Multimap<MazePassage, MazePassage> reachability = HashMultimap.create();
 
     public SetMazeComponent()
     {
     }
 
     @Deprecated
-    public SetMazeComponent(Set<MazeRoom> rooms, Map<MazeRoomConnection, C> exits)
+    public SetMazeComponent(Set<MazeRoom> rooms, Map<MazePassage, C> exits)
     {
         this(rooms, exits, HashMultimap.create());
         connectAll(exits.keySet(), reachability);
     }
 
-    public static void connectAll(Set<MazeRoomConnection> exits, Multimap<MazeRoomConnection, MazeRoomConnection> reachability)
+    public static void connectAll(Set<MazePassage> exits, Multimap<MazePassage, MazePassage> reachability)
     {
         // Transitive, so one in both direction is enough
-        List<MazeRoomConnection> connections = Lists.newArrayList(exits);
+        List<MazePassage> connections = Lists.newArrayList(exits);
         for (int i = 1; i < connections.size(); i++)
         {
-            MazeRoomConnection left = connections.get(i - 1);
-            MazeRoomConnection right = connections.get(i);
+            MazePassage left = connections.get(i - 1);
+            MazePassage right = connections.get(i);
             reachability.put(left, right);
             reachability.put(right, left);
         }
     }
 
-    public static void connectAll(Set<MazeRoomConnection> exits, ImmutableMultimap.Builder<MazeRoomConnection, MazeRoomConnection> reachability)
+    public static void connectAll(Set<MazePassage> exits, ImmutableMultimap.Builder<MazePassage, MazePassage> reachability)
     {
         // Transitive, so one in both direction is enough
-        List<MazeRoomConnection> connections = Lists.newArrayList(exits);
+        List<MazePassage> connections = Lists.newArrayList(exits);
         for (int i = 1; i < connections.size(); i++)
         {
-            MazeRoomConnection left = connections.get(i - 1);
-            MazeRoomConnection right = connections.get(i);
+            MazePassage left = connections.get(i - 1);
+            MazePassage right = connections.get(i);
             reachability.put(left, right);
             reachability.put(right, left);
         }
     }
 
-    public SetMazeComponent(Set<MazeRoom> rooms, Map<MazeRoomConnection, C> exits, Multimap<MazeRoomConnection, MazeRoomConnection> reachability)
+    public SetMazeComponent(Set<MazeRoom> rooms, Map<MazePassage, C> exits, Multimap<MazePassage, MazePassage> reachability)
     {
         this.rooms.addAll(rooms);
         this.exits.putAll(exits);
@@ -84,13 +84,13 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
     }
 
     @Override
-    public Map<MazeRoomConnection, C> exits()
+    public Map<MazePassage, C> exits()
     {
         return exits;
     }
 
     @Override
-    public Multimap<MazeRoomConnection, MazeRoomConnection> reachability()
+    public Multimap<MazePassage, MazePassage> reachability()
     {
         return reachability;
     }

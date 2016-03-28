@@ -29,7 +29,7 @@ public interface MazeComponent<C>
 {
     Set<MazeRoom> rooms();
 
-    Map<MazeRoomConnection, C> exits();
+    Map<MazePassage, C> exits();
 
-    Multimap<MazeRoomConnection, MazeRoomConnection> reachability();
+    Multimap<MazePassage, MazePassage> reachability();
 }

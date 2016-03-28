@@ -18,6 +18,7 @@ package ivorius.ivtoolkit.maze.components;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
@@ -74,6 +75,7 @@ public class MazeRoomConnection extends Pair<MazeRoom, MazeRoom>
         return new MazeRoomConnection(left.sub(sub), right.sub(sub));
     }
 
+    @Nullable
     public MazeRoom distance(MazeRoomConnection connection)
     {
         MazeRoom leftDist = connection.left.sub(left);

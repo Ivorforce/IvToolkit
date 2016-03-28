@@ -86,7 +86,7 @@ public class MazeComponentConnector
         ReverseInfo<M, C> reversing = null;
 
         List<ShiftedMazeComponent<M, C>> result = new ArrayList<>();
-        ArrayDeque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack = new ArrayDeque<>();
+        ArrayDeque<Triple<MazeRoom, MazePassage, C>> exitStack = new ArrayDeque<>();
 
         Predicate<ShiftedMazeComponent<M, C>> componentPredicate = ((Predicate<ShiftedMazeComponent<M, C>>) MazeComponents.compatibilityPredicate(maze, connectionStrategy)).and(input -> predicate.canPlace(maze, input));
         WeightedSelector.WeightFunction<ShiftedMazeComponent<M, C>> weightFunction = getWeightFunction();
@@ -121,9 +121,9 @@ public class MazeComponentConnector
                 result.remove(result.size() - 1);
             }
 
-            Triple<MazeRoom, MazeRoomConnection, C> triple = exitStack.removeLast();
+            Triple<MazeRoom, MazePassage, C> triple = exitStack.removeLast();
             MazeRoom room = triple.getLeft();
-            MazeRoomConnection exit = triple.getMiddle();
+            MazePassage exit = triple.getMiddle();
             C connection = triple.getRight();
 
             List<ShiftedMazeComponent<M, C>> placeable = Lists.newArrayList(
@@ -194,16 +194,16 @@ public class MazeComponentConnector
         return ImmutableList.<ShiftedMazeComponent<M, C>>builder().addAll(result).build();
     }
 
-    private static Predicate<Map.Entry<MazeRoomConnection, ?>> entryConnectsTo(final MazeRoom finalRoom)
+    private static Predicate<Map.Entry<MazePassage, ?>> entryConnectsTo(final MazeRoom finalRoom)
     {
         return input -> input != null && (input.getKey().has(finalRoom));
     }
 
-    private static <M extends WeightedMazeComponent<C>, C> void addAllExits(MazePredicate<M, C> placementStrategy, Deque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack, Set<Map.Entry<MazeRoomConnection, C>> entries)
+    private static <M extends WeightedMazeComponent<C>, C> void addAllExits(MazePredicate<M, C> placementStrategy, Deque<Triple<MazeRoom, MazePassage, C>> exitStack, Set<Map.Entry<MazePassage, C>> entries)
     {
-        for (Map.Entry<MazeRoomConnection, C> exit : entries)
+        for (Map.Entry<MazePassage, C> exit : entries)
         {
-            MazeRoomConnection connection = exit.getKey();
+            MazePassage connection = exit.getKey();
             C c = exit.getValue();
 
             if (placementStrategy.isDirtyConnection(connection.getLeft(), connection.getRight(), c))
@@ -223,7 +223,7 @@ public class MazeComponentConnector
         public final TIntList triedIndices = new TIntArrayList();
 
         public MorphingMazeComponent<C> maze;
-        public ArrayDeque<Triple<MazeRoom, MazeRoomConnection, C>> exitStack;
+        public ArrayDeque<Triple<MazeRoom, MazePassage, C>> exitStack;
         public ShiftedMazeComponent<M, C> placed;
     }
 }
