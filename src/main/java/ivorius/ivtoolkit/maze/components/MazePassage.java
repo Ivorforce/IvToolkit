@@ -88,13 +88,13 @@ public class MazePassage extends Pair<MazeRoom, MazeRoom>
     }
 
     @Nullable
-    public MazeRoom reverseDistance(MazePassage connection)
+    public MazeRoom inverseDistance(MazePassage connection)
     {
         MazeRoom leftDist = connection.source.sub(dest);
         return leftDist.equals(connection.dest.sub(source)) ? leftDist : null;
     }
 
-    public MazePassage reverse()
+    public MazePassage inverse()
     {
         return new MazePassage(dest, source);
     }
