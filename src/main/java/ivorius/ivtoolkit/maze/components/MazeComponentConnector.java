@@ -142,7 +142,7 @@ public class MazeComponentConnector
                 if (reverses == 0)
                 {
                     IvToolkitCoreContainer.logger.warn("Did not find fitting component for maze!");
-                    IvToolkitCoreContainer.logger.warn("Suggested: X with exits " + maze.exits().entrySet().stream().filter(entryConnectsTo(room)));
+                    IvToolkitCoreContainer.logger.warn("Suggested: X with exits " + maze.exits().entrySet().stream().filter(entryConnectsTo(room)).collect(Collectors.toList()));
 
                     reversing = null;
                 }
