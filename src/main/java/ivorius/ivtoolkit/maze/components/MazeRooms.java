@@ -43,7 +43,7 @@ public class MazeRooms
 
     public static Stream<MazeRoom> neighbors(final MazeRoom room, IntStream dimensions)
     {
-        return IntStream.of(1, -1).mapToObj(m -> dimensions.mapToObj(d -> room.addInDimension(d, m))).flatMap(t -> t);
+        return dimensions.mapToObj(d -> IntStream.of(1, -1).mapToObj(m -> room.addInDimension(d, m))).flatMap(t -> t);
     }
 
     public static Stream<MazeRoom> neighbors(MazeRoom room)
