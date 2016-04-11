@@ -99,6 +99,11 @@ public class MazeRoom
         return IvVecMathHelper.distance(coordinates, room.coordinates);
     }
 
+    public double distanceSQ(MazeRoom room)
+    {
+        return IvVecMathHelper.distanceSQ(coordinates, room.coordinates);
+    }
+
     @Override
     public boolean equals(Object o)
     {
