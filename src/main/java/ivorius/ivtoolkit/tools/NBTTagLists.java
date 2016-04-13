@@ -16,14 +16,14 @@
 
 package ivorius.ivtoolkit.tools;
 
-import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagIntArray;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -74,5 +74,47 @@ public class NBTTagLists
         for (int[] array : list)
             tagList.appendTag(new NBTTagIntArray(array));
         return tagList;
+    }
+
+    public static List<NBTBase> nbtBases(NBTTagList nbt)
+    {
+        ImmutableList.Builder<NBTBase> list = new ImmutableList.Builder<>();
+        NBTTagList copy = (NBTTagList) nbt.copy(); // TODO Change to getTagListAt when available
+
+        while (copy.tagCount() > 0)
+            list.add(copy.removeTag(0));
+
+        return list.build();
+    }
+
+    public static List<NBTTagList> listsFrom(NBTTagCompound compound, String key)
+    {
+        return lists(compound.getTagList(key, Constants.NBT.TAG_LIST));
+    }
+
+    public static List<NBTTagList> lists(NBTTagList nbt)
+    {
+        if (nbt.func_150303_d() != Constants.NBT.TAG_LIST)
+            throw new IllegalArgumentException();
+
+        ImmutableList.Builder<NBTTagList> list = new ImmutableList.Builder<>();
+        NBTTagList copy = (NBTTagList) nbt.copy(); // TODO Change to getTagListAt when available
+
+        while (copy.tagCount() > 0)
+            list.add((NBTTagList) copy.removeTag(0));
+
+        return list.build();
+    }
+
+    public static void writeTo(NBTTagCompound compound, String key, List<NBTTagList> lists)
+    {
+        compound.setTag(key, write(lists));
+    }
+
+    public static NBTTagList write(List<NBTTagList> lists)
+    {
+        NBTTagList list = new NBTTagList();
+        lists.forEach(list::appendTag);
+        return list;
     }
 }
