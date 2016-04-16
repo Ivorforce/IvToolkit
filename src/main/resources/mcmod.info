@@ -1,0 +1,14 @@
+[{
+  "modid": "IvToolkit",
+  "name": "IvToolkit",
+  "description": "This is a framework that I mostly use in my own mods, for shared functionality.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "http://minecraft.curseforge.com/projects/ivtoolkit",
+  "updateUrl": "",
+  "authorList": ["Ivorius"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}]
