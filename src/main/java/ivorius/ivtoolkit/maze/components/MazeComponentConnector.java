@@ -18,10 +18,7 @@ package ivorius.ivtoolkit.maze.components;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
 import ivorius.ivtoolkit.IvToolkitCoreContainer;
-import ivorius.ivtoolkit.random.WeightedSelector;
 import ivorius.ivtoolkit.random.WeightedShuffler;
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -90,7 +87,6 @@ public class MazeComponentConnector
         ArrayDeque<Triple<MazeRoom, MazePassage, C>> exitStack = new ArrayDeque<>();
 
         Predicate<ShiftedMazeComponent<M, C>> componentPredicate = ((Predicate<ShiftedMazeComponent<M, C>>) MazeComponents.compatibilityPredicate(maze, connectionStrategy)).and(input -> predicate.canPlace(maze, input));
-        WeightedSelector.WeightFunction<ShiftedMazeComponent<M, C>> weightFunction = getWeightFunction();
 
         addAllExits(predicate, exitStack, maze.exits().entrySet());
 
@@ -204,11 +200,6 @@ public class MazeComponentConnector
             if (placementStrategy.isDirtyConnection(connection.getRight(), connection.getLeft(), c))
                 exitStack.add(Triple.of(connection.getRight(), connection, c));
         }
-    }
-
-    private static <M extends WeightedMazeComponent<C>, C> WeightedSelector.WeightFunction<ShiftedMazeComponent<M, C>> getWeightFunction()
-    {
-        return item -> item.getComponent().getWeight();
     }
 
     private static class ReverseInfo<M extends WeightedMazeComponent<C>, C>

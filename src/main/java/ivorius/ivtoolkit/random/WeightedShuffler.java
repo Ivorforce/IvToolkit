@@ -16,16 +16,18 @@
 
 package ivorius.ivtoolkit.random;
 
-import java.util.*;
+import java.util.List;
+import java.util.Random;
+import java.util.function.ToDoubleFunction;
 
 public class WeightedShuffler
 {
-    public static <T extends WeightedSelector.Item> void shuffle(Random rand, List<T> items)
+    public static <T extends WeightedSelector.Item> void shuffleItems(Random rand, List<T> items)
     {
-        shuffle(rand, items, WeightedSelector.totalWeight(items));
+        shuffleItems(rand, items, WeightedSelector.totalWeight(items));
     }
 
-    public static <T extends WeightedSelector.Item> void shuffle(Random rand, List<T> items, double totalWeight)
+    public static <T extends WeightedSelector.Item> void shuffleItems(Random rand, List<T> items, double totalWeight)
     {
         int size = items.size();
 
@@ -38,14 +40,22 @@ public class WeightedShuffler
         }
     }
 
-    public static <T> void shuffle(Random rand, List<T> items, WeightedSelector.WeightFunction<T> weightFunction)
+    public static <T> void shuffle(Random rand, List<T> items, ToDoubleFunction<T> weightFunction)
     {
         shuffle(rand, items, weightFunction, WeightedSelector.totalWeight(items, weightFunction));
     }
 
-    public static <T> void shuffle(Random rand, List<T> items, WeightedSelector.WeightFunction<T> weightFunction, double totalWeight)
+    public static <T> void shuffle(Random rand, List<T> items, ToDoubleFunction<T> weightFunction, double totalWeight)
     {
-        shuffle(rand, WeightedSelector.SimpleItem.apply(items, weightFunction), totalWeight);
+        int size = items.size();
+
+        for (int shuffled = 0; shuffled < size - 1; shuffled++)
+        {
+            List<T> subList = items.subList(shuffled, size);
+            T selected = totalWeight > 0 ? WeightedSelector.select(rand, subList, weightFunction, totalWeight, true) : subList.get(rand.nextInt(subList.size()));
+            totalWeight -= weightFunction.applyAsDouble(selected);
+            subList.add(0, selected);
+        }
     }
 }
 
