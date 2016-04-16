@@ -32,10 +32,20 @@ public class WeightedShuffler
         for (int shuffled = 0; shuffled < size - 1; shuffled++)
         {
             List<T> subList = items.subList(shuffled, size);
-            T selected = WeightedSelector.selectItem(rand, subList, totalWeight, true);
+            T selected = totalWeight > 0 ? WeightedSelector.selectItem(rand, subList, totalWeight, true) : subList.get(rand.nextInt(subList.size()));
             totalWeight -= selected.getWeight();
             subList.add(0, selected);
         }
+    }
+
+    public static <T> void shuffle(Random rand, List<T> items, WeightedSelector.WeightFunction<T> weightFunction)
+    {
+        shuffle(rand, items, weightFunction, WeightedSelector.totalWeight(items, weightFunction));
+    }
+
+    public static <T> void shuffle(Random rand, List<T> items, WeightedSelector.WeightFunction<T> weightFunction, double totalWeight)
+    {
+        shuffle(rand, WeightedSelector.SimpleItem.apply(items, weightFunction), totalWeight);
     }
 }
 

@@ -18,12 +18,10 @@ package ivorius.ivtoolkit.random;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
 
 public class WeightedSelector
 {
@@ -132,7 +130,12 @@ public class WeightedSelector
 
         public static <T> Collection<SimpleItem<T>> apply(Collection<T> items, final WeightFunction<T> weightFunction)
         {
-            return Collections2.transform(items, input -> new SimpleItem<T>(weightFunction.apply(input), input));
+            return Collections2.transform(items, item -> new SimpleItem<>(weightFunction.apply(item), item));
+        }
+
+        public static <T> List<SimpleItem<T>> apply(List<T> items, final WeightFunction<T> weightFunction)
+        {
+            return Lists.transform(items, input -> new SimpleItem<>(weightFunction.apply(input), input));
         }
 
         public T getItem()

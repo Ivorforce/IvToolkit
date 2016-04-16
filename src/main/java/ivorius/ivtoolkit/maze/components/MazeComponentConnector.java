@@ -22,6 +22,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import ivorius.ivtoolkit.IvToolkitCoreContainer;
 import ivorius.ivtoolkit.random.WeightedSelector;
+import ivorius.ivtoolkit.random.WeightedShuffler;
 import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.*;
@@ -107,6 +108,7 @@ public class MazeComponentConnector
                 reversing = new ReverseInfo<>();
                 reversing.exitStack = exitStack.clone();
                 reversing.maze = maze.copy();
+                reversing.shuffleSeed = random.nextLong();
             }
             else
             {
@@ -126,18 +128,21 @@ public class MazeComponentConnector
             MazePassage exit = triple.getMiddle();
             C connection = triple.getRight();
 
-            List<ShiftedMazeComponent<M, C>> placeable = Lists.newArrayList(
+            List<ShiftedMazeComponent<M, C>> shuffled = Lists.newArrayList(
                     components.stream().flatMap(MazeComponents.shiftAllFunction(exit, connection, connectionStrategy))
-                            .filter(componentPredicate).collect(Collectors.toList())
+                            .collect(Collectors.toList())
             );
+            WeightedShuffler.shuffle(new Random(reversing.shuffleSeed), shuffled, shifted -> shifted.getComponent().getWeight());
 
-            if (reversing.triedIndices.size() > placeable.size())
+            if (reversing.triedIndices > shuffled.size())
                 throw new RuntimeException("Maze component selection not static.");
 
-            for (int i = 0; i < reversing.triedIndices.size(); i++)
-                placeable.remove(reversing.triedIndices.get(i));
+            ShiftedMazeComponent<M, C> placing = null;
+            while ((placing == null || !componentPredicate.test(placing)) && reversing.triedIndices < shuffled.size())
+                placing = shuffled.get(reversing.triedIndices++);
+            if (reversing.triedIndices >= shuffled.size()) placing = null;
 
-            if (placeable.size() == 0)
+            if (placing == null)
             {
                 if (reverses == 0)
                 {
@@ -164,18 +169,6 @@ public class MazeComponentConnector
                 continue;
             }
 
-            ShiftedMazeComponent<M, C> placing;
-            if (WeightedSelector.canSelect(placeable, weightFunction))
-            {
-                placing = WeightedSelector.select(random, placeable, weightFunction);
-                reversing.triedIndices.add(placeable.indexOf(placing));
-            }
-            else
-            {
-                int index = random.nextInt(placeable.size()); // All weight = 0 -> select at random
-                placing = placeable.get(index);
-                reversing.triedIndices.add(index);
-            }
             reversing.placed = placing;
 
             // Placing
@@ -220,7 +213,8 @@ public class MazeComponentConnector
 
     private static class ReverseInfo<M extends WeightedMazeComponent<C>, C>
     {
-        public final TIntList triedIndices = new TIntArrayList();
+        public long shuffleSeed;
+        public int triedIndices;
 
         public MorphingMazeComponent<C> maze;
         public ArrayDeque<Triple<MazeRoom, MazePassage, C>> exitStack;
