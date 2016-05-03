@@ -33,7 +33,7 @@ public final class JavaCompatibility {
      * <p>If your coremod (not regular mod!) requires Java 8, compile your {@code IFMLLoadingPlugin} for Java 6 and call this method
      * from {@link IFMLLoadingPlugin#getASMTransformerClass()}. This will display a warning to the user if Java 8 is not installed.</p>
      * <p>This class will always be compiled for Java 6.</p>
-     * <p>For regular mods Java 8 can be used always, since SevenCommons will require it before any regular mods load.</p>
+     * <p>For regular mods Java 8 can be used always, since this mod will require it before any regular mods load.</p>
      *
      * @param exit true to exit the game if Java 8 was not found, you almost always want this
      */
@@ -47,7 +47,7 @@ public final class JavaCompatibility {
         Logger logger = LogManager.getLogger("STDERR");
         logger.error("");
         logger.error(StringUtils.repeat('=', 80));
-        logger.error("SevenCommons requires Java 8 to be installed.");
+        logger.error("IvToolkit requires Java 8 to be installed.");
         logger.error("Please install the latest Java 8 appropriate for your System from https://java.com/download/" +
                 (displayExeNotice ? " or use the latest .exe launcher from https://minecraft.net/" : ""));
         logger.error("Thank you. The game will exit now.");
@@ -79,7 +79,7 @@ public final class JavaCompatibility {
                     JTextPane text = new JTextPane();
                     text.setContentType("text/html");
                     text.setText("<html><body style=\"" + style + "\">" +
-                            "<strong>SevenCommons requires Java 8 to be installed.</strong><br />" +
+                            "<strong>IvToolkit requires Java 8 to be installed.</strong><br />" +
                             "Please install the latest Java 8 appropriate for your System from <a href=\"https://java.com/download/\">java.com/download</a>" +
                             (displayExeNotice ? " or use the latest .exe launcher from <a href=\"https://minecraft.net/\">minecraft.net</a>" : "") +
                             ".<br /><br />Thank you. The game will exit now." +
