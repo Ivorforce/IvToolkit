@@ -94,7 +94,7 @@ public class NBTTagLists
 
     public static List<NBTTagList> lists(NBTTagList nbt)
     {
-        if (nbt.func_150303_d() != Constants.NBT.TAG_LIST)
+        if (nbt.getTagType() != Constants.NBT.TAG_LIST)
             throw new IllegalArgumentException();
 
         ImmutableList.Builder<NBTTagList> list = new ImmutableList.Builder<>();

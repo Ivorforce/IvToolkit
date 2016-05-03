@@ -74,14 +74,9 @@ public class IvWorldData
                 tileEntities.add(tileEntity);
         }
 
-        if (captureEntities)
-        {
-            entities = world.getEntitiesWithinAABB(null, blockArea.asAxisAlignedBB(), saveableEntityPredicate());
-        }
-        else
-        {
-            entities = Collections.emptyList();
-        }
+        entities = captureEntities
+                ? world.getEntitiesWithinAABB(null, blockArea.asAxisAlignedBB(), saveableEntityPredicate())
+                : Collections.emptyList();
     }
 
     public IvWorldData(NBTTagCompound compound, World world, MCRegistry registry)
@@ -120,14 +115,7 @@ public class IvWorldData
 
     public static Predicate<Entity> saveableEntityPredicate()
     {
-        return new Predicate<Entity>()
-        {
-            @Override
-            public boolean apply(Entity entity)
-            {
-                return !(entity instanceof EntityPlayer);
-            }
-        };
+        return entity -> !(entity instanceof EntityPlayer);
     }
 
     public static void recursivelyInjectIDFixTags(NBTTagCompound compound)
@@ -344,5 +332,6 @@ public class IvWorldData
         compound.setTag("entities", entityList);
 
         return compound;
+
     }
 }
