@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Lukas Tenbrink
+ * Copyright 2016 Lukas Tenbrink
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,25 +14,14 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit.maze.classic;
-
-import com.google.common.base.Function;
-import net.minecraft.nbt.NBTTagIntArray;
-
-import javax.annotation.Nullable;
+package ivorius.ivtoolkit;
 
 /**
- * Created by lukas on 13.04.15.
+ * Created by lukas on 21.03.16.
  */
-public class MazeRooms
+public class IvToolkit
 {
-    public static Function<MazeRoom, NBTTagIntArray> toNBT()
-    {
-        return input -> input.storeInNBT();
-    }
-
-    public static Function<NBTTagIntArray, MazeRoom> fromNBT()
-    {
-        return input -> new MazeRoom(input);
-    }
+    public static final String NAME = "IvToolkit";
+    public static final String VERSION = "1.2.1";
+    public static final String MODID = "ivtoolkit";
 }

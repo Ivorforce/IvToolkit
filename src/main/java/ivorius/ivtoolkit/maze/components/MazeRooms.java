@@ -16,14 +16,10 @@
 
 package ivorius.ivtoolkit.maze.components;
 
-import com.google.common.collect.ImmutableSet;
-import gnu.trove.procedure.TIntProcedure;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
-import ivorius.ivtoolkit.tools.Ranges;
 
-import java.util.Set;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * Created by lukas on 23.06.14.
@@ -45,24 +41,23 @@ public class MazeRooms
         return new MazeRoom(roomPosition);
     }
 
-    public static Set<MazeRoomConnection> neighbors(final MazeRoom room, TIntSet dimensions)
+    public static Stream<MazeRoom> neighbors(final MazeRoom room, IntStream dimensions)
     {
-        final ImmutableSet.Builder<MazeRoomConnection> set = ImmutableSet.builder();
-        dimensions.forEach(new TIntProcedure()
-        {
-            @Override
-            public boolean execute(int value)
-            {
-                set.add(new MazeRoomConnection(room, room.addInDimension(value, 1)));
-                set.add(new MazeRoomConnection(room, room.addInDimension(value, -1)));
-                return true;
-            }
-        });
-        return set.build();
+        return dimensions.mapToObj(d -> IntStream.of(1, -1).mapToObj(m -> room.addInDimension(d, m))).flatMap(t -> t);
     }
 
-    public static Set<MazeRoomConnection> neighbors(MazeRoom room)
+    public static Stream<MazeRoom> neighbors(MazeRoom room)
     {
-        return neighbors(room, new TIntHashSet(Ranges.to(room.getDimensions())));
+        return neighbors(room, IntStream.range(0, room.getDimensions()));
+    }
+
+    public static Stream<MazePassage> neighborPassages(final MazeRoom room, IntStream dimensions)
+    {
+        return neighbors(room, dimensions).map(r -> new MazePassage(room, r));
+    }
+
+    public static Stream<MazePassage> neighborPassages(MazeRoom room)
+    {
+        return neighbors(room).map(r -> new MazePassage(room, r));
     }
 }

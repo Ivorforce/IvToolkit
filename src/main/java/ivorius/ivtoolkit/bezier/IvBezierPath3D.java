@@ -20,6 +20,7 @@ import ivorius.ivtoolkit.math.IvVecMathHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class IvBezierPath3D
 {
@@ -81,10 +82,7 @@ public class IvBezierPath3D
             previousPoint = bezierPoint;
         }
 
-        for (Double d : cachedDistances)
-        {
-            cachedProgresses.add(d / cachedFullDistance);
-        }
+        cachedProgresses.addAll(cachedDistances.stream().map(d -> d / cachedFullDistance).collect(Collectors.toList()));
     }
 
     public double getPathLengthInRange(int startIndex, int endIndex)

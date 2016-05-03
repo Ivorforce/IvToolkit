@@ -38,11 +38,7 @@ public class MazeGenerator
         for (int i = 0; i < mazeSizeInRooms.length; i++)
             mazeSizeInRooms[i] = (maze.dimensions[i] - 1) / 2;
 
-        for (MazePath exitPath : maze.allPaths())
-        {
-            if (maze.isPathPointingOutside(exitPath))
-                maze.set(blockedPath, exitPath);
-        }
+        maze.allPaths().stream().filter(maze::isPathPointingOutside).forEach(exitPath -> maze.set(blockedPath, exitPath));
 
         for (MazeRoom blockedRoom : blockedRooms)
         {

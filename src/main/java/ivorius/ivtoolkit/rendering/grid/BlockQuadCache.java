@@ -36,17 +36,11 @@ public class BlockQuadCache
 
         final int[] size = {blockCollection.width, blockCollection.height, blockCollection.length};
 
-        return GridQuadCache.createQuadCache(size, scale, new Function<Pair<BlockPos, EnumFacing>, Object>()
-        {
-            @Nullable
-            @Override
-            public Object apply(Pair<BlockPos, EnumFacing> input)
-            {
-                Block block = blockCollection.getBlockState(input.getLeft()).getBlock();
-                return block.isOpaqueCube() && blockCollection.shouldRenderSide(input.getLeft(), input.getRight())
-                        ? handle
-                        : null;
-            }
+        return GridQuadCache.createQuadCache(size, scale, input -> {
+            Block block = blockCollection.getBlockState(input.getLeft()).getBlock();
+            return block.isOpaqueCube() && blockCollection.shouldRenderSide(input.getLeft(), input.getRight())
+                    ? handle
+                    : null;
         });
     }
 }

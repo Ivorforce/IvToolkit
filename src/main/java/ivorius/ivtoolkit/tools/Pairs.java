@@ -26,7 +26,8 @@ import javax.annotation.Nullable;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Created by lukas on 12.03.15.
@@ -35,59 +36,27 @@ public class Pairs
 {
     public static <T> Iterable<T> both(Iterable<? extends Pair<T, T>> set)
     {
-        return Sets.newHashSet(Iterables.concat(Iterables.transform(set, Pairs.<T>leftFunction()), Iterables.transform(set, Pairs.<T>rightFunction())));
+        return Sets.newHashSet(Iterables.concat(StreamSupport.stream(set.spliterator(), false).map(Pairs.<T>leftFunction()::apply).collect(Collectors.toList()), StreamSupport.stream(set.spliterator(), false).map(Pairs.<T>rightFunction()::apply).collect(Collectors.toList())));
     }
 
     public static <T> Function<Pair<T, T>, T> rightFunction()
     {
-        return new Function<Pair<T, T>, T>()
-        {
-            @Nullable
-            @Override
-            public T apply(@Nullable Pair<T, T> input)
-            {
-                return input.getRight();
-            }
-        };
+        return input -> input.getRight();
     }
 
     public static <T> Function<Pair<T, T>, T> leftFunction()
     {
-        return new Function<Pair<T, T>, T>()
-        {
-            @Nullable
-            @Override
-            public T apply(@Nullable Pair<T, T> input)
-            {
-                return input.getLeft();
-            }
-        };
+        return input -> input.getLeft();
     }
 
     public static <L, R> Iterable<Pair<L, R>> pairLeft(final L left, Iterable<R> right)
     {
-        return Iterables.transform(right, new Function<R, Pair<L, R>>()
-        {
-            @Nullable
-            @Override
-            public Pair<L, R> apply(R input)
-            {
-                return Pair.of(left, input);
-            }
-        });
+        return StreamSupport.stream(right.spliterator(), false).map(input -> Pair.of(left, input)).collect(Collectors.toList());
     }
 
     public static <L, R> Iterable<Pair<L, R>> pairRight(Iterable<L> left, final R right)
     {
-        return Iterables.transform(left, new Function<L, Pair<L, R>>()
-        {
-            @Nullable
-            @Override
-            public Pair<L, R> apply(L input)
-            {
-                return Pair.of(input, right);
-            }
-        });
+        return StreamSupport.stream(left.spliterator(), false).map(input -> Pair.of(input, right)).collect(Collectors.toList());
     }
 
     public static <L, R> Iterable<Pair<L, R>> of(final Iterable<L> left, final Iterable<R> right)

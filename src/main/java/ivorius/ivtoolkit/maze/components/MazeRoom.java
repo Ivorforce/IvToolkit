@@ -89,6 +89,21 @@ public class MazeRoom
         return new MazeRoom(coords);
     }
 
+    public double length()
+    {
+        return IvVecMathHelper.length(coordinates);
+    }
+
+    public double distance(MazeRoom room)
+    {
+        return IvVecMathHelper.distance(coordinates, room.coordinates);
+    }
+
+    public double distanceSQ(MazeRoom room)
+    {
+        return IvVecMathHelper.distanceSQ(coordinates, room.coordinates);
+    }
+
     @Override
     public boolean equals(Object o)
     {

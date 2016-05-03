@@ -17,12 +17,19 @@
 package ivorius.ivtoolkit.maze.components;
 
 /**
- * Created by lukas on 15.04.15.
+ * Created by lukas on 30.09.15.
  */
-@Deprecated
-public interface MazeComponentPlacementStrategy<M extends MazeComponent<C>, C>
+public interface MazePredicate<M extends MazeComponent<C>, C>
 {
-    boolean canPlace(ShiftedMazeComponent<M, C> component);
+    boolean canPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component);
 
-    boolean shouldContinue(MazeRoom dest, MazeRoom source, C c);
+    void willPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component);
+
+    void didPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component);
+
+    void willUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component);
+
+    void didUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component);
+
+    boolean isDirtyConnection(MazeRoom dest, MazeRoom source, C c);
 }

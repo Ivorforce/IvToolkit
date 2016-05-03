@@ -14,25 +14,13 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit.maze.classic;
+package ivorius.ivtoolkit.maze.components;
 
-import com.google.common.base.Function;
-import net.minecraft.nbt.NBTTagIntArray;
-
-import javax.annotation.Nullable;
+import java.util.function.Predicate;
 
 /**
- * Created by lukas on 13.04.15.
+ * Created by lukas on 15.04.15.
  */
-public class MazeRooms
+public class MazePredicates
 {
-    public static Function<MazeRoom, NBTTagIntArray> toNBT()
-    {
-        return input -> input.storeInNBT();
-    }
-
-    public static Function<NBTTagIntArray, MazeRoom> fromNBT()
-    {
-        return input -> new MazeRoom(input);
-    }
 }

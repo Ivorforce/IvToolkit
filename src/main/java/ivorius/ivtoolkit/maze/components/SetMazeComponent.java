@@ -16,8 +16,11 @@
 
 package ivorius.ivtoolkit.maze.components;
 
-import com.google.common.base.Predicates;
-import com.google.common.collect.Maps;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
@@ -27,16 +30,51 @@ import java.util.*;
 public class SetMazeComponent<C> implements MorphingMazeComponent<C>
 {
     public final Set<MazeRoom> rooms = new HashSet<>();
-    public final Map<MazeRoomConnection, C> exits = new HashMap<>();
+    public final Map<MazePassage, C> exits = new HashMap<>();
+    public final Multimap<MazePassage, MazePassage> reachability = HashMultimap.create();
 
     public SetMazeComponent()
     {
     }
 
-    public SetMazeComponent(Set<MazeRoom> rooms, Map<MazeRoomConnection, C> exits)
+    @Deprecated
+    public SetMazeComponent(Set<MazeRoom> rooms, Map<MazePassage, C> exits)
+    {
+        this(rooms, exits, HashMultimap.create());
+        connectAll(exits.keySet(), reachability);
+    }
+
+    public static void connectAll(Set<MazePassage> exits, Multimap<MazePassage, MazePassage> reachability)
+    {
+        // Transitive, so one in both direction is enough
+        List<MazePassage> connections = Lists.newArrayList(exits);
+        for (int i = 1; i < connections.size(); i++)
+        {
+            MazePassage left = connections.get(i - 1);
+            MazePassage right = connections.get(i);
+            reachability.put(left, right);
+            reachability.put(right, left);
+        }
+    }
+
+    public static void connectAll(Set<MazePassage> exits, ImmutableMultimap.Builder<MazePassage, MazePassage> reachability)
+    {
+        // Transitive, so one in both direction is enough
+        List<MazePassage> connections = Lists.newArrayList(exits);
+        for (int i = 1; i < connections.size(); i++)
+        {
+            MazePassage left = connections.get(i - 1);
+            MazePassage right = connections.get(i);
+            reachability.put(left, right);
+            reachability.put(right, left);
+        }
+    }
+
+    public SetMazeComponent(Set<MazeRoom> rooms, Map<MazePassage, C> exits, Multimap<MazePassage, MazePassage> reachability)
     {
         this.rooms.addAll(rooms);
         this.exits.putAll(exits);
+        this.reachability.putAll(reachability);
     }
 
     @Override
@@ -46,9 +84,15 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
     }
 
     @Override
-    public Map<MazeRoomConnection, C> exits()
+    public Map<MazePassage, C> exits()
     {
         return exits;
+    }
+
+    @Override
+    public Multimap<MazePassage, MazePassage> reachability()
+    {
+        return reachability;
     }
 
     @Override
@@ -57,8 +101,27 @@ public class SetMazeComponent<C> implements MorphingMazeComponent<C>
         rooms.addAll(component.rooms());
 
         // Remove all solved connections, and add the ones still open from the other component
-        for (Map.Entry<MazeRoomConnection, C> entry : component.exits().entrySet())
-            if (exits.remove(entry.getKey()) == null)
-                exits.put(entry.getKey(), entry.getValue());
+        component.exits().entrySet().stream().filter(entry -> exits.remove(entry.getKey()) == null).forEach(entry -> exits.put(entry.getKey(), entry.getValue()));
+
+        reachability.putAll(component.reachability());
+    }
+
+    @Override
+    public void set(MazeComponent<C> component)
+    {
+        rooms.clear();
+        rooms.addAll(component.rooms());
+
+        exits.clear();
+        exits.putAll(component.exits());
+
+        reachability.clear();
+        reachability.putAll(component.reachability());
+    }
+
+    @Override
+    public MorphingMazeComponent<C> copy()
+    {
+        return new SetMazeComponent<>(rooms, exits, reachability);
     }
 }

@@ -45,15 +45,15 @@ processResources
 
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
-//        include 'mcmod.info'
-                
+        include 'mcmod.info'
+            
         // replace version and mcversion
         expand 'version':project.version, 'mcversion':project.minecraft.version
     }
         
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
-//        exclude 'mcmod.info'
+        exclude 'mcmod.info'
     }
 }
 
@@ -63,9 +63,6 @@ runClient {
 runServer {
     jvmArgs '-Dfml.coreMods.load=ivorius.ivtoolkit.IvToolkitLoadingPlugin'
 }
-
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
 
 task sourceJar(type: Jar) {
     from sourceSets.main.allSource
@@ -84,6 +81,29 @@ task deobfJar(type: Jar) {
         attributes 'FMLCorePlugin': 'ivorius.ivtoolkit.IvToolkitLoadingPlugin'
     }
 }
+
+// compile SevenCommonsLoader separately, targeting Java 6
+// for the warning message
+task compileLoader(type: JavaCompile) {
+    source = fileTree(dir: "src/main/java")
+    classpath = sourceSets.main.compileClasspath
+    destinationDir = sourceSets.main.output.classesDir
+    include 'ivorius/ivtoolkit/IvToolkitLoadingPlugin*'
+    include 'ivorius/ivtoolkit/tools/JavaCompatibility*'
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.6
+}
+
+compileJava {
+    exclude 'ivorius/ivtoolkit/IvToolkitLoadingPlugin*'
+    exclude 'ivorius/ivtoolkit/tools/JavaCompatibility*'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    options.encoding = 'UTF-8'
+}
+
+tasks.compileJava.dependsOn('compileLoader')
 
 artifacts {
     archives sourceJar

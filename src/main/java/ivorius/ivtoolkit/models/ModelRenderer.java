@@ -56,23 +56,19 @@ public class ModelRenderer
 
         model.calculateTransforms();
 
-        for (Node node : model.nodes)
-        {
-            if (node.parts.size() > 0)
+        model.nodes.stream().filter(node -> node.parts.size() > 0).forEach(node -> {
+            GL11.glPushMatrix();
+
+            MatrixMathUtils.setTRS(TEMP_MATRIX, node.translation, node.rotation, node.scale);
+            glMultMatrix(TEMP_MATRIX);
+
+            for (NodePart nodePart : node.parts)
             {
-                GL11.glPushMatrix();
-
-                MatrixMathUtils.setTRS(TEMP_MATRIX, node.translation, node.rotation, node.scale);
-                glMultMatrix(TEMP_MATRIX);
-
-                for (NodePart nodePart : node.parts)
-                {
-                    renderNodePart(renderer, nodePart);
-                }
-
-                GL11.glPopMatrix();
+                renderNodePart(renderer, nodePart);
             }
-        }
+
+            GL11.glPopMatrix();
+        });
     }
 
     private static void renderNodePart(WorldRenderer renderer, NodePart nodePart)

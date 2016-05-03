@@ -131,6 +131,14 @@ public class AxisAlignedTransform2D
         return rotation == 1 || rotation == 2;
     }
 
+    public int apply(int direction)
+    {
+        if (direction < 0 || direction > 3)
+            throw new IllegalArgumentException();
+
+        return (direction + rotation) % 4;
+    }
+
     public BlockPos apply(BlockPos position, int[] size)
     {
         int positionX = mirrorX ? size[0] - 1 - position.getX() : position.getX();

@@ -30,9 +30,7 @@ public class IvVecMathHelper
         double max = 0.0;
 
         for (double aValue : vector)
-        {
             max += aValue * aValue;
-        }
 
         return max;
     }
@@ -47,14 +45,72 @@ public class IvVecMathHelper
         double distanceSQ = 0.0;
 
         for (int i = 0; i < pos1.length; i++)
-        {
             distanceSQ += (pos1[i] - pos2[i]) * (pos1[i] - pos2[i]);
-        }
 
         return distanceSQ;
     }
 
     public static double distance(double[] pos1, double[] pos2)
+    {
+        return MathHelper.sqrt_double(distanceSQ(pos1, pos2));
+    }
+
+    public static double lengthSQ(int[] vector)
+    {
+        double max = 0.0;
+
+        for (int aValue : vector)
+            max += aValue * aValue;
+
+        return max;
+    }
+
+    public static double length(int[] vector)
+    {
+        return MathHelper.sqrt_double(lengthSQ(vector));
+    }
+
+    public static double distanceSQ(int[] pos1, int[] pos2)
+    {
+        double distanceSQ = 0.0;
+
+        for (int i = 0; i < pos1.length; i++)
+            distanceSQ += (pos1[i] - pos2[i]) * (pos1[i] - pos2[i]);
+
+        return distanceSQ;
+    }
+
+    public static double distance(int[] pos1, int[] pos2)
+    {
+        return MathHelper.sqrt_double(distanceSQ(pos1, pos2));
+    }
+
+    public static double lengthSQ(long[] vector)
+    {
+        double max = 0.0;
+
+        for (long aValue : vector)
+            max += aValue * aValue;
+
+        return max;
+    }
+
+    public static double length(long[] vector)
+    {
+        return MathHelper.sqrt_double(lengthSQ(vector));
+    }
+
+    public static double distanceSQ(long[] pos1, long[] pos2)
+    {
+        double distanceSQ = 0.0;
+
+        for (int i = 0; i < pos1.length; i++)
+            distanceSQ += (pos1[i] - pos2[i]) * (pos1[i] - pos2[i]);
+
+        return distanceSQ;
+    }
+
+    public static double distance(long[] pos1, long[] pos2)
     {
         return MathHelper.sqrt_double(distanceSQ(pos1, pos2));
     }
