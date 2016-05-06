@@ -29,7 +29,7 @@ public interface MCRegistry
 {
     Item itemFromID(ResourceLocation itemID);
 
-    Object idFromItem(Item item);
+    ResourceLocation idFromItem(Item item);
 
     void modifyItemStackCompound(NBTTagCompound compound, ResourceLocation itemID);
 
