@@ -16,6 +16,7 @@
 
 package ivorius.ivtoolkit.rendering.grid;
 
+import ivorius.ivtoolkit.rendering.Icon;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.util.EnumFacing;
@@ -27,7 +28,6 @@ import java.util.Collection;
  */
 public class CubeMesh
 {
-
     public static void renderSides(Collection<EnumFacing> sides, double x1, double y1, double z1, double x2, double y2, double z2, Icon icon)
     {
         for (EnumFacing direction : sides)

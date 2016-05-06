@@ -18,7 +18,7 @@
 
 package ivorius.ivtoolkit.models.textures;
 
-import ivorius.ivtoolkit.rendering.grid.Icon;
+import ivorius.ivtoolkit.rendering.Icon;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Map;
