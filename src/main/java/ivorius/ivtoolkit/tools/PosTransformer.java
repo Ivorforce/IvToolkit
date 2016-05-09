@@ -83,6 +83,8 @@ public class PosTransformer
 
     public static void transformBlockDefault(AxisAlignedTransform2D transform, World world, IBlockState state, BlockPos coord, Block block)
     {
+        IBlockState newState = state;
+
         ImmutableSet<Map.Entry<IProperty, Comparable>> propertySet = state.getProperties().entrySet();
         for (Map.Entry<IProperty, Comparable> entry : propertySet)
         {
@@ -90,8 +92,11 @@ public class PosTransformer
             if (property.getValueClass() == EnumFacing.class && property.getAllowedValues().containsAll(Arrays.asList(EnumFacing.HORIZONTALS)))
             {
                 EnumFacing value = (EnumFacing) entry.getValue();
-                state = state.withProperty(property, transform.apply(value));
+                newState = newState.withProperty(property, transform.apply(value));
             }
         }
+
+        if (newState != state)
+            world.setBlockState(coord, newState);
     }
 }
