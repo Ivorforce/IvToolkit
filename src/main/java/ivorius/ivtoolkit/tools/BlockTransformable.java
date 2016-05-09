@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Lukas Tenbrink
+ * Copyright 2016 Lukas Tenbrink
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,18 +16,21 @@
 
 package ivorius.ivtoolkit.tools;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
 
 /**
- * Implement this if your TileEntity or Entity needs special treatment when being moved.
+ * Implement this if your Block needs special treatment when being transformed.
  */
-public interface Movable
+public interface BlockTransformable
 {
     /**
-     * Moves the object by the specified amount.
-     * Note that implementing this will delete default moving functionality, so you need to do that yourself.
+     * Transforms the object inside a certain bounds.
+     * Note that implementing this will delete default transforming functionality, so you need to do that yourself.
      *
-     * @param pos The distance moved
+     * @param rotation The amount of times to rotate.
+     * @param mirrorX If x is being mirrored.
      */
-    void move(BlockPos pos);
+    void transform(World world, BlockPos pos, IBlockState state, int rotation, boolean mirrorX);
 }

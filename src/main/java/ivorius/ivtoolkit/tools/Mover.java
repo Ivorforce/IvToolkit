@@ -29,73 +29,47 @@ import net.minecraft.util.BlockPos;
  */
 public class Mover
 {
-    public static void moveTileEntityForGeneration(TileEntity tileEntity, BlockPos coord)
+    public static void moveTileEntity(TileEntity tileEntity, BlockPos dist)
     {
         if (tileEntity instanceof Movable)
-            ((Movable) tileEntity).move(coord);
+            ((Movable) tileEntity).move(dist);
         else
-            tileEntity.setPos(tileEntity.getPos().add(coord));
+            moveTileEntityDefault(tileEntity, dist);
     }
 
-    public static void setTileEntityPosForGeneration(TileEntity tileEntity, BlockPos coord)
+    public static void moveTileEntityDefault(TileEntity tileEntity, BlockPos dist)
     {
-        moveTileEntityForGeneration(tileEntity, coord.subtract(tileEntity.getPos()));
+        tileEntity.setPos(tileEntity.getPos().add(dist));
     }
 
-    public static void transformTileEntityPosForGeneration(TileEntity tileEntity, AxisAlignedTransform2D transform, int[] size)
+    public static void setTileEntityPos(TileEntity tileEntity, BlockPos coord)
     {
-        if (tileEntity instanceof Transformable)
-            ((Transformable) tileEntity).transform(transform.getRotation(), transform.isMirrorX(), size);
-        else
-            setTileEntityPosForGeneration(tileEntity, transform.apply(tileEntity.getPos(), size));
+        moveTileEntity(tileEntity, coord.subtract(tileEntity.getPos()));
     }
 
-    public static void moveEntityForGeneration(Entity entity, BlockPos coord)
+    public static void moveEntity(Entity entity, BlockPos dist)
     {
         if (entity instanceof Movable)
-            ((Movable) entity).move(coord);
+            ((Movable) entity).move(dist);
         else
-        {
-            entity.setPosition(entity.posX + coord.getX(), entity.posY + coord.getY(), entity.posZ + coord.getZ());
-
-            if (entity instanceof EntityHanging)
-            {
-                EntityHanging entityHanging = (EntityHanging) entity;
-                BlockPos hangingPosition = entityHanging.getHangingPosition().add(coord);
-                entityHanging.setPosition(hangingPosition.getX(), hangingPosition.getY(), hangingPosition.getZ());
-            }
-
-            if (entity instanceof EntityCreature)
-            {
-                EntityCreature entityCreature = (EntityCreature) entity;
-                EntityCreatureAccessor.setHomePosition(entityCreature, entityCreature.getHomePosition().add(coord));
-            }
-        }
+            moveEntityDefault(entity, dist);
     }
 
-    public static void transformEntityPosForGeneration(Entity entity, AxisAlignedTransform2D transform, int[] size)
+    public static void moveEntityDefault(Entity entity, BlockPos dist)
     {
-        if (entity instanceof Transformable)
-            ((Transformable) entity).transform(transform.getRotation(), transform.isMirrorX(), size);
-        else
+        entity.setPosition(entity.posX + dist.getX(), entity.posY + dist.getY(), entity.posZ + dist.getZ());
+
+        if (entity instanceof EntityHanging)
         {
-            double[] newEntityPos = transform.apply(new double[]{entity.posX, entity.posY, entity.posZ}, size);
-            entity.setPosition(newEntityPos[0], newEntityPos[1], newEntityPos[2]);
+            EntityHanging entityHanging = (EntityHanging) entity;
+            BlockPos hangingPosition = entityHanging.getHangingPosition().add(dist);
+            entityHanging.setPosition(hangingPosition.getX(), hangingPosition.getY(), hangingPosition.getZ());
+        }
 
-            if (entity instanceof EntityHanging)
-            {
-                EntityHanging entityHanging = (EntityHanging) entity;
-                BlockPos hangingCoord = entityHanging.getHangingPosition();
-                BlockPos newHangingCoord = transform.apply(hangingCoord, size);
-                entityHanging.setPosition(newHangingCoord.getX(), newHangingCoord.getY(), newHangingCoord.getZ());
-                EntityHangingAccessor.setHangingDirection(entityHanging, Directions.rotate(entityHanging.facingDirection, transform));
-            }
-
-            if (entity instanceof EntityCreature)
-            {
-                EntityCreature entityCreature = (EntityCreature) entity;
-                EntityCreatureAccessor.setHomePosition(entityCreature, transform.apply(entityCreature.getHomePosition(), size));
-            }
+        if (entity instanceof EntityCreature)
+        {
+            EntityCreature entityCreature = (EntityCreature) entity;
+            EntityCreatureAccessor.setHomePosition(entityCreature, entityCreature.getHomePosition().add(dist));
         }
     }
 }

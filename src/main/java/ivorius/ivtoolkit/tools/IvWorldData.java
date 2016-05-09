@@ -308,9 +308,9 @@ public class IvWorldData
         {
             NBTTagCompound teCompound = new NBTTagCompound();
 
-            Mover.moveTileEntityForGeneration(tileEntity, invertedReference);
+            Mover.moveTileEntity(tileEntity, invertedReference);
             tileEntity.writeToNBT(teCompound);
-            Mover.moveTileEntityForGeneration(tileEntity, referenceCoord);
+            Mover.moveTileEntity(tileEntity, referenceCoord);
 
             recursivelyInjectIDFixTags(teCompound);
             teList.appendTag(teCompound);
@@ -322,9 +322,9 @@ public class IvWorldData
         {
             NBTTagCompound entityCompound = new NBTTagCompound();
 
-            Mover.moveEntityForGeneration(entity, invertedReference);
+            Mover.moveEntity(entity, invertedReference);
             entity.writeToNBTOptional(entityCompound);
-            Mover.moveEntityForGeneration(entity, referenceCoord);
+            Mover.moveEntity(entity, referenceCoord);
 
             recursivelyInjectIDFixTags(entityCompound);
             entityList.appendTag(entityCompound);

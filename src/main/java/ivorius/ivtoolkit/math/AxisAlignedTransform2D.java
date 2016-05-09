@@ -131,12 +131,23 @@ public class AxisAlignedTransform2D
         return rotation == 1 || rotation == 2;
     }
 
-    public int apply(int direction)
+    public int apply(int direction) // TODO Add mirror
     {
         if (direction < 0 || direction > 3)
             throw new IllegalArgumentException();
 
         return (direction + rotation) % 4;
+    }
+
+    public EnumFacing apply(EnumFacing facing)
+    {
+        if (facing.getAxis() == EnumFacing.Axis.Y)
+            return facing;
+
+        if (mirrorX && facing.getAxis() == EnumFacing.Axis.X)
+            facing = facing.getOpposite();
+
+        return EnumFacing.HORIZONTALS[(facing.getHorizontalIndex() + rotation) % EnumFacing.HORIZONTALS.length];
     }
 
     public BlockPos apply(BlockPos position, int[] size)
@@ -213,12 +224,6 @@ public class AxisAlignedTransform2D
             default:
                 throw new InternalError();
         }
-    }
-
-    public void rotateBlock(World world, BlockPos coord, Block block)
-    {
-        for (int i = 0; i < rotation; i++)
-            block.rotateBlock(world, coord, EnumFacing.UP);
     }
 
     @Override
