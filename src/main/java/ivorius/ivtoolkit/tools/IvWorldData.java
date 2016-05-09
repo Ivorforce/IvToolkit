@@ -75,7 +75,7 @@ public class IvWorldData
         }
 
         entities = captureEntities
-                ? world.getEntitiesWithinAABB(null, blockArea.asAxisAlignedBB(), saveableEntityPredicate())
+                ? world.getEntitiesInAABBexcluding(null, blockArea.asAxisAlignedBB(), saveableEntityPredicate())
                 : Collections.emptyList();
     }
 
