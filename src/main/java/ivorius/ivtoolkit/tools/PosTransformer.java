@@ -73,7 +73,7 @@ public class PosTransformer
         }
     }
 
-    public void transformBlock(AxisAlignedTransform2D transform, World world, IBlockState state, BlockPos coord, Block block)
+    public static void transformBlock(AxisAlignedTransform2D transform, World world, IBlockState state, BlockPos coord, Block block)
     {
         if (block instanceof BlockTransformable)
             ((BlockTransformable) block).transform(world, coord, state, transform.getRotation(), transform.isMirrorX());
@@ -81,7 +81,7 @@ public class PosTransformer
             transformBlockDefault(transform, world, state, coord, block);
     }
 
-    public void transformBlockDefault(AxisAlignedTransform2D transform, World world, IBlockState state, BlockPos coord, Block block)
+    public static void transformBlockDefault(AxisAlignedTransform2D transform, World world, IBlockState state, BlockPos coord, Block block)
     {
         ImmutableSet<Map.Entry<IProperty, Comparable>> propertySet = state.getProperties().entrySet();
         for (Map.Entry<IProperty, Comparable> entry : propertySet)
