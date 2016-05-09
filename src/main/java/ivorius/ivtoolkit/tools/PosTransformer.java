@@ -17,6 +17,7 @@
 package ivorius.ivtoolkit.tools;
 
 import com.google.common.collect.ImmutableSet;
+import ivorius.ivtoolkit.blocks.BlockTransformable;
 import ivorius.ivtoolkit.blocks.Directions;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
 import net.minecraft.block.Block;
@@ -36,7 +37,7 @@ import java.util.Map;
 /**
  * Created by lukas on 09.05.16.
  */
-public class Transformer
+public class PosTransformer
 {
     public static void transformTileEntityPos(TileEntity tileEntity, AxisAlignedTransform2D transform, int[] size)
     {

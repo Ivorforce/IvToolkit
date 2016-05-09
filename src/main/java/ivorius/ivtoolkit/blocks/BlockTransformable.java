@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit.tools;
+package ivorius.ivtoolkit.blocks;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
