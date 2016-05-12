@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
@@ -11,11 +11,12 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.0-SNAPSHOT'
     }
 }
 
-apply plugin: 'forge'
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'maven'  
 
 version = "1.2.2"
 def ENV = System.getenv()
@@ -26,9 +27,10 @@ group = "ivorius.ivtoolkit" // http://maven.apache.org/guides/mini/guide-naming-
 archivesBaseName = "IvToolkit"
 
 minecraft {
-    version = "1.8-11.14.3.1491"
+    version = "1.8-11.14.4.1563"
     runDir = "eclipse"
-    mappings = "snapshot_20150721"
+    mappings = "stable_18"
+    useDepAts = true
 }
 
 jar {
@@ -64,24 +66,6 @@ runServer {
     jvmArgs '-Dfml.coreMods.load=ivorius.ivtoolkit.IvToolkitLoadingPlugin'
 }
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-
-    manifest {
-        attributes 'FMLCorePlugin': 'ivorius.ivtoolkit.IvToolkitLoadingPlugin'
-    }
-}
-
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    classifier = 'dev'
-
-    manifest {
-        attributes 'FMLCorePlugin': 'ivorius.ivtoolkit.IvToolkitLoadingPlugin'
-    }
-}
-
 // compile SevenCommonsLoader separately, targeting Java 6
 // for the warning message
 task compileLoader(type: JavaCompile) {
@@ -105,13 +89,8 @@ compileJava {
 
 tasks.compileJava.dependsOn('compileLoader')
 
-artifacts {
-    archives sourceJar
-    archives deobfJar
-}
-
 uploadArchives() {
-    dependsOn reobf
+    dependsOn build
 
     if (project.hasProperty("mavenUrl") && project.hasProperty("mavenUser") && project.hasProperty("mavenPassword")) {
         repositories {
@@ -123,10 +102,6 @@ uploadArchives() {
                     authentication(userName: project."mavenUser", password: project."mavenPassword")
                 }
 
-                addFilter('deobf') {artifact, file ->
-                    artifact.attributes['classifier'] == 'dev'
-                }
-                pom('deobf').version = project.version
                 addFilter('sources') {artifact, file ->
                     artifact.attributes['classifier'] == 'sources'
                 }
