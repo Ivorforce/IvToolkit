@@ -118,25 +118,21 @@ public class WeightedSelector
         return last;
     }
 
-    @Deprecated
     public static <T> T select(Random rand, Collection<SimpleItem<T>> items)
     {
         return selectItem(rand, items).getItem();
     }
 
-    @Deprecated
     public static <T> T select(Random rand, Collection<SimpleItem<T>> items, double totalWeight)
     {
         return selectItem(rand, items, totalWeight).getItem();
     }
 
-    @Deprecated
     public static <T> T select(Random rand, Collection<SimpleItem<T>> items, boolean remove)
     {
         return selectItem(rand, items, remove).getItem();
     }
 
-    @Deprecated
     public static <T> T select(Random rand, Collection<SimpleItem<T>> items, double totalWeight, boolean remove)
     {
         return selectItem(rand, items, totalWeight, remove).getItem();
@@ -147,7 +143,6 @@ public class WeightedSelector
         double getWeight();
     }
 
-    @Deprecated
     public static class SimpleItem<T> implements Item, Comparable<Item>
     {
         protected final double weight;
