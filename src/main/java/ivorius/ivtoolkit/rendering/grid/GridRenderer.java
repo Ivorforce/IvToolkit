@@ -21,7 +21,7 @@ import ivorius.ivtoolkit.tools.WorldRendererAccessor;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.util.EnumFacing;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.GlStateManager;
 
 /**
  * Created by lukas on 21.02.15.

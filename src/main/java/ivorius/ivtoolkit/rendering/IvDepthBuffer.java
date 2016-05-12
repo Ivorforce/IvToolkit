@@ -19,13 +19,15 @@ package ivorius.ivtoolkit.rendering;
 import net.minecraft.client.renderer.OpenGlHelper;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.ARBMultitexture;
+import net.minecraft.client.renderer.GlStateManager;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL14;
 import org.lwjgl.util.glu.GLU;
 
 import java.nio.ByteBuffer;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
-import static org.lwjgl.opengl.GL14.*;
+import static net.minecraft.client.renderer.GlStateManager.*;
 
 /**
  * Created by lukas on 26.02.14.
@@ -63,10 +65,10 @@ public class IvDepthBuffer
             depthFB = OpenGlHelper.glGenFramebuffers();
             OpenGlHelper.glBindFramebuffer(OpenGlHelper.GL_FRAMEBUFFER, depthFB);
 
-            OpenGlHelper.glFramebufferTexture2D(OpenGlHelper.GL_FRAMEBUFFER, OpenGlHelper.GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTextureIndex, 0);
+            OpenGlHelper.glFramebufferTexture2D(OpenGlHelper.GL_FRAMEBUFFER, OpenGlHelper.GL_DEPTH_ATTACHMENT, GL11.GL_TEXTURE_2D, depthTextureIndex, 0);
 
-            glDrawBuffer(GL_NONE);
-            glReadBuffer(GL_NONE);
+            GL11.glDrawBuffer(GL11.GL_NONE);
+            GL11.glReadBuffer(GL11.GL_NONE);
 
             int status = OpenGlHelper.glCheckFramebufferStatus(OpenGlHelper.GL_FRAMEBUFFER);
             if (status != OpenGlHelper.GL_FRAMEBUFFER_COMPLETE)
@@ -86,16 +88,16 @@ public class IvDepthBuffer
 
     public static int genDefaultDepthTexture(int textureWidth, int textureHeight)
     {
-        int depthTextureIndex = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, depthTextureIndex);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, textureWidth, textureHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, (ByteBuffer) null);
+        int depthTextureIndex = GlStateManager.generateTexture();
+        GlStateManager.bindTexture(depthTextureIndex);
+        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
+        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL14.GL_DEPTH_TEXTURE_MODE, GL11.GL_INTENSITY);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_COMPARE_MODE, GL14.GL_COMPARE_R_TO_TEXTURE);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_COMPARE_FUNC, GL11.GL_LEQUAL);
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT24, textureWidth, textureHeight, 0, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT, (ByteBuffer) null);
 
         return depthTextureIndex;
     }
@@ -106,7 +108,7 @@ public class IvDepthBuffer
 
         if (depthTextureIndex > 0)
         {
-            glDeleteTextures(depthTextureIndex);
+            GlStateManager.deleteTexture(depthTextureIndex);
             depthTextureIndex = 0;
         }
         if (depthFB > 0)
@@ -132,8 +134,8 @@ public class IvDepthBuffer
         {
             bindTextureForDestination();
             OpenGlHelper.glBindFramebuffer(OpenGlHelper.GL_FRAMEBUFFER, depthFB);
-            glDrawBuffer(GL_NONE);
-            glReadBuffer(GL_NONE);
+            GL11.glDrawBuffer(GL11.GL_NONE);
+            GL11.glReadBuffer(GL11.GL_NONE);
         }
     }
 
@@ -142,8 +144,8 @@ public class IvDepthBuffer
         if (isAllocated())
         {
             OpenGlHelper.glBindFramebuffer(OpenGlHelper.GL_FRAMEBUFFER, 0);
-            glDrawBuffer(GL_BACK);
-            glReadBuffer(GL_BACK);
+            GL11.glDrawBuffer(GL11.GL_BACK);
+            GL11.glReadBuffer(GL11.GL_BACK);
 
             if (parentFB > 0) // Binds buffers itself? Anyway, calling the draw and read buffer functions causes invalid operation
             {
@@ -183,20 +185,20 @@ public class IvDepthBuffer
 
     public static void bindTextureForSource(int glTexture, int textureIndex)
     {
-        glBindTexture(GL_TEXTURE_2D, textureIndex);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-        glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+        GlStateManager.bindTexture(textureIndex);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_COMPARE_MODE, GL11.GL_NONE);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL14.GL_DEPTH_TEXTURE_MODE, GL11.GL_LUMINANCE);
 
         OpenGlHelper.setActiveTexture(glTexture);
-        glBindTexture(GL_TEXTURE_2D, textureIndex);
+        GlStateManager.bindTexture(textureIndex);
         OpenGlHelper.setActiveTexture(ARBMultitexture.GL_TEXTURE0_ARB);
     }
 
     public static void bindTextureForDestination(int textureIndex)
     {
-        glBindTexture(GL_TEXTURE_2D, textureIndex);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-        glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+        GlStateManager.bindTexture(textureIndex);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_COMPARE_MODE, GL14.GL_COMPARE_R_TO_TEXTURE);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL14.GL_DEPTH_TEXTURE_MODE, GL11.GL_INTENSITY);
     }
 
     public void bindTextureForSource(int glTexture)

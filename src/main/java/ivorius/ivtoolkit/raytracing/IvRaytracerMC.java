@@ -19,7 +19,7 @@ package ivorius.ivtoolkit.raytracing;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Vec3;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.GlStateManager;
 
 import java.util.List;
 
@@ -53,9 +53,9 @@ public class IvRaytracerMC
 
     public static void drawStandardOutlinesFromTileEntity(List<IvRaytraceableObject> objects, double d, double d1, double d2, TileEntity tileEntity)
     {
-        GL11.glPushMatrix();
-        GL11.glTranslatef((float) d - tileEntity.getPos().getX(), (float) d1 - tileEntity.getPos().getY(), (float) d2 - tileEntity.getPos().getZ());
+        GlStateManager.pushMatrix();
+        GlStateManager.translate((float) d - tileEntity.getPos().getX(), (float) d1 - tileEntity.getPos().getY(), (float) d2 - tileEntity.getPos().getZ());
         IvRaytracer.drawStandardOutlines(objects);
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 }

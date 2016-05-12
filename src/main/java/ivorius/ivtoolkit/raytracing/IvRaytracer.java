@@ -17,6 +17,7 @@
 package ivorius.ivtoolkit.raytracing;
 
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
@@ -71,23 +72,23 @@ public class IvRaytracer
 
     public static void drawStandardOutlines(List<IvRaytraceableObject> objects)
     {
-        GL11.glEnable(GL11.GL_BLEND);
+        GlStateManager.enableBlend();
         OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
         GL11.glLineWidth(2.0F);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glDepthMask(false);
-//		GL11.glColor4f(0, 0, 0, 0.4f);
+        GlStateManager.disableTexture2D();
+        GlStateManager.depthMask(false);
+//		GlStateManager.color(0, 0, 0, 0.4f);
 
         Random r = new Random(0);
         for (IvRaytraceableObject object : objects)
         {
             int color = r.nextInt();
-            GL11.glColor4f(((color >> 16) & 255) / 255.0f, ((color >> 8) & 255) / 255.0f, ((color >> 0) & 255) / 255.0f, 0.8F);
+            GlStateManager.color(((color >> 16) & 255) / 255.0f, ((color >> 8) & 255) / 255.0f, ((color >> 0) & 255) / 255.0f, 0.8F);
             object.drawOutlines();
         }
 
-        GL11.glDepthMask(true);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_BLEND);
+        GlStateManager.depthMask(true);
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
     }
 }

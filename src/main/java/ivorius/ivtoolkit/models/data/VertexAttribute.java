@@ -19,6 +19,7 @@
 package ivorius.ivtoolkit.models.data;
 
 import ivorius.ivtoolkit.models.data.VertexAttributes.Usage;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 
 public final class VertexAttribute
@@ -36,7 +37,7 @@ public final class VertexAttribute
      */
     public final boolean normalized;
     /**
-     * the OpenGL type of each component, e.g. GL11.GL_FLOAT or GL11.GL_UNSIGNED_BYTE
+     * the OpenGL type of each component, e.g. GlStateManager.GL_FLOAT or GlStateManager.GL_UNSIGNED_BYTE
      */
     public final int type;
     /**

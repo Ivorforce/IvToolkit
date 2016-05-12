@@ -19,6 +19,7 @@
 package ivorius.ivtoolkit.models.attributes;
 
 import ivorius.ivtoolkit.models.Attribute;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 
 public class DepthTestAttribute extends Attribute

@@ -39,6 +39,7 @@ import ivorius.ivtoolkit.models.utils.ArrayMap;
 import ivorius.ivtoolkit.models.utils.BufferUtils;
 import ivorius.ivtoolkit.models.utils.MatrixMathUtils;
 import org.apache.logging.log4j.Logger;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Quaternion;

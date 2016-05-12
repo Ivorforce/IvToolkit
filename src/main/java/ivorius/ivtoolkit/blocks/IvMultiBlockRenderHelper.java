@@ -16,7 +16,7 @@
 
 package ivorius.ivtoolkit.blocks;
 
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.GlStateManager;
 
 /**
  * Created by lukas on 23.04.14.
@@ -27,7 +27,7 @@ public class IvMultiBlockRenderHelper
     {
         double[] center = tileEntity.getActiveCenterCoords();
 
-        GL11.glTranslated(renderX + center[0] - tileEntity.getPos().getX(), renderY + center[1] - tileEntity.getPos().getY(), renderZ + center[2] - tileEntity.getPos().getZ());
-        GL11.glRotatef(IvRotatableBlockRenderHelper.getAngleFromSouth(tileEntity.getFacing()), 0.0f, 1.0f, 0.0f);
+        GlStateManager.translate(renderX + center[0] - tileEntity.getPos().getX(), renderY + center[1] - tileEntity.getPos().getY(), renderZ + center[2] - tileEntity.getPos().getZ());
+        GlStateManager.rotate(IvRotatableBlockRenderHelper.getAngleFromSouth(tileEntity.getFacing()), 0.0f, 1.0f, 0.0f);
     }
 }

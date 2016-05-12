@@ -19,6 +19,7 @@ package ivorius.ivtoolkit.bezier;
 import ivorius.ivtoolkit.math.IvMathHelper;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
@@ -118,7 +119,7 @@ public class IvBezierPath3DRendererText
             path.buildDistances();
         }
 
-        GL11.glEnable(GL11.GL_BLEND);
+        GlStateManager.enableBlend();
         OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 
         String plainText = "";
@@ -164,17 +165,17 @@ public class IvBezierPath3DRendererText
 
                     double textSize = IvMathHelper.mix(cachedStep.getLeftPoint().getFontSize(), cachedStep.getRightPoint().getFontSize(), cachedStep.getInnerProgress());
 
-                    GL11.glPushMatrix();
-                    GL11.glTranslated(position[0], position[1], position[2]);
-                    GL11.glScaled(-textSize / 12.0, -textSize / 12.0, -textSize / 12.0);
-                    GL11.glRotatef((float) rotation[0] + (inwards ? 0.0f : 180.0f), 0.0f, 1.0f, 0.0f);
-                    GL11.glRotatef((float) rotation[1], 1.0f, 0.0f, 0.0f);
+                    GlStateManager.pushMatrix();
+                    GlStateManager.translate(position[0], position[1], position[2]);
+                    GlStateManager.scale(-textSize / 12.0, -textSize / 12.0, -textSize / 12.0);
+                    GlStateManager.rotate((float) rotation[0] + (inwards ? 0.0f : 180.0f), 0.0f, 1.0f, 0.0f);
+                    GlStateManager.rotate((float) rotation[1], 1.0f, 0.0f, 0.0f);
                     fontRenderer.drawString(modifiers.get(charIndex) + character, 0, 0, ((int) (red * 255.0) << 16) + ((int) (green * 255.0) << 8) + ((int) (blue * 255.0)));
-                    GL11.glPopMatrix();
+                    GlStateManager.popMatrix();
                 }
             }
         }
 
-        GL11.glDisable(GL11.GL_BLEND);
+        GlStateManager.disableBlend();
     }
 }

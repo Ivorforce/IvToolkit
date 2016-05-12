@@ -22,6 +22,7 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -53,17 +54,17 @@ public class AreaRenderer
 
         int sizeCE = insides ? -1 : 1;
 
-        GL11.glPushMatrix();
-        GL11.glTranslated(centerX, centerY, centerZ);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(centerX, centerY, centerZ);
         if (lined)
         {
-            GL11.glDisable(GL11.GL_TEXTURE_2D);
+            GlStateManager.disableTexture2D();
             drawLineCuboid(Tessellator.getInstance().getWorldRenderer(), width2 + sizeP, height2 + sizeP, length2 + sizeP, 1);
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            GlStateManager.enableTexture2D();
         }
         else
             drawCuboid(Tessellator.getInstance().getWorldRenderer(), width2 * sizeCE + sizeP, height2 * sizeCE + sizeP, length2 * sizeCE + sizeP, 1);
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 
     public static void drawCuboid(WorldRenderer renderer, float sizeX, float sizeY, float sizeZ, float in)

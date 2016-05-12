@@ -31,7 +31,7 @@ import ivorius.ivtoolkit.models.utils.MatrixMathUtils;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector4f;
 
@@ -57,7 +57,7 @@ public class ModelRenderer
         model.calculateTransforms();
 
         model.nodes.stream().filter(node -> node.parts.size() > 0).forEach(node -> {
-            GL11.glPushMatrix();
+            GlStateManager.pushMatrix();
 
             MatrixMathUtils.setTRS(TEMP_MATRIX, node.translation, node.rotation, node.scale);
             glMultMatrix(TEMP_MATRIX);
@@ -67,7 +67,7 @@ public class ModelRenderer
                 renderNodePart(renderer, nodePart);
             }
 
-            GL11.glPopMatrix();
+            GlStateManager.popMatrix();
         });
     }
 
@@ -114,18 +114,18 @@ public class ModelRenderer
         BlendingAttribute blend = material.get(BlendingAttribute.class, BlendingAttribute.Type);
         if (blend != null)
         {
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glBlendFunc(blend.sourceFunction, blend.destFunction);
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(blend.sourceFunction, blend.destFunction);
 
-            GL11.glColor4f(rgb[0], rgb[1], rgb[2], blend.opacity);
+            GlStateManager.color(rgb[0], rgb[1], rgb[2], blend.opacity);
         }
         else
-            GL11.glColor3f(rgb[0], rgb[1], rgb[2]);
+            GlStateManager.color(rgb[0], rgb[1], rgb[2]);
 
         if (texture != null)
             texture.bindTexture();
         else
-            GL11.glDisable(GL11.GL_TEXTURE_2D);
+            GlStateManager.disableTexture2D();
 
         List<VertexAttribute> boneWeightAttributes = new ArrayList<>();
         for (VertexAttribute attribute : vertexAttributes)
@@ -169,10 +169,10 @@ public class ModelRenderer
         Tessellator.getInstance().draw();
 
         if (texture == null)
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            GlStateManager.enableTexture2D();
 
         if (blend != null)
-            GL11.glDisable(GL11.GL_BLEND);
+            GlStateManager.disableBlend();
     }
 
     public static void buildMatrix(Matrix4f dst, Collection<VertexAttribute> boneWeightAttributes, FloatBuffer floatBuffer, int vertexIndex, Matrix4f[] bones)
@@ -195,7 +195,7 @@ public class ModelRenderer
     {
         matrix4f.store(MATRIX_BUFFER);
         MATRIX_BUFFER.position(0);
-        GL11.glMultMatrix(MATRIX_BUFFER);
+        GlStateManager.multMatrix(MATRIX_BUFFER);
         MATRIX_BUFFER.rewind();
     }
 

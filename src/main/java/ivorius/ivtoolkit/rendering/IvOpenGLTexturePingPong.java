@@ -16,12 +16,12 @@
 
 package ivorius.ivtoolkit.rendering;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.opengl.GL11;
 
 import java.nio.ByteBuffer;
-
-import static org.lwjgl.opengl.GL11.*;
 
 public class IvOpenGLTexturePingPong
 {
@@ -56,7 +56,7 @@ public class IvOpenGLTexturePingPong
         for (int i = 0; i < 2; i++)
         {
             cacheTextures[i] = IvOpenGLHelper.genStandardTexture();
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, (ByteBuffer) null);
+            GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, screenWidth, screenHeight, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
         }
 
         if (cacheTextures[0] <= 0 || cacheTextures[1] <= 0)
@@ -69,8 +69,8 @@ public class IvOpenGLTexturePingPong
             pingPongFB = OpenGlHelper.glGenFramebuffers();
 
             OpenGlHelper.glBindFramebuffer(OpenGlHelper.GL_FRAMEBUFFER, pingPongFB);
-            OpenGlHelper.glFramebufferTexture2D(OpenGlHelper.GL_FRAMEBUFFER, OpenGlHelper.GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, cacheTextures[0], 0);
-            OpenGlHelper.glFramebufferTexture2D(OpenGlHelper.GL_FRAMEBUFFER, OpenGlHelper.GL_COLOR_ATTACHMENT0 + 1, GL_TEXTURE_2D, cacheTextures[1], 0);
+            OpenGlHelper.glFramebufferTexture2D(OpenGlHelper.GL_FRAMEBUFFER, OpenGlHelper.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, cacheTextures[0], 0);
+            OpenGlHelper.glFramebufferTexture2D(OpenGlHelper.GL_FRAMEBUFFER, OpenGlHelper.GL_COLOR_ATTACHMENT0 + 1, GL11.GL_TEXTURE_2D, cacheTextures[1], 0);
 
             int status = OpenGlHelper.glCheckFramebufferStatus(OpenGlHelper.GL_FRAMEBUFFER);
             if (status != OpenGlHelper.GL_FRAMEBUFFER_COMPLETE)
@@ -152,10 +152,11 @@ public class IvOpenGLTexturePingPong
                 activeBuffer = 0;
                 bindCurrentTexture();
 
-                glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, screenWidth, screenHeight, 0);
+                GL11.glCopyTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB, 0, 0, screenWidth, screenHeight, 0);
 
                 OpenGlHelper.glBindFramebuffer(OpenGlHelper.GL_FRAMEBUFFER, pingPongFB);
-                glPushAttrib(GL_VIEWPORT_BIT | GL_COLOR_BUFFER_BIT);
+//                glPushAttrib(GL_VIEWPORT_BIT | GL_COLOR_BUFFER_BIT);
+                GlStateManager.pushAttrib();
 
                 setupCacheTextureForTick = true;
             }
@@ -165,24 +166,24 @@ public class IvOpenGLTexturePingPong
                 bindCurrentTexture();
             }
 
-            glDrawBuffer(activeBuffer == 1 ? OpenGlHelper.GL_COLOR_ATTACHMENT0 : OpenGlHelper.GL_COLOR_ATTACHMENT0 + 1);
+            GL11.glDrawBuffer(activeBuffer == 1 ? OpenGlHelper.GL_COLOR_ATTACHMENT0 : OpenGlHelper.GL_COLOR_ATTACHMENT0 + 1);
 //            glReadBuffer(activeBuffer == 0 ? GL_COLOR_ATTACHMENT0_EXT : GL_COLOR_ATTACHMENT1_EXT);
 
-            glViewport(0, 0, screenWidth, screenHeight);
+            GlStateManager.viewport(0, 0, screenWidth, screenHeight);
 //            glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 //            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //            IvOpenGLHelper.setUpOpenGLStandard2D(screenWidth, screenHeight);
         }
         else // Use direct draw workaround
         {
-            glBindTexture(GL_TEXTURE_2D, cacheTextures[0]);
-            glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, screenWidth, screenHeight, 0);
+            GlStateManager.bindTexture(cacheTextures[0]);
+            GL11.glCopyTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB, 0, 0, screenWidth, screenHeight, 0);
         }
     }
 
     public void bindCurrentTexture()
     {
-        glBindTexture(GL_TEXTURE_2D, cacheTextures[activeBuffer]);
+        GlStateManager.bindTexture(cacheTextures[activeBuffer]);
     }
 
     public void postTick()
@@ -191,12 +192,12 @@ public class IvOpenGLTexturePingPong
         {
 //            glDrawBuffer(GL_BACK);
 //            glReadBuffer(GL_BACK);
-            glPopAttrib();
+            GlStateManager.popAttrib();
             OpenGlHelper.glBindFramebuffer(OpenGlHelper.GL_FRAMEBUFFER, parentFrameBuffer);
 
             activeBuffer = 1 - activeBuffer;
 
-            glColor3f(1.0f, 1.0f, 1.0f);
+            GlStateManager.color(1.0f, 1.0f, 1.0f);
             bindCurrentTexture();
             IvRenderHelper.drawRectFullScreen(screenWidth, screenHeight);
         }
@@ -208,7 +209,7 @@ public class IvOpenGLTexturePingPong
         {
             if (cacheTextures[i] > 0)
             {
-                glDeleteTextures(cacheTextures[i]);
+                GlStateManager.deleteTexture(cacheTextures[i]);
                 cacheTextures[i] = 0;
             }
         }

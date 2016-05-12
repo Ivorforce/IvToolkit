@@ -20,6 +20,7 @@ import ivorius.ivtoolkit.math.IvMathHelper;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -76,7 +77,7 @@ public class IvBezierPath3DRendererTexture
 
         WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
 
-        GL11.glEnable(GL11.GL_BLEND);
+        GlStateManager.enableBlend();
         OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
 
         for (double progress = 0.0; progress < (1.0 + stepSize); progress += stepSize)
@@ -112,6 +113,6 @@ public class IvBezierPath3DRendererTexture
             }
         }
 
-        GL11.glDisable(GL11.GL_BLEND);
+        GlStateManager.disableBlend();
     }
 }
