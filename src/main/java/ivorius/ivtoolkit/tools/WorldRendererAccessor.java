@@ -56,9 +56,7 @@ public class WorldRendererAccessor
     {
         try
         {
-            getXOffset().setDouble(renderer, x);
-            getYOffset().setDouble(renderer, y);
-            getZOffset().setDouble(renderer, z);
+            renderer.setTranslation(getXOffset().getDouble(renderer) + x, getYOffset().getDouble(renderer) + y, getZOffset().getDouble(renderer) + z);
         }
         catch (IllegalAccessException e)
         {
