@@ -16,7 +16,7 @@ buildscript {
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'maven'  
+apply plugin: 'maven-publish'
 
 version = "1.2.2"
 def ENV = System.getenv()
@@ -66,7 +66,7 @@ runServer {
     jvmArgs '-Dfml.coreMods.load=ivorius.ivtoolkit.IvToolkitLoadingPlugin'
 }
 
-// compile SevenCommonsLoader separately, targeting Java 6
+// compile Loader separately, targeting Java 6
 // for the warning message
 task compileLoader(type: JavaCompile) {
     source = fileTree(dir: "src/main/java")
@@ -88,71 +88,35 @@ compileJava {
 }
 
 tasks.compileJava.dependsOn('compileLoader')
+// end compileLoader
 
-uploadArchives() {
-    dependsOn build
-
-    if (project.hasProperty("mavenUrl") && project.hasProperty("mavenUser") && project.hasProperty("mavenPassword")) {
-        repositories {
-            logger.info('Publishing to files server')
-
-            mavenDeployer {
-
-                repository(url: project."mavenUrl") {
-                    authentication(userName: project."mavenUser", password: project."mavenPassword")
-                }
-
-                addFilter('sources') {artifact, file ->
-                    artifact.attributes['classifier'] == 'sources'
-                }
-                pom('sources').version = project.version
-                addFilter('universal') {artifact, file ->
-                    artifact.attributes['classifier'] == null
-                }
-                pom('universal').version = project.version
-
-                pom {
-                    groupId = project.group
-                    version = project.version
-                    artifactId = project.archivesBaseName
-                    project {
-                        name project.archivesBaseName
-                        packaging 'jar'
-                        description 'Shared functionality for Ivorius\' mods'
-                        url 'https://github.com/Ivorforce/IvToolkit'
-
-                        scm {
-                            url 'scm:git:git@github.com:Ivorforce/IvToolkit.git'
-                            connection 'scm:git:git@github.com:Ivorforce/IvToolkit.git'
-                            developerConnection 'scm:git:git@github.com:Ivorforce/IvToolkit.git'
-                        }
-
-                        issueManagement {
-                            system 'github'
-                            url 'https://github.com/Ivorforce/IvToolkit/issues'
-                        }
-
-                        licenses {
-                            license {
-                                name 'Apache 2.0'
-                                url 'http://www.apache.org/licenses/LICENSE-2.0.html'
-                                distribution 'repo'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id 'Ivorius'
-                                name 'Ivorius'
-                                roles { role 'developer' }
-                            }
-                        }
-                    }
-                }
+publishing {
+    tasks.publish.dependsOn 'build'
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+            artifact sourceJar
+        }
+        mavenCustom(MavenPublication) {
+            pom.withXml {
+                asNode().appendNode('description', 'Shared functionality for Ivorius\' mods')
+                asNode().appendNode('url', 'https://github.com/Ivorforce/IvToolkit')
             }
         }
     }
-    else {
-        logger.log(LogLevel.ERROR, 'No upload variables defined!');
+    repositories {
+        if (project.hasProperty('mavenUrl')) {
+            maven {
+                url project."mavenUrl"
+                if (project.hasProperty('mavenUser') && project.hasProperty('mavenPassword')) {
+                    credentials {
+                        username project."mavenUser"
+                        password project."mavenPassword"
+                    }
+                }
+            }
+        } else {
+            mavenLocal()
+        }
     }
 }
