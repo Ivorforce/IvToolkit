@@ -26,17 +26,15 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 /**
  * Created by lukas on 02.07.14.
  */
-public class PacketEntityDataHandler implements IMessageHandler<PacketEntityData, IMessage>
+public class PacketEntityDataHandler extends SchedulingMessageHandler<PacketEntityData, IMessage>
 {
     @Override
-    public IMessage onMessage(PacketEntityData message, MessageContext ctx)
+    public void processClient(PacketEntityData message, MessageContext ctx)
     {
         World world = IvSideClient.getClientWorld();
         Entity entity = world.getEntityByID(message.getEntityID());
 
         if (entity != null)
             ((PartialUpdateHandler) entity).readUpdateData(message.getPayload(), message.getContext());
-
-        return null;
     }
 }

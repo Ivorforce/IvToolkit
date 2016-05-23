@@ -27,10 +27,10 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 /**
  * Created by lukas on 02.07.14.
  */
-public class PacketExtendedEntityPropertiesDataHandler implements IMessageHandler<PacketExtendedEntityPropertiesData, IMessage>
+public class PacketExtendedEntityPropertiesDataHandler extends SchedulingMessageHandler<PacketExtendedEntityPropertiesData, IMessage>
 {
     @Override
-    public IMessage onMessage(PacketExtendedEntityPropertiesData message, MessageContext ctx)
+    public void processClient(PacketExtendedEntityPropertiesData message, MessageContext ctx)
     {
         World world = IvSideClient.getClientWorld();
         Entity entity = world.getEntityByID(message.getEntityID());
@@ -42,7 +42,5 @@ public class PacketExtendedEntityPropertiesDataHandler implements IMessageHandle
             if (eep != null)
                 ((PartialUpdateHandler) eep).readUpdateData(message.getPayload(), message.getContext());
         }
-
-        return null;
     }
 }

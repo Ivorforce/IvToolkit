@@ -19,24 +19,27 @@ package ivorius.ivtoolkit.network;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
  * Created by lukas on 02.07.14.
  */
-public class PacketTileEntityClientEventHandler implements IMessageHandler<PacketTileEntityClientEvent, IMessage>
+public class PacketTileEntityClientEventHandler extends SchedulingMessageHandler<PacketTileEntityClientEvent, IMessage>
 {
     @Override
-    public IMessage onMessage(PacketTileEntityClientEvent message, MessageContext ctx)
+    public WorldServer getServerWorld(PacketTileEntityClientEvent message, MessageContext ctx)
     {
-        World world = MinecraftServer.getServer().worldServerForDimension(message.getDimension());
+        return MinecraftServer.getServer().worldServerForDimension(message.getDimension());
+    }
+
+    @Override
+    public void processServer(PacketTileEntityClientEvent message, MessageContext ctx, WorldServer world)
+    {
         TileEntity entity = world.getTileEntity(message.getPos());
 
         if (entity != null)
             ((ClientEventHandler) entity).onClientEvent(message.getPayload(), message.getContext(), ctx.getServerHandler().playerEntity);
-
-        return null;
     }
 }

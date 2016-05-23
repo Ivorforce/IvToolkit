@@ -18,17 +18,17 @@ package ivorius.ivtoolkit.network;
 
 import net.minecraft.inventory.Container;
 import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
  * Created by lukas on 02.07.14.
  */
-public class PacketGuiActionHandler implements IMessageHandler<PacketGuiAction, IMessage>
+public class PacketGuiActionHandler extends SchedulingMessageHandler<PacketGuiAction, IMessage>
 {
     @Override
-    public IMessage onMessage(PacketGuiAction message, MessageContext ctx)
+    public void processServer(PacketGuiAction message, MessageContext ctx, WorldServer world)
     {
         NetHandlerPlayServer netHandler = ctx.getServerHandler();
 
@@ -37,7 +37,5 @@ public class PacketGuiActionHandler implements IMessageHandler<PacketGuiAction, 
         {
             ((PacketGuiAction.ActionHandler) container).handleAction(message.getContext(), message.getPayload());
         }
-
-        return null;
     }
 }
