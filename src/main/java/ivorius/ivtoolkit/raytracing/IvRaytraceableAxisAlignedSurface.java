@@ -220,7 +220,7 @@ public class IvRaytraceableAxisAlignedSurface extends IvRaytraceableObject
     {
         WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
 
-        renderer.begin(3, DefaultVertexFormats.POSITION_TEX_COLOR);
+        renderer.begin(3, DefaultVertexFormats.POSITION);
         if (width == 0)
         {
             renderer.pos(x, y, z).endVertex();

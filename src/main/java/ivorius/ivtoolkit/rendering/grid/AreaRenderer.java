@@ -70,7 +70,7 @@ public class AreaRenderer
 
     public static void drawCuboid(WorldRenderer renderer, float sizeX, float sizeY, float sizeZ, float in)
     {
-        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
         renderer.pos(-sizeX * in, -sizeY * in, -sizeZ).tex(0, 0).endVertex();
         renderer.pos(-sizeX * in, sizeY * in, -sizeZ).tex(0, 1).endVertex();
@@ -107,7 +107,7 @@ public class AreaRenderer
 
     public static void drawLineCuboid(WorldRenderer renderer, float sizeX, float sizeY, float sizeZ, float in)
     {
-        renderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+        renderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
 
         renderer.pos(-sizeX * in, -sizeY * in, -sizeZ).endVertex();
         renderer.pos(-sizeX * in, sizeY * in, -sizeZ).endVertex();
@@ -123,7 +123,7 @@ public class AreaRenderer
 
         Tessellator.getInstance().draw();
 
-        renderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_TEX_COLOR);
+        renderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
 
         renderer.pos(-sizeX * in, sizeY * in, -sizeZ).endVertex();
         renderer.pos(-sizeX * in, sizeY * in, sizeZ).endVertex();
