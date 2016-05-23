@@ -135,7 +135,7 @@ public class ModelRenderer
                 boneWeightAttributes.add(attribute);
         }
 
-        renderer.begin(meshPart.primitiveType, DefaultVertexFormats.POSITION_TEX_COLOR);
+        renderer.begin(meshPart.primitiveType, DefaultVertexFormats.POSITION_TEX);
         for (int i = meshPart.indexOffset; i < meshPart.numVertices + meshPart.indexOffset; i++)
         {
             int vertexIndex = indexBuf.get(i) * vertexLengthInFloats;

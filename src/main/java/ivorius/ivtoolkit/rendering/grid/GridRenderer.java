@@ -32,7 +32,7 @@ public class GridRenderer
 {
     public static void renderGrid(int lines, float spacing, float lineLength, float lineWidth)
     {
-        Tessellator.getInstance().getWorldRenderer().begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+        Tessellator.getInstance().getWorldRenderer().begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
 
         for (int x = -lines; x <= lines; x++)
             for (int z = -lines; z <= lines; z++)

@@ -40,11 +40,11 @@ public class IvRenderHelper
     {
         WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
 
-        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-        renderer.pos(0.0, 0.0, 0.0).tex(0.0, 1.0);
-        renderer.pos(0.0, screenHeight, 0.0).tex(0.0, 0.0);
-        renderer.pos(screenWidth, screenHeight, 0.0).tex(1.0, 0.0);
-        renderer.pos(screenWidth, 0.0, 0.0).tex(1.0, 1.0);
+        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        renderer.pos(0.0, 0.0, 0.0).tex(0.0, 1.0).endVertex();
+        renderer.pos(0.0, screenHeight, 0.0).tex(0.0, 0.0).endVertex();
+        renderer.pos(screenWidth, screenHeight, 0.0).tex(1.0, 0.0).endVertex();
+        renderer.pos(screenWidth, 0.0, 0.0).tex(1.0, 1.0).endVertex();
         Tessellator.getInstance().draw();
     }
 
@@ -90,7 +90,7 @@ public class IvRenderHelper
                 GlStateManager.rotate(random.nextFloat() * 360.0F, 1.0F, 0.0F, 0.0F);
                 GlStateManager.rotate(random.nextFloat() * 360.0F, 0.0F, 1.0F, 0.0F);
                 GlStateManager.rotate(random.nextFloat() * 360.0F + usedTicks * 90.0F, 0.0F, 0.0F, 1.0F);
-                renderer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_TEX_COLOR);
+                renderer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR);
                 float var8 = random.nextFloat() * 20.0F + 5.0F;
                 float var9 = random.nextFloat() * 2.0F + 1.0F;
                 renderer.color(r, g, b, alpha * lightAlpha);
@@ -134,7 +134,7 @@ public class IvRenderHelper
         float f11 = 0.0f;
         float f12 = 0.0f;
         float f13 = 0.0f;
-        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         renderer.pos((double) (f11 - f1 * f10 - f3 * f10), (double) (f12 - f5 * f10), (double) (f13 - f2 * f10 - f4 * f10)).tex((double) f7, (double) f9).endVertex();
         renderer.pos((double) (f11 - f1 * f10 + f3 * f10), (double) (f12 + f5 * f10), (double) (f13 - f2 * f10 + f4 * f10)).tex((double) f7, (double) f8).endVertex();
         renderer.pos((double) (f11 + f1 * f10 + f3 * f10), (double) (f12 + f5 * f10), (double) (f13 + f2 * f10 + f4 * f10)).tex((double) f6, (double) f8).endVertex();
@@ -146,11 +146,11 @@ public class IvRenderHelper
     {
         if (lined)
         {
-            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
         }
         else
         {
-            tessellator.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+            tessellator.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
         }
 
         tessellator.pos(-size * in, -size * in, -size).endVertex();
@@ -164,7 +164,7 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
         }
         tessellator.pos(-size * in, -size * in, size).endVertex();
         tessellator.pos(-size * in, size * in, size).endVertex();
@@ -177,7 +177,7 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
         }
         tessellator.pos(-size, -size * in, -size * in).endVertex();
         tessellator.pos(-size, size * in, -size * in).endVertex();
@@ -190,7 +190,7 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
         }
         tessellator.pos(size, -size * in, -size * in).endVertex();
         tessellator.pos(size, -size * in, size * in).endVertex();
@@ -203,7 +203,7 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
         }
         tessellator.pos(-size * in, size, -size * in).endVertex();
         tessellator.pos(size * in, size, -size * in).endVertex();
@@ -216,7 +216,7 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
         }
         tessellator.pos(-size * in, -size, -size * in).endVertex();
         tessellator.pos(-size * in, -size, size * in).endVertex();
@@ -230,11 +230,11 @@ public class IvRenderHelper
     {
         if (lined)
         {
-            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
         }
         else
         {
-            tessellator.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+            tessellator.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
         }
 
         tessellator.pos(-sizeX * in, -sizeY * in, -sizeZ).endVertex();
@@ -248,7 +248,7 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
         }
         tessellator.pos(-sizeX * in, -sizeY * in, sizeZ).endVertex();
         tessellator.pos(sizeX * in, -sizeY * in, sizeZ).endVertex();
@@ -261,7 +261,7 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
         }
         tessellator.pos(-sizeX, -sizeY * in, -sizeZ * in).endVertex();
         tessellator.pos(-sizeX, -sizeY * in, sizeZ * in).endVertex();
@@ -274,7 +274,7 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
         }
         tessellator.pos(sizeX, -sizeY * in, -sizeZ * in).endVertex();
         tessellator.pos(sizeX, sizeY * in, -sizeZ * in).endVertex();
@@ -287,7 +287,7 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
         }
         tessellator.pos(-sizeX * in, sizeY, -sizeZ * in).endVertex();
         tessellator.pos(-sizeX * in, sizeY, sizeZ * in).endVertex();
@@ -300,7 +300,7 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
         }
         tessellator.pos(-sizeX * in, -sizeY, -sizeZ * in).endVertex();
         tessellator.pos(sizeX * in, -sizeY, -sizeZ * in).endVertex();
