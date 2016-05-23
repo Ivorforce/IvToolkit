@@ -20,8 +20,10 @@ import ivorius.ivtoolkit.rendering.IvRenderHelper;
 import ivorius.ivtoolkit.tools.WorldRendererAccessor;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.client.renderer.GlStateManager;
+import org.lwjgl.opengl.GL11;
 
 /**
  * Created by lukas on 21.02.15.
@@ -30,7 +32,7 @@ public class GridRenderer
 {
     public static void renderGrid(int lines, float spacing, float lineLength, float lineWidth)
     {
-        Tessellator.getInstance().getWorldRenderer().startDrawingQuads();
+        Tessellator.getInstance().getWorldRenderer().begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 
         for (int x = -lines; x <= lines; x++)
             for (int z = -lines; z <= lines; z++)

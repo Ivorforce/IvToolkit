@@ -101,8 +101,10 @@ public class IvNetworkHelperServer
         WorldServer server = (WorldServer) world;
         PlayerManager playerManager = server.getPlayerManager();
 
-        List<EntityPlayerMP> players = server.playerEntities;
-        playersWatching.addAll(players.stream().filter(player -> playerManager.isPlayerWatchingChunk(player, chunkX, chunkZ)).collect(Collectors.toList()));
+        List<EntityPlayer> players = server.playerEntities;
+        List<EntityPlayerMP> mpplayers = ((List) players.stream().filter(p -> p instanceof EntityPlayerMP).collect(Collectors.toList()));
+
+        playersWatching.addAll(mpplayers.stream().filter(player -> playerManager.isPlayerWatchingChunk(player, chunkX, chunkZ)).collect(Collectors.toList()));
 
         return playersWatching;
     }

@@ -21,6 +21,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -98,18 +99,18 @@ public class IvBezierPath3DRendererTexture
             double textureX = totalProgress + textureShift;
             if (!isVeryFirst)
             {
-                renderer.setColorRGBA_F((float) red, (float) green, (float) blue, (float) alpha);
-                renderer.addVertexWithUV(position[0] - pVector[0] * lineWidth, position[1] - pVector[1] * lineWidth, position[2] - pVector[2] * lineWidth, textureX, 0);
-                renderer.addVertexWithUV(position[0] + pVector[0] * lineWidth, position[1] + pVector[1] * lineWidth, position[2] + pVector[2] * lineWidth, textureX, 1);
+                renderer.color((float) red, (float) green, (float) blue, (float) alpha);
+                renderer.pos(position[0] - pVector[0] * lineWidth, position[1] - pVector[1] * lineWidth, position[2] - pVector[2] * lineWidth).tex(textureX, 0).endVertex();
+                renderer.pos(position[0] + pVector[0] * lineWidth, position[1] + pVector[1] * lineWidth, position[2] + pVector[2] * lineWidth).tex(textureX, 1).endVertex();
                 Tessellator.getInstance().draw();
             }
 
             if (!isVeryLast)
             {
-                renderer.startDrawingQuads();
-                renderer.setColorRGBA_F((float) red, (float) green, (float) blue, (float) alpha);
-                renderer.addVertexWithUV(position[0] + pVector[0] * lineWidth, position[1] + pVector[1] * lineWidth, position[2] + pVector[2] * lineWidth, textureX, 1);
-                renderer.addVertexWithUV(position[0] - pVector[0] * lineWidth, position[1] - pVector[1] * lineWidth, position[2] - pVector[2] * lineWidth, textureX, 0);
+                renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+                renderer.color((float) red, (float) green, (float) blue, (float) alpha);
+                renderer.pos(position[0] + pVector[0] * lineWidth, position[1] + pVector[1] * lineWidth, position[2] + pVector[2] * lineWidth).tex(textureX, 1).endVertex();
+                renderer.pos(position[0] - pVector[0] * lineWidth, position[1] - pVector[1] * lineWidth, position[2] - pVector[2] * lineWidth).tex(textureX, 0).endVertex();
             }
         }
 

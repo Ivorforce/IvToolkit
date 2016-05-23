@@ -32,6 +32,7 @@ import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector4f;
 
@@ -134,7 +135,7 @@ public class ModelRenderer
                 boneWeightAttributes.add(attribute);
         }
 
-        renderer.startDrawing(meshPart.primitiveType);
+        renderer.begin(meshPart.primitiveType, DefaultVertexFormats.POSITION_TEX_COLOR);
         for (int i = meshPart.indexOffset; i < meshPart.numVertices + meshPart.indexOffset; i++)
         {
             int vertexIndex = indexBuf.get(i) * vertexLengthInFloats;
@@ -144,11 +145,11 @@ public class ModelRenderer
                 if (textureCoordAttr != null)
                 {
                     int textureIndex = vertexIndex + (textureCoordAttr.offset >> 2);
-                    renderer.setTextureUV(MathUtils.mix(texture.minU(), texture.maxU(), vertexBuf.get(textureIndex)),
+                    renderer.tex(MathUtils.mix(texture.minU(), texture.maxU(), vertexBuf.get(textureIndex)),
                             MathUtils.mix(texture.minV(), texture.maxV(), vertexBuf.get(textureIndex + 1)));
                 }
                 else if (uvs != null)
-                    renderer.setTextureUV(uvs[i * 2], uvs[i * 2 + 1]);
+                    renderer.tex(uvs[i * 2], uvs[i * 2 + 1]);
             }
 
             int posIndex = vertexIndex + (posAttr.offset >> 2);
@@ -161,10 +162,10 @@ public class ModelRenderer
                 buildMatrix(TEMP_MATRIX, boneWeightAttributes, vertexBuf, vertexIndex, bones);
                 TEMP_VEC.set(vertexX, vertexY, vertexZ, 1.0f);
                 Matrix4f.transform(TEMP_MATRIX, TEMP_VEC, TEMP_VEC);
-                renderer.addVertex(TEMP_VEC.x, TEMP_VEC.y, TEMP_VEC.z);
+                renderer.pos(TEMP_VEC.x, TEMP_VEC.y, TEMP_VEC.z).endVertex();
             }
             else
-                renderer.addVertex(vertexX, vertexY, vertexZ);
+                renderer.pos(vertexX, vertexY, vertexZ).endVertex();
         }
         Tessellator.getInstance().draw();
 

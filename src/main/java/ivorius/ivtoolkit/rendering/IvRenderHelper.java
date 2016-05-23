@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Random;
@@ -39,17 +40,21 @@ public class IvRenderHelper
     {
         WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
 
-        renderer.startDrawingQuads();
-        renderer.addVertexWithUV(0.0, 0.0, 0.0, 0.0, 1.0);
-        renderer.addVertexWithUV(0.0, screenHeight, 0.0, 0.0, 0.0);
-        renderer.addVertexWithUV(screenWidth, screenHeight, 0.0, 1.0, 0.0);
-        renderer.addVertexWithUV(screenWidth, 0.0, 0.0, 1.0, 1.0);
+        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+        renderer.pos(0.0, 0.0, 0.0).tex(0.0, 1.0);
+        renderer.pos(0.0, screenHeight, 0.0).tex(0.0, 0.0);
+        renderer.pos(screenWidth, screenHeight, 0.0).tex(1.0, 0.0);
+        renderer.pos(screenWidth, 0.0, 0.0).tex(1.0, 1.0);
         Tessellator.getInstance().draw();
     }
 
     public static void renderLights(float ticks, int color, float alpha, int number)
     {
         float width = 2.5f;
+
+        float r = (float)(color >> 16 & 255) / 255.0F;
+        float g = (float)(color >> 8 & 255) / 255.0F;
+        float b = (float)(color & 255) / 255.0F;
 
         WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
 
@@ -85,16 +90,16 @@ public class IvRenderHelper
                 GlStateManager.rotate(random.nextFloat() * 360.0F, 1.0F, 0.0F, 0.0F);
                 GlStateManager.rotate(random.nextFloat() * 360.0F, 0.0F, 1.0F, 0.0F);
                 GlStateManager.rotate(random.nextFloat() * 360.0F + usedTicks * 90.0F, 0.0F, 0.0F, 1.0F);
-                renderer.startDrawing(6);
+                renderer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_TEX_COLOR);
                 float var8 = random.nextFloat() * 20.0F + 5.0F;
                 float var9 = random.nextFloat() * 2.0F + 1.0F;
-                renderer.setColorRGBA_I(color, (int) (255.0F * alpha * lightAlpha));
-                renderer.addVertex(0.0D, 0.0D, 0.0D);
-                renderer.setColorRGBA_I(color, 0);
-                renderer.addVertex(-width * (double) var9, var8, (-0.5F * var9));
-                renderer.addVertex(width * (double) var9, var8, (-0.5F * var9));
-                renderer.addVertex(0.0D, var8, (1.0F * var9));
-                renderer.addVertex(-width * (double) var9, var8, (-0.5F * var9));
+                renderer.color(r, g, b, alpha * lightAlpha);
+                renderer.pos(0.0D, 0.0D, 0.0D).endVertex();
+                renderer.color(r, g, b, 0);
+                renderer.pos(-width * (double) var9, var8, (-0.5F * var9)).endVertex();
+                renderer.pos(width * (double) var9, var8, (-0.5F * var9)).endVertex();
+                renderer.pos(0.0D, var8, (1.0F * var9)).endVertex();
+                renderer.pos(-width * (double) var9, var8, (-0.5F * var9)).endVertex();
                 Tessellator.getInstance().draw();
             }
         }
@@ -129,11 +134,11 @@ public class IvRenderHelper
         float f11 = 0.0f;
         float f12 = 0.0f;
         float f13 = 0.0f;
-        renderer.startDrawingQuads();
-        renderer.addVertexWithUV((double) (f11 - f1 * f10 - f3 * f10), (double) (f12 - f5 * f10), (double) (f13 - f2 * f10 - f4 * f10), (double) f7, (double) f9);
-        renderer.addVertexWithUV((double) (f11 - f1 * f10 + f3 * f10), (double) (f12 + f5 * f10), (double) (f13 - f2 * f10 + f4 * f10), (double) f7, (double) f8);
-        renderer.addVertexWithUV((double) (f11 + f1 * f10 + f3 * f10), (double) (f12 + f5 * f10), (double) (f13 + f2 * f10 + f4 * f10), (double) f6, (double) f8);
-        renderer.addVertexWithUV((double) (f11 + f1 * f10 - f3 * f10), (double) (f12 - f5 * f10), (double) (f13 + f2 * f10 - f4 * f10), (double) f6, (double) f9);
+        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+        renderer.pos((double) (f11 - f1 * f10 - f3 * f10), (double) (f12 - f5 * f10), (double) (f13 - f2 * f10 - f4 * f10)).tex((double) f7, (double) f9).endVertex();
+        renderer.pos((double) (f11 - f1 * f10 + f3 * f10), (double) (f12 + f5 * f10), (double) (f13 - f2 * f10 + f4 * f10)).tex((double) f7, (double) f8).endVertex();
+        renderer.pos((double) (f11 + f1 * f10 + f3 * f10), (double) (f12 + f5 * f10), (double) (f13 + f2 * f10 + f4 * f10)).tex((double) f6, (double) f8).endVertex();
+        renderer.pos((double) (f11 + f1 * f10 - f3 * f10), (double) (f12 - f5 * f10), (double) (f13 + f2 * f10 - f4 * f10)).tex((double) f6, (double) f9).endVertex();
         Tessellator.getInstance().draw();
     }
 
@@ -141,17 +146,17 @@ public class IvRenderHelper
     {
         if (lined)
         {
-            tessellator.startDrawing(GL11.GL_LINE_STRIP);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
         }
         else
         {
-            tessellator.startDrawingQuads();
+            tessellator.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
         }
 
-        tessellator.addVertex(-size * in, -size * in, -size);
-        tessellator.addVertex(size * in, -size * in, -size);
-        tessellator.addVertex(size * in, size * in, -size);
-        tessellator.addVertex(-size * in, size * in, -size);
+        tessellator.pos(-size * in, -size * in, -size).endVertex();
+        tessellator.pos(size * in, -size * in, -size).endVertex();
+        tessellator.pos(size * in, size * in, -size).endVertex();
+        tessellator.pos(-size * in, size * in, -size).endVertex();
         if (lined)
         {
             Tessellator.getInstance().draw();
@@ -159,12 +164,12 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.startDrawing(GL11.GL_LINE_STRIP);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
         }
-        tessellator.addVertex(-size * in, -size * in, size);
-        tessellator.addVertex(-size * in, size * in, size);
-        tessellator.addVertex(size * in, size * in, size);
-        tessellator.addVertex(size * in, -size * in, size);
+        tessellator.pos(-size * in, -size * in, size).endVertex();
+        tessellator.pos(-size * in, size * in, size).endVertex();
+        tessellator.pos(size * in, size * in, size).endVertex();
+        tessellator.pos(size * in, -size * in, size).endVertex();
         if (lined)
         {
             Tessellator.getInstance().draw();
@@ -172,12 +177,12 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.startDrawing(GL11.GL_LINE_STRIP);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
         }
-        tessellator.addVertex(-size, -size * in, -size * in);
-        tessellator.addVertex(-size, size * in, -size * in);
-        tessellator.addVertex(-size, size * in, size * in);
-        tessellator.addVertex(-size, -size * in, size * in);
+        tessellator.pos(-size, -size * in, -size * in).endVertex();
+        tessellator.pos(-size, size * in, -size * in).endVertex();
+        tessellator.pos(-size, size * in, size * in).endVertex();
+        tessellator.pos(-size, -size * in, size * in).endVertex();
         if (lined)
         {
             Tessellator.getInstance().draw();
@@ -185,12 +190,12 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.startDrawing(GL11.GL_LINE_STRIP);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
         }
-        tessellator.addVertex(size, -size * in, -size * in);
-        tessellator.addVertex(size, -size * in, size * in);
-        tessellator.addVertex(size, size * in, size * in);
-        tessellator.addVertex(size, size * in, -size * in);
+        tessellator.pos(size, -size * in, -size * in).endVertex();
+        tessellator.pos(size, -size * in, size * in).endVertex();
+        tessellator.pos(size, size * in, size * in).endVertex();
+        tessellator.pos(size, size * in, -size * in).endVertex();
         if (lined)
         {
             Tessellator.getInstance().draw();
@@ -198,12 +203,12 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.startDrawing(GL11.GL_LINE_STRIP);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
         }
-        tessellator.addVertex(-size * in, size, -size * in);
-        tessellator.addVertex(size * in, size, -size * in);
-        tessellator.addVertex(size * in, size, size * in);
-        tessellator.addVertex(-size * in, size, size * in);
+        tessellator.pos(-size * in, size, -size * in).endVertex();
+        tessellator.pos(size * in, size, -size * in).endVertex();
+        tessellator.pos(size * in, size, size * in).endVertex();
+        tessellator.pos(-size * in, size, size * in).endVertex();
         if (lined)
         {
             Tessellator.getInstance().draw();
@@ -211,12 +216,12 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.startDrawing(GL11.GL_LINE_STRIP);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
         }
-        tessellator.addVertex(-size * in, -size, -size * in);
-        tessellator.addVertex(-size * in, -size, size * in);
-        tessellator.addVertex(size * in, -size, size * in);
-        tessellator.addVertex(size * in, -size, -size * in);
+        tessellator.pos(-size * in, -size, -size * in).endVertex();
+        tessellator.pos(-size * in, -size, size * in).endVertex();
+        tessellator.pos(size * in, -size, size * in).endVertex();
+        tessellator.pos(size * in, -size, -size * in).endVertex();
 
         Tessellator.getInstance().draw();
     }
@@ -225,17 +230,17 @@ public class IvRenderHelper
     {
         if (lined)
         {
-            tessellator.startDrawing(GL11.GL_LINE_STRIP);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
         }
         else
         {
-            tessellator.startDrawingQuads();
+            tessellator.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
         }
 
-        tessellator.addVertex(-sizeX * in, -sizeY * in, -sizeZ);
-        tessellator.addVertex(-sizeX * in, sizeY * in, -sizeZ);
-        tessellator.addVertex(sizeX * in, sizeY * in, -sizeZ);
-        tessellator.addVertex(sizeX * in, -sizeY * in, -sizeZ);
+        tessellator.pos(-sizeX * in, -sizeY * in, -sizeZ).endVertex();
+        tessellator.pos(-sizeX * in, sizeY * in, -sizeZ).endVertex();
+        tessellator.pos(sizeX * in, sizeY * in, -sizeZ).endVertex();
+        tessellator.pos(sizeX * in, -sizeY * in, -sizeZ).endVertex();
         if (lined)
         {
             Tessellator.getInstance().draw();
@@ -243,12 +248,12 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.startDrawing(GL11.GL_LINE_STRIP);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
         }
-        tessellator.addVertex(-sizeX * in, -sizeY * in, sizeZ);
-        tessellator.addVertex(sizeX * in, -sizeY * in, sizeZ);
-        tessellator.addVertex(sizeX * in, sizeY * in, sizeZ);
-        tessellator.addVertex(-sizeX * in, sizeY * in, sizeZ);
+        tessellator.pos(-sizeX * in, -sizeY * in, sizeZ).endVertex();
+        tessellator.pos(sizeX * in, -sizeY * in, sizeZ).endVertex();
+        tessellator.pos(sizeX * in, sizeY * in, sizeZ).endVertex();
+        tessellator.pos(-sizeX * in, sizeY * in, sizeZ).endVertex();
         if (lined)
         {
             Tessellator.getInstance().draw();
@@ -256,12 +261,12 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.startDrawing(GL11.GL_LINE_STRIP);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
         }
-        tessellator.addVertex(-sizeX, -sizeY * in, -sizeZ * in);
-        tessellator.addVertex(-sizeX, -sizeY * in, sizeZ * in);
-        tessellator.addVertex(-sizeX, sizeY * in, sizeZ * in);
-        tessellator.addVertex(-sizeX, sizeY * in, -sizeZ * in);
+        tessellator.pos(-sizeX, -sizeY * in, -sizeZ * in).endVertex();
+        tessellator.pos(-sizeX, -sizeY * in, sizeZ * in).endVertex();
+        tessellator.pos(-sizeX, sizeY * in, sizeZ * in).endVertex();
+        tessellator.pos(-sizeX, sizeY * in, -sizeZ * in).endVertex();
         if (lined)
         {
             Tessellator.getInstance().draw();
@@ -269,12 +274,12 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.startDrawing(GL11.GL_LINE_STRIP);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
         }
-        tessellator.addVertex(sizeX, -sizeY * in, -sizeZ * in);
-        tessellator.addVertex(sizeX, sizeY * in, -sizeZ * in);
-        tessellator.addVertex(sizeX, sizeY * in, sizeZ * in);
-        tessellator.addVertex(sizeX, -sizeY * in, sizeZ * in);
+        tessellator.pos(sizeX, -sizeY * in, -sizeZ * in).endVertex();
+        tessellator.pos(sizeX, sizeY * in, -sizeZ * in).endVertex();
+        tessellator.pos(sizeX, sizeY * in, sizeZ * in).endVertex();
+        tessellator.pos(sizeX, -sizeY * in, sizeZ * in).endVertex();
         if (lined)
         {
             Tessellator.getInstance().draw();
@@ -282,12 +287,12 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.startDrawing(GL11.GL_LINE_STRIP);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
         }
-        tessellator.addVertex(-sizeX * in, sizeY, -sizeZ * in);
-        tessellator.addVertex(-sizeX * in, sizeY, sizeZ * in);
-        tessellator.addVertex(sizeX * in, sizeY, sizeZ * in);
-        tessellator.addVertex(sizeX * in, sizeY, -sizeZ * in);
+        tessellator.pos(-sizeX * in, sizeY, -sizeZ * in).endVertex();
+        tessellator.pos(-sizeX * in, sizeY, sizeZ * in).endVertex();
+        tessellator.pos(sizeX * in, sizeY, sizeZ * in).endVertex();
+        tessellator.pos(sizeX * in, sizeY, -sizeZ * in).endVertex();
         if (lined)
         {
             Tessellator.getInstance().draw();
@@ -295,47 +300,47 @@ public class IvRenderHelper
 
         if (lined)
         {
-            tessellator.startDrawing(GL11.GL_LINE_STRIP);
+            tessellator.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
         }
-        tessellator.addVertex(-sizeX * in, -sizeY, -sizeZ * in);
-        tessellator.addVertex(sizeX * in, -sizeY, -sizeZ * in);
-        tessellator.addVertex(sizeX * in, -sizeY, sizeZ * in);
-        tessellator.addVertex(-sizeX * in, -sizeY, sizeZ * in);
+        tessellator.pos(-sizeX * in, -sizeY, -sizeZ * in).endVertex();
+        tessellator.pos(sizeX * in, -sizeY, -sizeZ * in).endVertex();
+        tessellator.pos(sizeX * in, -sizeY, sizeZ * in).endVertex();
+        tessellator.pos(-sizeX * in, -sizeY, sizeZ * in).endVertex();
 
         Tessellator.getInstance().draw();
     }
 
     public static void renderCuboid(WorldRenderer tessellator, float sizeX, float sizeY, float sizeZ, float in)
     {
-        tessellator.addVertex(-sizeX * in, -sizeY * in, -sizeZ);
-        tessellator.addVertex(-sizeX * in, sizeY * in, -sizeZ);
-        tessellator.addVertex(sizeX * in, sizeY * in, -sizeZ);
-        tessellator.addVertex(sizeX * in, -sizeY * in, -sizeZ);
+        tessellator.pos(-sizeX * in, -sizeY * in, -sizeZ).endVertex();
+        tessellator.pos(-sizeX * in, sizeY * in, -sizeZ).endVertex();
+        tessellator.pos(sizeX * in, sizeY * in, -sizeZ).endVertex();
+        tessellator.pos(sizeX * in, -sizeY * in, -sizeZ).endVertex();
 
-        tessellator.addVertex(-sizeX * in, -sizeY * in, sizeZ);
-        tessellator.addVertex(sizeX * in, -sizeY * in, sizeZ);
-        tessellator.addVertex(sizeX * in, sizeY * in, sizeZ);
-        tessellator.addVertex(-sizeX * in, sizeY * in, sizeZ);
+        tessellator.pos(-sizeX * in, -sizeY * in, sizeZ).endVertex();
+        tessellator.pos(sizeX * in, -sizeY * in, sizeZ).endVertex();
+        tessellator.pos(sizeX * in, sizeY * in, sizeZ).endVertex();
+        tessellator.pos(-sizeX * in, sizeY * in, sizeZ).endVertex();
 
-        tessellator.addVertex(-sizeX, -sizeY * in, -sizeZ * in);
-        tessellator.addVertex(-sizeX, -sizeY * in, sizeZ * in);
-        tessellator.addVertex(-sizeX, sizeY * in, sizeZ * in);
-        tessellator.addVertex(-sizeX, sizeY * in, -sizeZ * in);
+        tessellator.pos(-sizeX, -sizeY * in, -sizeZ * in).endVertex();
+        tessellator.pos(-sizeX, -sizeY * in, sizeZ * in).endVertex();
+        tessellator.pos(-sizeX, sizeY * in, sizeZ * in).endVertex();
+        tessellator.pos(-sizeX, sizeY * in, -sizeZ * in).endVertex();
 
-        tessellator.addVertex(sizeX, -sizeY * in, -sizeZ * in);
-        tessellator.addVertex(sizeX, sizeY * in, -sizeZ * in);
-        tessellator.addVertex(sizeX, sizeY * in, sizeZ * in);
-        tessellator.addVertex(sizeX, -sizeY * in, sizeZ * in);
+        tessellator.pos(sizeX, -sizeY * in, -sizeZ * in).endVertex();
+        tessellator.pos(sizeX, sizeY * in, -sizeZ * in).endVertex();
+        tessellator.pos(sizeX, sizeY * in, sizeZ * in).endVertex();
+        tessellator.pos(sizeX, -sizeY * in, sizeZ * in).endVertex();
 
-        tessellator.addVertex(-sizeX * in, sizeY, -sizeZ * in);
-        tessellator.addVertex(-sizeX * in, sizeY, sizeZ * in);
-        tessellator.addVertex(sizeX * in, sizeY, sizeZ * in);
-        tessellator.addVertex(sizeX * in, sizeY, -sizeZ * in);
+        tessellator.pos(-sizeX * in, sizeY, -sizeZ * in).endVertex();
+        tessellator.pos(-sizeX * in, sizeY, sizeZ * in).endVertex();
+        tessellator.pos(sizeX * in, sizeY, sizeZ * in).endVertex();
+        tessellator.pos(sizeX * in, sizeY, -sizeZ * in).endVertex();
 
-        tessellator.addVertex(-sizeX * in, -sizeY, -sizeZ * in);
-        tessellator.addVertex(sizeX * in, -sizeY, -sizeZ * in);
-        tessellator.addVertex(sizeX * in, -sizeY, sizeZ * in);
-        tessellator.addVertex(-sizeX * in, -sizeY, sizeZ * in);
+        tessellator.pos(-sizeX * in, -sizeY, -sizeZ * in).endVertex();
+        tessellator.pos(sizeX * in, -sizeY, -sizeZ * in).endVertex();
+        tessellator.pos(sizeX * in, -sizeY, sizeZ * in).endVertex();
+        tessellator.pos(-sizeX * in, -sizeY, sizeZ * in).endVertex();
     }
 
     public static void drawModelCuboid(WorldRenderer renderer, float x, float y, float z, float sizeX, float sizeY, float sizeZ)

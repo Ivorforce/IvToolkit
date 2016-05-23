@@ -64,54 +64,54 @@ public class CubeMesh
     public static void renderNorth(double x1, double y1, double x2, double y2, double z, Icon icon)
     {
         WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
-        renderer.addVertexWithUV(x1, y1, z, icon.getMinU(), icon.getMinV());
-        renderer.addVertexWithUV(x1, y2, z, icon.getMaxU(), icon.getMinV());
-        renderer.addVertexWithUV(x2, y2, z, icon.getMaxU(), icon.getMaxV());
-        renderer.addVertexWithUV(x2, y1, z, icon.getMinU(), icon.getMaxV());
+        renderer.pos(x1, y1, z).tex(icon.getMinU(), icon.getMinV()).endVertex();
+        renderer.pos(x1, y2, z).tex(icon.getMaxU(), icon.getMinV()).endVertex();
+        renderer.pos(x2, y2, z).tex(icon.getMaxU(), icon.getMaxV()).endVertex();
+        renderer.pos(x2, y1, z).tex(icon.getMinU(), icon.getMaxV()).endVertex();
     }
 
     public static void renderEast(double z1, double y1, double z2, double y2, double x, Icon icon)
     {
         WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
-        renderer.addVertexWithUV(x, y1, z1, icon.getMinU(), icon.getMinV());
-        renderer.addVertexWithUV(x, y2, z1, icon.getMinU(), icon.getMaxV());
-        renderer.addVertexWithUV(x, y2, z2, icon.getMaxU(), icon.getMaxV());
-        renderer.addVertexWithUV(x, y1, z2, icon.getMaxU(), icon.getMinV());
+        renderer.pos(x, y1, z1).tex(icon.getMinU(), icon.getMinV()).endVertex();
+        renderer.pos(x, y2, z1).tex(icon.getMinU(), icon.getMaxV()).endVertex();
+        renderer.pos(x, y2, z2).tex(icon.getMaxU(), icon.getMaxV()).endVertex();
+        renderer.pos(x, y1, z2).tex(icon.getMaxU(), icon.getMinV()).endVertex();
     }
 
     public static void renderSouth(double x1, double y1, double x2, double y2, double z, Icon icon)
     {
         WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
-        renderer.addVertexWithUV(x1, y1, z, icon.getMinU(), icon.getMinV());
-        renderer.addVertexWithUV(x2, y1, z, icon.getMinU(), icon.getMaxV());
-        renderer.addVertexWithUV(x2, y2, z, icon.getMaxU(), icon.getMaxV());
-        renderer.addVertexWithUV(x1, y2, z, icon.getMaxU(), icon.getMinV());
+        renderer.pos(x1, y1, z).tex(icon.getMinU(), icon.getMinV()).endVertex();
+        renderer.pos(x2, y1, z).tex(icon.getMinU(), icon.getMaxV()).endVertex();
+        renderer.pos(x2, y2, z).tex(icon.getMaxU(), icon.getMaxV()).endVertex();
+        renderer.pos(x1, y2, z).tex(icon.getMaxU(), icon.getMinV()).endVertex();
     }
 
     public static void renderWest(double z1, double y1, double z2, double y2, double x, Icon icon)
     {
         WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
-        renderer.addVertexWithUV(x, y1, z1, icon.getMinU(), icon.getMinV());
-        renderer.addVertexWithUV(x, y1, z2, icon.getMaxU(), icon.getMinV());
-        renderer.addVertexWithUV(x, y2, z2, icon.getMaxU(), icon.getMaxV());
-        renderer.addVertexWithUV(x, y2, z1, icon.getMinU(), icon.getMaxV());
+        renderer.pos(x, y1, z1).tex(icon.getMinU(), icon.getMinV()).endVertex();
+        renderer.pos(x, y1, z2).tex(icon.getMaxU(), icon.getMinV()).endVertex();
+        renderer.pos(x, y2, z2).tex(icon.getMaxU(), icon.getMaxV()).endVertex();
+        renderer.pos(x, y2, z1).tex(icon.getMinU(), icon.getMaxV()).endVertex();
     }
 
     public static void renderUp(double x1, double z1, double x2, double z2, double y, Icon icon)
     {
         WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
-        renderer.addVertexWithUV(x1, y, z1, icon.getMinU(), icon.getMinV());
-        renderer.addVertexWithUV(x1, y, z2, icon.getMinU(), icon.getMaxV());
-        renderer.addVertexWithUV(x2, y, z2, icon.getMaxU(), icon.getMaxV());
-        renderer.addVertexWithUV(x2, y, z1, icon.getMaxU(), icon.getMinV());
+        renderer.pos(x1, y, z1).tex(icon.getMinU(), icon.getMinV()).endVertex();
+        renderer.pos(x1, y, z2).tex(icon.getMinU(), icon.getMaxV()).endVertex();
+        renderer.pos(x2, y, z2).tex(icon.getMaxU(), icon.getMaxV()).endVertex();
+        renderer.pos(x2, y, z1).tex(icon.getMaxU(), icon.getMinV()).endVertex();
     }
 
     public static void renderDown(double x1, double z1, double x2, double z2, double y, Icon icon)
     {
         WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
-        renderer.addVertexWithUV(x1, y, z1, icon.getMinU(), icon.getMinV());
-        renderer.addVertexWithUV(x2, y, z1, icon.getMaxU(), icon.getMinV());
-        renderer.addVertexWithUV(x2, y, z2, icon.getMaxU(), icon.getMaxV());
-        renderer.addVertexWithUV(x1, y, z2, icon.getMinU(), icon.getMaxV());
+        renderer.pos(x1, y, z1).tex(icon.getMinU(), icon.getMinV()).endVertex();
+        renderer.pos(x2, y, z1).tex(icon.getMaxU(), icon.getMinV()).endVertex();
+        renderer.pos(x2, y, z2).tex(icon.getMaxU(), icon.getMaxV()).endVertex();
+        renderer.pos(x1, y, z2).tex(icon.getMinU(), icon.getMaxV()).endVertex();
     }
 }
