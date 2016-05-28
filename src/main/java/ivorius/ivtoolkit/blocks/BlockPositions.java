@@ -18,6 +18,7 @@ package ivorius.ivtoolkit.blocks;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 
 import java.util.Collection;
@@ -163,5 +164,10 @@ public final class BlockPositions
     public static BlockPos sub(BlockPos pos, BlockPos sub)
     {
         return new BlockPos(pos.getX() - sub.getX(), pos.getY() - sub.getY(), pos.getZ() - sub.getZ());
+    }
+
+    public static AxisAlignedBB expandToAABB(BlockPos pos, double x, double y, double z)
+    {
+        return AxisAlignedBB.fromBounds(pos.getX() - x, pos.getY() - y, pos.getZ() - z, pos.getX() + x + 1, pos.getY() + y + 1, pos.getZ() + z + 1);
     }
 }
