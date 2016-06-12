@@ -103,7 +103,7 @@ public class IvWorldData
         return new IvWorldData(blockCollection, tileEntities, entities);
     }
 
-    public IvWorldData(NBTTagCompound compound, World world, MCRegistry registry)
+    public IvWorldData(NBTTagCompound compound, MCRegistry registry)
     {
         compound = (NBTTagCompound) compound.copy(); // Copy since ID fix tags are being removed when being applied
 
@@ -118,16 +118,13 @@ public class IvWorldData
             tileEntities.add(teCompound);
         }
 
-        if (world != null)
+        NBTTagList entityList = compound.getTagList("entities", Constants.NBT.TAG_COMPOUND);
+        entities = new ArrayList<>(entityList.tagCount());
+        for (int i = 0; i < entityList.tagCount(); i++)
         {
-            NBTTagList entityList = compound.getTagList("entities", Constants.NBT.TAG_COMPOUND);
-            entities = new ArrayList<>(entityList.tagCount());
-            for (int i = 0; i < entityList.tagCount(); i++)
-            {
-                NBTTagCompound entityCompound = entityList.getCompoundTagAt(i);
-                recursivelyApplyIDFixTags(entityCompound, registry);
-                entities.add(entityCompound);
-            }
+            NBTTagCompound entityCompound = entityList.getCompoundTagAt(i);
+            recursivelyApplyIDFixTags(entityCompound, registry);
+            entities.add(entityCompound);
         }
     }
 
