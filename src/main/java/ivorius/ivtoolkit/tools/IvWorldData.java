@@ -38,6 +38,7 @@ import net.minecraftforge.common.util.Constants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by lukas on 24.05.14.
@@ -47,22 +48,25 @@ public class IvWorldData
     public static final String ID_FIX_TAG_KEY = "SG_ID_FIX_TAG";
 
     public IvBlockCollection blockCollection;
-    public List<TileEntity> tileEntities;
-    public List<Entity> entities;
+    public List<NBTTagCompound> tileEntities;
+    public List<NBTTagCompound> entities;
 
-    public IvWorldData(IvBlockCollection blockCollection, List<TileEntity> tileEntities, List<Entity> entities)
+    public IvWorldData(IvBlockCollection blockCollection, List<NBTTagCompound> tileEntities, List<NBTTagCompound> entities)
     {
         this.blockCollection = blockCollection;
         this.tileEntities = tileEntities;
         this.entities = entities;
     }
 
-    public IvWorldData(World world, BlockArea blockArea, boolean captureEntities)
+    public static IvWorldData capture(World world, BlockArea blockArea, boolean captureEntities)
     {
-        int[] size = blockArea.areaSize();
-        blockCollection = new IvBlockCollection(size[0], size[1], size[2]);
+        BlockPos referenceCoord = blockArea.getLowerCorner();
+        BlockPos invertedReference = BlockPositions.invert(referenceCoord);
 
-        tileEntities = new ArrayList<>();
+        int[] size = blockArea.areaSize();
+        IvBlockCollection blockCollection = new IvBlockCollection(size[0], size[1], size[2]);
+
+        List<NBTTagCompound> tileEntities = new ArrayList<>();
         for (BlockPos worldCoord : blockArea)
         {
             BlockPos dataCoord = worldCoord.subtract(blockArea.getLowerCorner());
@@ -71,12 +75,32 @@ public class IvWorldData
 
             TileEntity tileEntity = world.getTileEntity(worldCoord);
             if (tileEntity != null)
-                tileEntities.add(tileEntity);
+            {
+                Mover.moveTileEntity(tileEntity, invertedReference);
+
+                NBTTagCompound teCompound = NBTCompoundObjectsMC.write(tileEntity);
+                recursivelyInjectIDFixTags(teCompound);
+                tileEntities.add(teCompound);
+
+                Mover.moveTileEntity(tileEntity, referenceCoord);
+            }
         }
 
-        entities = captureEntities
-                ? world.getEntitiesInAABBexcluding(null, blockArea.asAxisAlignedBB(), saveableEntityPredicate())
+        List<NBTTagCompound> entities = captureEntities
+                ? world.getEntitiesInAABBexcluding(null, blockArea.asAxisAlignedBB(), saveableEntityPredicate()).stream()
+                .map(entity -> {
+                    Mover.moveEntity(entity, invertedReference);
+
+                    NBTTagCompound entityCompound = NBTCompoundObjectsMC.write(entity);
+                    recursivelyInjectIDFixTags(entityCompound);
+
+                    Mover.moveEntity(entity, referenceCoord);
+
+                    return entityCompound;
+                }).collect(Collectors.toList())
                 : Collections.emptyList();
+
+        return new IvWorldData(blockCollection, tileEntities, entities);
     }
 
     public IvWorldData(NBTTagCompound compound, World world, MCRegistry registry)
@@ -91,10 +115,7 @@ public class IvWorldData
         {
             NBTTagCompound teCompound = teList.getCompoundTagAt(i);
             recursivelyApplyIDFixTags(teCompound, registry);
-            TileEntity tileEntity = registry.loadTileEntity(teCompound);
-
-            if (tileEntity != null)
-                tileEntities.add(tileEntity);
+            tileEntities.add(teCompound);
         }
 
         if (world != null)
@@ -105,10 +126,7 @@ public class IvWorldData
             {
                 NBTTagCompound entityCompound = entityList.getCompoundTagAt(i);
                 recursivelyApplyIDFixTags(entityCompound, registry);
-                Entity entity = EntityList.createEntityFromNBT(entityCompound, world);
-
-                if (entity != null)
-                    entities.add(entity);
+                entities.add(entityCompound);
             }
         }
     }
@@ -302,36 +320,9 @@ public class IvWorldData
         NBTTagCompound compound = new NBTTagCompound();
 
         compound.setTag("blockCollection", blockCollection.createTagCompound());
-
-        NBTTagList teList = new NBTTagList();
-        for (TileEntity tileEntity : tileEntities)
-        {
-            NBTTagCompound teCompound = new NBTTagCompound();
-
-            Mover.moveTileEntity(tileEntity, invertedReference);
-            tileEntity.writeToNBT(teCompound);
-            Mover.moveTileEntity(tileEntity, referenceCoord);
-
-            recursivelyInjectIDFixTags(teCompound);
-            teList.appendTag(teCompound);
-        }
-        compound.setTag("tileEntities", teList);
-
-        NBTTagList entityList = new NBTTagList();
-        for (Entity entity : entities)
-        {
-            NBTTagCompound entityCompound = new NBTTagCompound();
-
-            Mover.moveEntity(entity, invertedReference);
-            entity.writeToNBTOptional(entityCompound);
-            Mover.moveEntity(entity, referenceCoord);
-
-            recursivelyInjectIDFixTags(entityCompound);
-            entityList.appendTag(entityCompound);
-        }
-        compound.setTag("entities", entityList);
+        compound.setTag("tileEntities", NBTTagLists.write(tileEntities));
+        compound.setTag("entities", NBTTagLists.write(tileEntities));
 
         return compound;
-
     }
 }

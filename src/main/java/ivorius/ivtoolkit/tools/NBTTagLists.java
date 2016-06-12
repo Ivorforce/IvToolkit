@@ -106,12 +106,12 @@ public class NBTTagLists
         return list.build();
     }
 
-    public static void writeTo(NBTTagCompound compound, String key, List<NBTTagList> lists)
+    public static void writeTo(NBTTagCompound compound, String key, List<? extends NBTBase> lists)
     {
         compound.setTag(key, write(lists));
     }
 
-    public static NBTTagList write(List<NBTTagList> lists)
+    public static NBTTagList write(List<? extends NBTBase> lists)
     {
         NBTTagList list = new NBTTagList();
         lists.forEach(list::appendTag);
