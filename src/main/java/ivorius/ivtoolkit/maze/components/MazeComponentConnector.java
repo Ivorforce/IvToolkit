@@ -33,50 +33,6 @@ public class MazeComponentConnector
 {
     public static int INFINITE_REVERSES = -1;
 
-    @Deprecated
-    public static <M extends WeightedMazeComponent<C>, C> List<ShiftedMazeComponent<M, C>> randomlyConnect(MorphingMazeComponent<C> morphingComponent, List<M> components,
-                                                                                                           ConnectionStrategy<C> connectionStrategy, final MazeComponentPlacementStrategy<M, C> placementStrategy, Random random)
-    {
-        return randomlyConnect(morphingComponent, components, connectionStrategy, new MazePredicate<M, C>()
-        {
-            @Override
-            public boolean canPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
-            {
-                return placementStrategy.canPlace(component);
-            }
-
-            @Override
-            public void willPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
-            {
-
-            }
-
-            @Override
-            public void didPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
-            {
-
-            }
-
-            @Override
-            public void willUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
-            {
-
-            }
-
-            @Override
-            public void didUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
-            {
-
-            }
-
-            @Override
-            public boolean isDirtyConnection(MazeRoom dest, MazeRoom source, C c)
-            {
-                return placementStrategy.shouldContinue(dest, source, c);
-            }
-        }, random, 0);
-    }
-
     public static <M extends WeightedMazeComponent<C>, C> List<ShiftedMazeComponent<M, C>> randomlyConnect(MorphingMazeComponent<C> maze, List<M> components,
                                                                                                            ConnectionStrategy<C> connectionStrategy, final MazePredicate<M, C> predicate, Random random, int reverses)
     {
@@ -128,7 +84,7 @@ public class MazeComponentConnector
                     components.stream().flatMap(MazeComponents.shiftAllFunction(exit, connection, connectionStrategy))
                             .collect(Collectors.toList())
             );
-            WeightedShuffler.shuffle(new Random(reversing.shuffleSeed), shuffled, shifted -> shifted.getComponent().getWeight());
+            WeightedShuffler.shuffle(new Random(reversing.shuffleSeed), shuffled, shifted -> shifted.getComponent().getWeight() * MazeComponents.connectWeight(maze, shifted, connectionStrategy));
 
             if (reversing.triedIndices > shuffled.size())
                 throw new RuntimeException("Maze component selection not static.");

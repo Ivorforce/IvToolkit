@@ -33,7 +33,7 @@ public class MazeComponents
     {
         return component -> component.exits().entrySet().stream().map(entry -> {
             MazeRoom dist = entry.getKey().inverseDistance(connection);
-            if (dist != null && strategy.connect(connection, connector, entry.getValue()))
+            if (dist != null && strategy.connect(connection, connector, entry.getValue()) >= 0f)
                 return shift(component, dist);
             return null;
         }).filter(Objects::nonNull);
@@ -65,6 +65,14 @@ public class MazeComponents
 
     public static <C> boolean allExitsCompatible(final MazeComponent<C> existing, final MazeComponent<C> add, final ConnectionStrategy<C> strategy)
     {
-        return add.exits().entrySet().stream().allMatch(input -> strategy.connect(input.getKey(), existing.exits().get(input.getKey().inverse()), input.getValue()));
+        return add.exits().entrySet().stream().allMatch(input -> strategy.connect(input.getKey(), existing.exits().get(input.getKey().inverse()), input.getValue()) >= 0f);
+    }
+
+    public static <C> float connectWeight(final MazeComponent<C> existing, final MazeComponent<C> add, final ConnectionStrategy<C> strategy)
+    {
+        return add.exits().entrySet().stream().reduce(0f,
+                (weight, input) -> strategy.connect(input.getKey(), existing.exits().get(input.getKey().inverse()), input.getValue()),
+                (w1, w2) -> w1 < 0 || w2 < 0 ? -1 : w1 * w2
+        );
     }
 }
