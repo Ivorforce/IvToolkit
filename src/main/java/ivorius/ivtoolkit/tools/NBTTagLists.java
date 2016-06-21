@@ -25,6 +25,8 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Created by lukas on 30.03.15.
@@ -78,13 +80,7 @@ public class NBTTagLists
 
     public static List<NBTBase> nbtBases(NBTTagList nbt)
     {
-        ImmutableList.Builder<NBTBase> list = new ImmutableList.Builder<>();
-        NBTTagList copy = (NBTTagList) nbt.copy(); // TODO Change to getTagListAt when available
-
-        while (copy.tagCount() > 0)
-            list.add(copy.removeTag(0));
-
-        return list.build();
+        return IntStream.range(0, nbt.tagCount()).mapToObj(nbt::get).collect(Collectors.toList());
     }
 
     public static List<NBTTagList> listsFrom(NBTTagCompound compound, String key)
@@ -97,13 +93,7 @@ public class NBTTagLists
         if (nbt.getTagType() != Constants.NBT.TAG_LIST)
             throw new IllegalArgumentException();
 
-        ImmutableList.Builder<NBTTagList> list = new ImmutableList.Builder<>();
-        NBTTagList copy = (NBTTagList) nbt.copy(); // TODO Change to getTagListAt when available
-
-        while (copy.tagCount() > 0)
-            list.add((NBTTagList) copy.removeTag(0));
-
-        return list.build();
+        return (List) IntStream.range(0, nbt.tagCount()).mapToObj(nbt::get).collect(Collectors.toList());
     }
 
     public static void writeTo(NBTTagCompound compound, String key, List<? extends NBTBase> lists)
