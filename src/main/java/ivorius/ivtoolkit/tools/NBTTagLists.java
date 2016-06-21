@@ -57,9 +57,6 @@ public class NBTTagLists
 
     public static List<NBTTagCompound> compounds(final NBTTagList nbt)
     {
-        if (nbt.getTagType() != Constants.NBT.TAG_COMPOUND)
-            throw new IllegalArgumentException();
-
         return IntStream.range(0, nbt.tagCount()).mapToObj(nbt::getCompoundTagAt).collect(Collectors.toList());
     }
 
@@ -82,9 +79,6 @@ public class NBTTagLists
 
     public static List<int[]> intArrays(final NBTTagList nbt)
     {
-        if (nbt.getTagType() != Constants.NBT.TAG_INT_ARRAY)
-            throw new IllegalArgumentException();
-
         return IntStream.range(0, nbt.tagCount()).mapToObj(nbt::getIntArrayAt).collect(Collectors.toList());
     }
 
@@ -107,9 +101,6 @@ public class NBTTagLists
 
     public static List<NBTTagList> lists(NBTTagList nbt)
     {
-        if (nbt.getTagType() != Constants.NBT.TAG_LIST)
-            throw new IllegalArgumentException();
-
-        return (List) IntStream.range(0, nbt.tagCount()).mapToObj(nbt::get).collect(Collectors.toList());
+        return (List) IntStream.range(0, nbt.tagCount()).mapToObj(i -> nbt.get(i).getId() == Constants.NBT.TAG_LIST ? nbt.get(i) : new NBTTagList()).collect(Collectors.toList());
     }
 }
