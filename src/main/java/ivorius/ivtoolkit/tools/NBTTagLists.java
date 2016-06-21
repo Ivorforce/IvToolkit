@@ -33,6 +33,11 @@ import java.util.stream.IntStream;
  */
 public class NBTTagLists
 {
+    public static List<NBTBase> nbtBases(NBTTagList nbt)
+    {
+        return IntStream.range(0, nbt.tagCount()).mapToObj(nbt::get).collect(Collectors.toList());
+    }
+
     public static List<NBTTagCompound> compoundsFrom(NBTTagCompound compound, String key)
     {
         return compounds(compound.getTagList(key, Constants.NBT.TAG_COMPOUND));
@@ -40,7 +45,7 @@ public class NBTTagLists
 
     public static List<NBTTagCompound> compounds(final NBTTagList list)
     {
-        return Lists.transform(Ranges.rangeList(0, list.tagCount()), input -> list.getCompoundTagAt(input));
+        return Lists.transform(Ranges.rangeList(0, list.tagCount()), list::getCompoundTagAt);
     }
 
     public static void writeCompoundsTo(NBTTagCompound compound, String key, List<NBTTagCompound> list)
@@ -62,7 +67,7 @@ public class NBTTagLists
 
     public static List<int[]> intArrays(final NBTTagList list)
     {
-        return Lists.transform(Ranges.rangeList(0, list.tagCount()), input -> list.getIntArrayAt(input));
+        return Lists.transform(Ranges.rangeList(0, list.tagCount()), list::getIntArrayAt);
     }
 
     public static void writeIntArraysTo(NBTTagCompound compound, String key, List<int[]> list)
@@ -76,11 +81,6 @@ public class NBTTagLists
         for (int[] array : list)
             tagList.appendTag(new NBTTagIntArray(array));
         return tagList;
-    }
-
-    public static List<NBTBase> nbtBases(NBTTagList nbt)
-    {
-        return IntStream.range(0, nbt.tagCount()).mapToObj(nbt::get).collect(Collectors.toList());
     }
 
     public static List<NBTTagList> listsFrom(NBTTagCompound compound, String key)

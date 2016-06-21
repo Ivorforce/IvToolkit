@@ -102,23 +102,11 @@ public class IvWorldData
 
         blockCollection = new IvBlockCollection(compound.getCompoundTag("blockCollection"), registry);
 
-        NBTTagList teList = compound.getTagList("tileEntities", Constants.NBT.TAG_COMPOUND);
-        tileEntities = new ArrayList<>(teList.tagCount());
-        for (int i = 0; i < teList.tagCount(); i++)
-        {
-            NBTTagCompound teCompound = teList.getCompoundTagAt(i);
-            NBTStateInjector.recursivelyApply(teCompound, registry, false);
-            tileEntities.add(teCompound);
-        }
+        tileEntities.addAll(NBTTagLists.compoundsFrom(compound, "tileEntities"));
+        tileEntities.forEach(teCompound -> NBTStateInjector.recursivelyApply(teCompound, registry, false));
 
-        NBTTagList entityList = compound.getTagList("entities", Constants.NBT.TAG_COMPOUND);
-        entities = new ArrayList<>(entityList.tagCount());
-        for (int i = 0; i < entityList.tagCount(); i++)
-        {
-            NBTTagCompound entityCompound = entityList.getCompoundTagAt(i);
-            NBTStateInjector.recursivelyApply(entityCompound, registry, false);
-            entities.add(entityCompound);
-        }
+        entities.addAll(NBTTagLists.compoundsFrom(compound, "entities"));
+        entities.forEach(entityCompound -> NBTStateInjector.recursivelyApply(entityCompound, registry, false));
     }
 
     public static Predicate<Entity> saveableEntityPredicate()
@@ -132,7 +120,7 @@ public class IvWorldData
 
         compound.setTag("blockCollection", blockCollection.createTagCompound());
         compound.setTag("tileEntities", NBTTagLists.write(tileEntities));
-        compound.setTag("entities", NBTTagLists.write(tileEntities));
+        compound.setTag("entities", NBTTagLists.write(entities));
 
         return compound;
     }
