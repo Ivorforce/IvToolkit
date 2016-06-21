@@ -17,10 +17,10 @@
 package ivorius.ivtoolkit.random;
 
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 
 import java.util.*;
 import java.util.function.ToDoubleFunction;
+import java.util.stream.Collectors;
 
 public class WeightedSelector
 {
@@ -166,7 +166,7 @@ public class WeightedSelector
 
         public static <T> List<SimpleItem<T>> apply(List<T> items, final ToDoubleFunction<T> weightFunction)
         {
-            return Lists.transform(items, input -> new SimpleItem<>(weightFunction.applyAsDouble(input), input));
+            return items.stream().map(input -> new SimpleItem<>(weightFunction.applyAsDouble(input), input)).collect(Collectors.toList());
         }
 
         public T getItem()

@@ -16,9 +16,7 @@
 
 package ivorius.ivtoolkit.blocks;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import ivorius.ivtoolkit.raytracing.IvRaytraceableAxisAlignedBox;
 import ivorius.ivtoolkit.raytracing.IvRaytraceableObject;
 import ivorius.ivtoolkit.raytracing.IvRaytracedIntersection;
@@ -26,35 +24,30 @@ import ivorius.ivtoolkit.raytracing.IvRaytracer;
 import ivorius.ivtoolkit.tools.MCRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
 
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by lukas on 11.02.14.
  */
 public class IvBlockCollection
 {
-    private final IBlockState[] blockStates;
     public final int width;
     public final int height;
     public final int length;
+    private final IBlockState[] blockStates;
 
     public IvBlockCollection(int width, int height, int length)
     {
         this(airArray(width, height, length), width, height, length);
-    }
-
-    private static IBlockState[] airArray(int width, int height, int length)
-    {
-        IBlockState[] blocks = new IBlockState[width * height * length];
-        Arrays.fill(blocks, Blocks.air.getDefaultState());
-        return blocks;
     }
 
     public IvBlockCollection(IBlockState[] blockStates, int width, int height, int length)
@@ -83,6 +76,13 @@ public class IvBlockCollection
         blockStates = new IBlockState[width * height * length];
         for (int i = 0; i < blockStates.length; i++)
             blockStates[i] = blocks[i].getStateFromMeta(metas[i]);
+    }
+
+    private static IBlockState[] airArray(int width, int height, int length)
+    {
+        IBlockState[] blocks = new IBlockState[width * height * length];
+        Arrays.fill(blocks, Blocks.air.getDefaultState());
+        return blocks;
     }
 
     public int getWidth()
@@ -220,15 +220,7 @@ public class IvBlockCollection
             metas[i] = (byte) blockStates[i].getBlock().getMetaFromState(blockStates[i]);
         compound.setByteArray("metadata", metas);
 
-        List<Block> blockList = Lists.transform(Arrays.asList(blockStates), new Function<IBlockState, Block>()
-        {
-            @Nullable
-            @Override
-            public Block apply(IBlockState s)
-            {
-                return s.getBlock();
-            }
-        });
+        List<Block> blockList = Stream.of(blockStates).map(IBlockState::getBlock).collect(Collectors.toList());
         mapper.addMapping(blockList);
         compound.setTag("mapping", mapper.createTagList());
         compound.setTag("blocks", mapper.createNBTForBlocks(blockList));

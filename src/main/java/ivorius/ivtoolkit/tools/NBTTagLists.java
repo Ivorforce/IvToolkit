@@ -38,26 +38,41 @@ public class NBTTagLists
         return IntStream.range(0, nbt.tagCount()).mapToObj(nbt::get).collect(Collectors.toList());
     }
 
+    public static void writeTo(NBTTagCompound compound, String key, List<? extends NBTBase> lists)
+    {
+        compound.setTag(key, write(lists));
+    }
+
+    public static NBTTagList write(List<? extends NBTBase> lists)
+    {
+        NBTTagList list = new NBTTagList();
+        lists.forEach(list::appendTag);
+        return list;
+    }
+
     public static List<NBTTagCompound> compoundsFrom(NBTTagCompound compound, String key)
     {
         return compounds(compound.getTagList(key, Constants.NBT.TAG_COMPOUND));
     }
 
-    public static List<NBTTagCompound> compounds(final NBTTagList list)
+    public static List<NBTTagCompound> compounds(final NBTTagList nbt)
     {
-        return Lists.transform(Ranges.rangeList(0, list.tagCount()), list::getCompoundTagAt);
+        if (nbt.getTagType() != Constants.NBT.TAG_COMPOUND)
+            throw new IllegalArgumentException();
+
+        return IntStream.range(0, nbt.tagCount()).mapToObj(nbt::getCompoundTagAt).collect(Collectors.toList());
     }
 
+    @Deprecated
     public static void writeCompoundsTo(NBTTagCompound compound, String key, List<NBTTagCompound> list)
     {
         compound.setTag(key, writeCompounds(list));
     }
 
+    @Deprecated
     public static NBTTagList writeCompounds(List<NBTTagCompound> list)
     {
-        NBTTagList tagList = new NBTTagList();
-        list.forEach(tagList::appendTag);
-        return tagList;
+        return write(list);
     }
 
     public static List<int[]> intArraysFrom(NBTTagCompound compound, String key)
@@ -65,9 +80,12 @@ public class NBTTagLists
         return intArrays(compound.getTagList(key, Constants.NBT.TAG_INT_ARRAY));
     }
 
-    public static List<int[]> intArrays(final NBTTagList list)
+    public static List<int[]> intArrays(final NBTTagList nbt)
     {
-        return Lists.transform(Ranges.rangeList(0, list.tagCount()), list::getIntArrayAt);
+        if (nbt.getTagType() != Constants.NBT.TAG_INT_ARRAY)
+            throw new IllegalArgumentException();
+
+        return IntStream.range(0, nbt.tagCount()).mapToObj(nbt::getIntArrayAt).collect(Collectors.toList());
     }
 
     public static void writeIntArraysTo(NBTTagCompound compound, String key, List<int[]> list)
@@ -78,8 +96,7 @@ public class NBTTagLists
     public static NBTTagList writeIntArrays(List<int[]> list)
     {
         NBTTagList tagList = new NBTTagList();
-        for (int[] array : list)
-            tagList.appendTag(new NBTTagIntArray(array));
+        list.forEach(array -> tagList.appendTag(new NBTTagIntArray(array)));
         return tagList;
     }
 
@@ -94,17 +111,5 @@ public class NBTTagLists
             throw new IllegalArgumentException();
 
         return (List) IntStream.range(0, nbt.tagCount()).mapToObj(nbt::get).collect(Collectors.toList());
-    }
-
-    public static void writeTo(NBTTagCompound compound, String key, List<? extends NBTBase> lists)
-    {
-        compound.setTag(key, write(lists));
-    }
-
-    public static NBTTagList write(List<? extends NBTBase> lists)
-    {
-        NBTTagList list = new NBTTagList();
-        lists.forEach(list::appendTag);
-        return list;
     }
 }

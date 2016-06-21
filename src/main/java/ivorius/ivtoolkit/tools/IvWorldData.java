@@ -23,11 +23,9 @@ import ivorius.ivtoolkit.blocks.IvBlockCollection;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +37,6 @@ import java.util.stream.Collectors;
  */
 public class IvWorldData
 {
-
     public IvBlockCollection blockCollection;
     public List<NBTTagCompound> tileEntities;
     public List<NBTTagCompound> entities;
@@ -49,6 +46,21 @@ public class IvWorldData
         this.blockCollection = blockCollection;
         this.tileEntities = tileEntities;
         this.entities = entities;
+    }
+
+    public IvWorldData(NBTTagCompound compound, MCRegistry registry)
+    {
+        compound = (NBTTagCompound) compound.copy(); // Copy since ID fix tags are being removed when being applied
+
+        blockCollection = new IvBlockCollection(compound.getCompoundTag("blockCollection"), registry);
+
+        tileEntities = new ArrayList<>();
+        tileEntities.addAll(NBTTagLists.compoundsFrom(compound, "tileEntities"));
+        tileEntities.forEach(teCompound -> NBTStateInjector.recursivelyApply(teCompound, registry, false));
+
+        entities = new ArrayList<>();
+        entities.addAll(NBTTagLists.compoundsFrom(compound, "entities"));
+        entities.forEach(entityCompound -> NBTStateInjector.recursivelyApply(entityCompound, registry, false));
     }
 
     public static IvWorldData capture(World world, BlockArea blockArea, boolean captureEntities)
@@ -94,19 +106,6 @@ public class IvWorldData
                 : Collections.emptyList();
 
         return new IvWorldData(blockCollection, tileEntities, entities);
-    }
-
-    public IvWorldData(NBTTagCompound compound, MCRegistry registry)
-    {
-        compound = (NBTTagCompound) compound.copy(); // Copy since ID fix tags are being removed when being applied
-
-        blockCollection = new IvBlockCollection(compound.getCompoundTag("blockCollection"), registry);
-
-        tileEntities.addAll(NBTTagLists.compoundsFrom(compound, "tileEntities"));
-        tileEntities.forEach(teCompound -> NBTStateInjector.recursivelyApply(teCompound, registry, false));
-
-        entities.addAll(NBTTagLists.compoundsFrom(compound, "entities"));
-        entities.forEach(entityCompound -> NBTStateInjector.recursivelyApply(entityCompound, registry, false));
     }
 
     public static Predicate<Entity> saveableEntityPredicate()
