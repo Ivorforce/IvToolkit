@@ -115,6 +115,7 @@ public class IvWorldData
         {
             NBTTagCompound teCompound = teList.getCompoundTagAt(i);
             recursivelyApplyIDFixTags(teCompound, registry);
+            recursivelyInjectIDFixTags(teCompound);
             tileEntities.add(teCompound);
         }
 
@@ -124,6 +125,7 @@ public class IvWorldData
         {
             NBTTagCompound entityCompound = entityList.getCompoundTagAt(i);
             recursivelyApplyIDFixTags(entityCompound, registry);
+            recursivelyInjectIDFixTags(entityCompound);
             entities.add(entityCompound);
         }
     }
