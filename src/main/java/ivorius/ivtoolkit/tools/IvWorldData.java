@@ -39,7 +39,6 @@ import java.util.stream.Collectors;
  */
 public class IvWorldData
 {
-    public static final String ID_FIX_TAG_KEY = "SG_ID_FIX_TAG";
 
     public IvBlockCollection blockCollection;
     public List<NBTTagCompound> tileEntities;

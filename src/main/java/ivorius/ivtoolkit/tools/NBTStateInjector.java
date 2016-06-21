@@ -30,6 +30,8 @@ import net.minecraftforge.common.util.Constants;
  */
 public class NBTStateInjector
 {
+    public static final String ID_FIX_TAG_KEY = "SG_ID_FIX_TAG";
+
     public static void recursivelyInject(NBTBase nbt)
     {
         NBTWalker.walkCompounds(nbt, cmp -> {
@@ -49,7 +51,7 @@ public class NBTStateInjector
 
         if (list.tagCount() > 0)
         {
-            compound.setTag(IvWorldData.ID_FIX_TAG_KEY, list);
+            compound.setTag(ID_FIX_TAG_KEY, list);
         }
     }
 
@@ -92,16 +94,16 @@ public class NBTStateInjector
     {
         NBTWalker.walkCompounds(nbt, cmp -> {
             apply(cmp, registry);
-            if (remove) cmp.removeTag(IvWorldData.ID_FIX_TAG_KEY);
+            if (remove) cmp.removeTag(ID_FIX_TAG_KEY);
             return true;
         });
     }
 
     public static void apply(NBTTagCompound compound, MCRegistry registry)
     {
-        if (compound.hasKey(IvWorldData.ID_FIX_TAG_KEY))
+        if (compound.hasKey(ID_FIX_TAG_KEY))
         {
-            NBTTagList list = compound.getTagList(IvWorldData.ID_FIX_TAG_KEY, Constants.NBT.TAG_COMPOUND);
+            NBTTagList list = compound.getTagList(ID_FIX_TAG_KEY, Constants.NBT.TAG_COMPOUND);
             for (int i = 0; i < list.tagCount(); i++)
                 applyIDFixTag(compound, registry, list.getCompoundTagAt(i));
         }
