@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Lukas Tenbrink
+ * Copyright 2016 Lukas Tenbrink
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,10 +14,9 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit.tools;
+package ivorius.ivtoolkit.transform;
 
-import ivorius.ivtoolkit.blocks.Directions;
-import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
+import ivorius.ivtoolkit.tools.EntityCreatureAccessor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityHanging;

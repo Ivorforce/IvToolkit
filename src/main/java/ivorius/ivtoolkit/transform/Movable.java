@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Lukas Tenbrink
+ * Copyright 2016 Lukas Tenbrink
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,20 +14,20 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit.tools;
+package ivorius.ivtoolkit.transform;
+
+import net.minecraft.util.BlockPos;
 
 /**
- * Implement this if your TileEntity or Entity needs special treatment when being transformed.
+ * Implement this if your TileEntity or Entity needs special treatment when being moved.
  */
-public interface AreaTransformable
+public interface Movable
 {
     /**
-     * Transforms the object inside a certain bounds.
-     * Note that implementing this will delete default transforming functionality, so you need to do that yourself.
+     * Moves the object by the specified amount.
+     * Note that implementing this will delete default moving functionality, so you need to do that yourself.
      *
-     * @param rotation The amount of times to rotate.
-     * @param mirrorX If x is being mirrored.
-     * @param inBounds The bounds of the area the transformation should take place in.
+     * @param pos The distance moved
      */
-    void transform(int rotation, boolean mirrorX, int[] inBounds);
+    void move(BlockPos pos);
 }

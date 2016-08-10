@@ -20,6 +20,7 @@ import com.google.common.base.Predicate;
 import ivorius.ivtoolkit.blocks.BlockArea;
 import ivorius.ivtoolkit.blocks.BlockPositions;
 import ivorius.ivtoolkit.blocks.IvBlockCollection;
+import ivorius.ivtoolkit.transform.Mover;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;

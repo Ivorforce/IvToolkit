@@ -14,12 +14,14 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit.tools;
+package ivorius.ivtoolkit.transform;
 
 import com.google.common.collect.ImmutableSet;
 import ivorius.ivtoolkit.blocks.BlockTransformable;
 import ivorius.ivtoolkit.blocks.Directions;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
+import ivorius.ivtoolkit.tools.EntityCreatureAccessor;
+import ivorius.ivtoolkit.tools.EntityHangingAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
