@@ -16,7 +16,7 @@
 
 package ivorius.ivtoolkit.transform;
 
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Implement this if your TileEntity or Entity needs special treatment when being moved.

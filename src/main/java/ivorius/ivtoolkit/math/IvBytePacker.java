@@ -16,7 +16,7 @@
 
 package ivorius.ivtoolkit.math;
 
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.MathHelper;
 
 /**
  * Created by lukas on 13.07.14.

@@ -19,9 +19,8 @@ package ivorius.ivtoolkit.network;
 import ivorius.ivtoolkit.tools.IvSideClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
-import net.minecraftforge.common.IExtendedEntityProperties;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -29,21 +28,27 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 /**
  * Created by lukas on 02.07.14.
  */
-public class PacketExtendedEntityPropertiesDataHandler extends SchedulingMessageHandler<PacketExtendedEntityPropertiesData, IMessage>
+public class PacketExtendedEntityPropertiesDataHandler extends SchedulingMessageHandler<PacketEntityCapabilityData, IMessage>
 {
     @SideOnly(Side.CLIENT)
     @Override
-    public void processClient(PacketExtendedEntityPropertiesData message, MessageContext ctx)
+    public void processClient(PacketEntityCapabilityData message, MessageContext ctx)
+    {
+        processClientC(message);
+    }
+
+    private <T> void processClientC(PacketEntityCapabilityData message)
     {
         World world = IvSideClient.getClientWorld();
         Entity entity = world.getEntityByID(message.getEntityID());
 
         if (entity != null)
         {
-            IExtendedEntityProperties eep = entity.getExtendedProperties(message.getEepKey());
+            Capability<T> capability = CapabilityUpdateRegistry.INSTANCE.capability(message.getCapabilityKey());
+            T t = entity.getCapability(capability, message.getDirection());
 
-            if (eep != null)
-                ((PartialUpdateHandler) eep).readUpdateData(message.getPayload(), message.getContext());
+            if (t != null)
+                ((PartiallyUpdatableCapability<T>) capability).readUpdateData(t, message.getDirection(), message.getPayload(), message.getContext());
         }
     }
 }

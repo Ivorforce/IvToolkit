@@ -19,35 +19,39 @@ package ivorius.ivtoolkit.network;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
-import net.minecraftforge.common.IExtendedEntityProperties;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 /**
  * Created by lukas on 01.07.14.
  */
-public class PacketExtendedEntityPropertiesData implements IMessage
+public class PacketEntityCapabilityData implements IMessage
 {
     private int entityID;
     private String context;
-    private String eepKey;
+    private String capabilityKey;
+    private EnumFacing direction;
     private ByteBuf payload;
 
-    public PacketExtendedEntityPropertiesData()
+    public PacketEntityCapabilityData()
     {
     }
 
-    public PacketExtendedEntityPropertiesData(int entityID, String context, String eepKey, ByteBuf payload)
+    public PacketEntityCapabilityData(int entityID, String context, String capabilityKey, EnumFacing direction, ByteBuf payload)
     {
         this.entityID = entityID;
         this.context = context;
-        this.eepKey = eepKey;
+        this.capabilityKey = capabilityKey;
+        this.direction = direction;
         this.payload = payload;
     }
 
-    public static PacketExtendedEntityPropertiesData packetEntityData(Entity entity, String eepKey, String context, Object... params)
+    public static <T> PacketEntityCapabilityData packetEntityData(Entity entity, String capabilityKey, EnumFacing facing, String context, Object... params)
     {
-        IExtendedEntityProperties eep = entity.getExtendedProperties(eepKey);
+        Capability<T> capability = CapabilityUpdateRegistry.INSTANCE.capability(capabilityKey);
+        T eep = entity.getCapability(capability, facing);
 
         if (!(eep instanceof PartialUpdateHandler))
             throw new IllegalArgumentException("IExtendedEntityProperties must implement IExtendedEntityPropertiesUpdateData to send update packets!");
@@ -55,7 +59,7 @@ public class PacketExtendedEntityPropertiesData implements IMessage
         ByteBuf buf = Unpooled.buffer();
         ((PartialUpdateHandler) eep).writeUpdateData(buf, context, params);
 
-        return new PacketExtendedEntityPropertiesData(entity.getEntityId(), context, eepKey, buf);
+        return new PacketEntityCapabilityData(entity.getEntityId(), context, capabilityKey, facing, buf);
     }
 
     public int getEntityID()
@@ -78,14 +82,24 @@ public class PacketExtendedEntityPropertiesData implements IMessage
         this.context = context;
     }
 
-    public String getEepKey()
+    public String getCapabilityKey()
     {
-        return eepKey;
+        return capabilityKey;
     }
 
-    public void setEepKey(String eepKey)
+    public void setCapabilityKey(String capabilityKey)
     {
-        this.eepKey = eepKey;
+        this.capabilityKey = capabilityKey;
+    }
+
+    public EnumFacing getDirection()
+    {
+        return direction;
+    }
+
+    public void setDirection(EnumFacing direction)
+    {
+        this.direction = direction;
     }
 
     public ByteBuf getPayload()
@@ -103,7 +117,8 @@ public class PacketExtendedEntityPropertiesData implements IMessage
     {
         entityID = buf.readInt();
         context = ByteBufUtils.readUTF8String(buf);
-        eepKey = ByteBufUtils.readUTF8String(buf);
+        capabilityKey = ByteBufUtils.readUTF8String(buf);
+        direction = EnumFacing.getFront(buf.readInt());
         payload = IvPacketHelper.readByteBuffer(buf);
     }
 
@@ -112,7 +127,8 @@ public class PacketExtendedEntityPropertiesData implements IMessage
     {
         buf.writeInt(entityID);
         ByteBufUtils.writeUTF8String(buf, context);
-        ByteBufUtils.writeUTF8String(buf, eepKey);
+        ByteBufUtils.writeUTF8String(buf, capabilityKey);
+        buf.writeInt(direction.getIndex());
         IvPacketHelper.writeByteBuffer(buf, payload);
     }
 

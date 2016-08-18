@@ -16,7 +16,7 @@
 
 package ivorius.ivtoolkit.tools;
 
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.text.translation.I18n;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,27 +28,27 @@ public class IvTranslations
 {
     public static boolean has(String key)
     {
-        return StatCollector.canTranslate(key);
+        return I18n.canTranslate(key);
     }
 
     public static String get(String key)
     {
-        return StatCollector.translateToLocal(key);
+        return I18n.translateToLocal(key);
     }
 
     public static String format(String key, Object... args)
     {
-        return StatCollector.translateToLocalFormatted(key, args);
+        return I18n.translateToLocalFormatted(key, args);
     }
 
     public static List<String> getLines(String key)
     {
-        return splitLines(StatCollector.translateToLocal(key));
+        return splitLines(I18n.translateToLocal(key));
     }
 
     public static List<String> formatLines(String key, Object... args)
     {
-        return splitLines(StatCollector.translateToLocalFormatted(key, args));
+        return splitLines(I18n.translateToLocalFormatted(key, args));
     }
 
 

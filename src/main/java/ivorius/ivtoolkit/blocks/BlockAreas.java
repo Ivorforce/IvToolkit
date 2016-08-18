@@ -17,7 +17,7 @@
 package ivorius.ivtoolkit.blocks;
 
 import ivorius.ivtoolkit.gui.IntegerRange;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nonnull;

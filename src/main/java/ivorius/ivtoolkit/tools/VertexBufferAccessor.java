@@ -16,7 +16,7 @@
 
 package ivorius.ivtoolkit.tools;
 
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.entity.EntityCreature;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
@@ -25,7 +25,7 @@ import java.lang.reflect.Field;
 /**
  * Created by lukas on 22.07.15.
  */
-public class WorldRendererAccessor
+public class VertexBufferAccessor
 {
     protected static Field xOffset;
     protected static Field yOffset;
@@ -35,24 +35,24 @@ public class WorldRendererAccessor
     {
         return xOffset != null
                 ? xOffset
-                : (xOffset = ReflectionHelper.findField(WorldRenderer.class, "xOffset", "field_179004_l"));
+                : (xOffset = ReflectionHelper.findField(VertexBuffer.class, "xOffset", "field_179004_l"));
     }
 
     protected static Field getYOffset()
     {
         return yOffset != null
                 ? yOffset
-                : (yOffset = ReflectionHelper.findField(WorldRenderer.class, "yOffset", "field_179005_m"));
+                : (yOffset = ReflectionHelper.findField(VertexBuffer.class, "yOffset", "field_179005_m"));
     }
 
     protected static Field getZOffset()
     {
         return zOffset != null
                 ? zOffset
-                : (zOffset = ReflectionHelper.findField(WorldRenderer.class, "zOffset", "field_179002_n"));
+                : (zOffset = ReflectionHelper.findField(VertexBuffer.class, "zOffset", "field_179002_n"));
     }
 
-    public static void addTranslation(WorldRenderer renderer, double x, double y, double z)
+    public static void addTranslation(VertexBuffer renderer, double x, double y, double z)
     {
         try
         {

@@ -26,6 +26,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -192,7 +195,7 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
         IBlockState iblockstate = world.getBlockState(pos);
         Block block = iblockstate.getBlock();
 
-        if (block == Blocks.snow_layer && ((Integer)iblockstate.getValue(BlockSnow.LAYERS)).intValue() < 1)
+        if (block == Blocks.SNOW_LAYER && ((Integer)iblockstate.getValue(BlockSnow.LAYERS)).intValue() < 1)
         {
             side = EnumFacing.UP;
         }
@@ -205,7 +208,7 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
         {
             return new ArrayList<>();
         }
-        else if (pos.getY() == world.getHeight() && state.getBlock().getMaterial().isSolid())
+        else if (pos.getY() == world.getHeight() && state.getMaterial().isSolid())
         {
             return new ArrayList<>();
         }
@@ -356,18 +359,18 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
         return null;
     }
 
-    public static Vec3 getRotatedVector(Vec3 vec3, EnumFacing facing)
+    public static Vec3d getRotatedVector(Vec3d vec3, EnumFacing facing)
     {
         switch (facing)
         {
             case SOUTH:
-                return new Vec3(vec3.xCoord, vec3.yCoord, vec3.zCoord);
+                return new Vec3d(vec3.xCoord, vec3.yCoord, vec3.zCoord);
             case WEST:
-                return new Vec3(-vec3.zCoord, vec3.yCoord, vec3.xCoord);
+                return new Vec3d(-vec3.zCoord, vec3.yCoord, vec3.xCoord);
             case NORTH:
-                return new Vec3(-vec3.xCoord, vec3.yCoord, -vec3.zCoord);
+                return new Vec3d(-vec3.xCoord, vec3.yCoord, -vec3.zCoord);
             case EAST:
-                return new Vec3(vec3.zCoord, vec3.yCoord, -vec3.xCoord);
+                return new Vec3d(vec3.zCoord, vec3.yCoord, -vec3.xCoord);
         }
 
         return null;
@@ -375,7 +378,7 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
 
     public static AxisAlignedBB getBBWithLengths(double x, double y, double z, double width, double height, double depth)
     {
-        return AxisAlignedBB.fromBounds(x, y, z, x + width, y + height, z + depth);
+        return new AxisAlignedBB(x, y, z, x + width, y + height, z + depth);
     }
 
     public static EnumFacing getRotation(Entity entity)

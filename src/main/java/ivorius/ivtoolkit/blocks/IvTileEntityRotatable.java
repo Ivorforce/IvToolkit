@@ -23,13 +23,15 @@ import ivorius.ivtoolkit.tools.EnumFacingHelper;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.Constants;
 import org.lwjgl.util.vector.Vector3f;
+
+import javax.annotation.Nullable;
 
 public class IvTileEntityRotatable extends TileEntity
 {
@@ -61,21 +63,24 @@ public class IvTileEntityRotatable extends TileEntity
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tagCompound)
+    public NBTTagCompound writeToNBT(NBTTagCompound tagCompound)
     {
         super.writeToNBT(tagCompound);
 
         tagCompound.setString("facing", facing.getName());
+
+        return tagCompound;
     }
 
+    @Nullable
     @Override
-    public Packet getDescriptionPacket()
+    public SPacketUpdateTileEntity getUpdatePacket()
     {
         return IvTileEntityHelper.getStandardDescriptionPacket(this);
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt)
     {
         readFromNBT(pkt.getNbtCompound());
     }
@@ -108,7 +113,7 @@ public class IvTileEntityRotatable extends TileEntity
         return IvMultiBlockHelper.getRotatedVector(vector3f, getFacing());
     }
 
-    public Vec3 getRotatedVector(Vec3 vec3)
+    public Vec3d getRotatedVector(Vec3d vec3)
     {
         return IvMultiBlockHelper.getRotatedVector(vec3, getFacing());
     }

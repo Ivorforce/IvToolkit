@@ -19,7 +19,8 @@ package ivorius.ivtoolkit.rendering.grid;
 import com.google.common.base.Function;
 import ivorius.ivtoolkit.blocks.IvBlockCollection;
 import net.minecraft.block.Block;
-import net.minecraft.util.BlockPos;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -37,7 +38,7 @@ public class BlockQuadCache
         final int[] size = {blockCollection.width, blockCollection.height, blockCollection.length};
 
         return GridQuadCache.createQuadCache(size, scale, input -> {
-            Block block = blockCollection.getBlockState(input.getLeft()).getBlock();
+            IBlockState block = blockCollection.getBlockState(input.getLeft());
             return block.isOpaqueCube() && blockCollection.shouldRenderSide(input.getLeft(), input.getRight())
                     ? handle
                     : null;

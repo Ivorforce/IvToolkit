@@ -19,7 +19,7 @@ package ivorius.ivtoolkit.rendering.grid;
 import com.google.common.base.Function;
 import gnu.trove.TIntCollection;
 import gnu.trove.list.array.TIntArrayList;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.BufferUtils;

@@ -89,7 +89,7 @@ public class IvBlockMapper
 
         for (Block block : mapping)
         {
-            String name = Block.blockRegistry.getNameForObject(block).toString();
+            String name = Block.REGISTRY.getNameForObject(block).toString();
 
             if (name != null)
                 list.appendTag(new NBTTagString(name));

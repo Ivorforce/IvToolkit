@@ -29,7 +29,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityHanging;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
@@ -87,8 +87,8 @@ public class PosTransformer
     {
         IBlockState newState = state;
 
-        ImmutableSet<Map.Entry<IProperty, Comparable>> propertySet = state.getProperties().entrySet();
-        for (Map.Entry<IProperty, Comparable> entry : propertySet)
+        ImmutableSet<Map.Entry<IProperty<?>, Comparable<?>>> propertySet = state.getProperties().entrySet();
+        for (Map.Entry<IProperty<?>, Comparable<?>> entry : propertySet)
         {
             IProperty property = entry.getKey();
             if (property.getValueClass() == EnumFacing.class && property.getAllowedValues().containsAll(Arrays.asList(EnumFacing.HORIZONTALS)))

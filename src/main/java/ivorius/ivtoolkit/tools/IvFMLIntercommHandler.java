@@ -21,6 +21,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import org.apache.logging.log4j.Logger;
 
@@ -126,7 +127,7 @@ public abstract class IvFMLIntercommHandler
         }
         else
         {
-            return MinecraftServer.getServer().worldServerForDimension(compound.getInteger(worldKey)).getEntityByID(compound.getInteger(entityKey));
+            return FMLCommonHandler.instance().getSidedDelegate().getServer().worldServerForDimension(compound.getInteger(worldKey)).getEntityByID(compound.getInteger(entityKey));
         }
     }
 

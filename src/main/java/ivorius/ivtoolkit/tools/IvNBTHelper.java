@@ -214,7 +214,7 @@ public class IvNBTHelper
             NBTTagList nbtTagList = new NBTTagList();
 
             for (Block b : blocks)
-                nbtTagList.appendTag(new NBTTagString(Block.blockRegistry.getNameForObject(b).toString()));
+                nbtTagList.appendTag(new NBTTagString(Block.REGISTRY.getNameForObject(b).toString()));
 
             compound.setTag(id, nbtTagList);
         }

@@ -20,7 +20,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import ivorius.ivtoolkit.blocks.BlockPositions;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
@@ -50,7 +50,7 @@ public class PacketTileEntityClientEvent implements IMessage
     {
         ByteBuf buf = Unpooled.buffer();
         entity.assembleClientEvent(buf, context, params);
-        return new PacketTileEntityClientEvent(entity.getWorld().provider.getDimensionId(), entity.getPos(), context, buf);
+        return new PacketTileEntityClientEvent(entity.getWorld().provider.getDimension(), entity.getPos(), context, buf);
     }
 
     public int getDimension()

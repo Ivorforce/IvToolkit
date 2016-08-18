@@ -16,13 +16,13 @@
 
 package ivorius.ivtoolkit.rendering;
 
-import ivorius.ivtoolkit.tools.WorldRendererAccessor;
+import ivorius.ivtoolkit.tools.VertexBufferAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
@@ -38,7 +38,7 @@ public class IvRenderHelper
 
     public static void drawRectFullScreen(int screenWidth, int screenHeight)
     {
-        WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
+        VertexBuffer renderer = Tessellator.getInstance().getBuffer();
 
         renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         renderer.pos(0.0, 0.0, 0.0).tex(0.0, 1.0).endVertex();
@@ -56,7 +56,7 @@ public class IvRenderHelper
         float g = (float)(color >> 8 & 255) / 255.0F;
         float b = (float)(color & 255) / 255.0F;
 
-        WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
+        VertexBuffer renderer = Tessellator.getInstance().getBuffer();
 
         float usedTicks = ticks / 200.0F;
 
@@ -114,7 +114,7 @@ public class IvRenderHelper
         GL11.glEnable(GL11.GL_ALPHA_TEST);
     }
 
-    public static void renderParticle(WorldRenderer renderer, float time, float scale)
+    public static void renderParticle(VertexBuffer renderer, float time, float scale)
     {
         float f1 = ActiveRenderInfo.getRotationX();
         float f2 = ActiveRenderInfo.getRotationZ();
@@ -142,7 +142,7 @@ public class IvRenderHelper
         Tessellator.getInstance().draw();
     }
 
-    public static void drawNormalCube(WorldRenderer tessellator, float size, float in, boolean lined)
+    public static void drawNormalCube(VertexBuffer tessellator, float size, float in, boolean lined)
     {
         if (lined)
         {
@@ -226,7 +226,7 @@ public class IvRenderHelper
         Tessellator.getInstance().draw();
     }
 
-    public static void drawCuboid(WorldRenderer tessellator, float sizeX, float sizeY, float sizeZ, float in, boolean lined)
+    public static void drawCuboid(VertexBuffer tessellator, float sizeX, float sizeY, float sizeZ, float in, boolean lined)
     {
         if (lined)
         {
@@ -310,7 +310,7 @@ public class IvRenderHelper
         Tessellator.getInstance().draw();
     }
 
-    public static void renderCuboid(WorldRenderer tessellator, float sizeX, float sizeY, float sizeZ, float in)
+    public static void renderCuboid(VertexBuffer tessellator, float sizeX, float sizeY, float sizeZ, float in)
     {
         tessellator.pos(-sizeX * in, -sizeY * in, -sizeZ).endVertex();
         tessellator.pos(-sizeX * in, sizeY * in, -sizeZ).endVertex();
@@ -343,7 +343,7 @@ public class IvRenderHelper
         tessellator.pos(-sizeX * in, -sizeY, sizeZ * in).endVertex();
     }
 
-    public static void drawModelCuboid(WorldRenderer renderer, float x, float y, float z, float sizeX, float sizeY, float sizeZ)
+    public static void drawModelCuboid(VertexBuffer renderer, float x, float y, float z, float sizeX, float sizeY, float sizeZ)
     {
         float tM = 1.0f / 16.0f;
 
@@ -351,8 +351,8 @@ public class IvRenderHelper
         float transY = (y + sizeY * 0.5f) * tM - 0.5f;
         float transZ = (z + sizeZ * 0.5f) * tM;
 
-        WorldRendererAccessor.addTranslation(renderer, transX, transY, transZ);
+        VertexBufferAccessor.addTranslation(renderer, transX, transY, transZ);
         renderCuboid(renderer, sizeX * tM * 0.5f, sizeY * tM * 0.5f, sizeZ * tM * 0.5f, 1.0f);
-        WorldRendererAccessor.addTranslation(renderer, -transX, -transY, -transZ);
+        VertexBufferAccessor.addTranslation(renderer, -transX, -transY, -transZ);
     }
 }

@@ -75,7 +75,7 @@ public class NBTStateInjector
         Block block = Block.getBlockById(blockID);
         if (block != null)
         {
-            String stringID = Block.blockRegistry.getNameForObject(block).toString();
+            String stringID = Block.REGISTRY.getNameForObject(block).toString();
 
             NBTTagCompound idCompound = new NBTTagCompound();
             idCompound.setString("type", "block");

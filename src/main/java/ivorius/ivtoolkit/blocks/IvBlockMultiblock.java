@@ -23,7 +23,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -86,7 +86,7 @@ public abstract class IvBlockMultiblock extends Block
 
     protected void triggerBlockDestroyEffects(World world, BlockPos pos)
     {
-        world.playAuxSFX(2001, pos, Block.getStateId(world.getBlockState(pos)));
+        world.playBroadcastSound(2001, pos, Block.getStateId(world.getBlockState(pos)));
 //        if (world.isRemote)
 //            Minecraft.getMinecraft().effectRenderer.addBlockDestroyEffects(parentTE.xCoord, parentTE.yCoord, parentTE.zCoord, parentTE.getBlockType(), parentTE.getBlockMetadata());
     }
@@ -104,7 +104,7 @@ public abstract class IvBlockMultiblock extends Block
     }
 
     @Override
-    public boolean removedByPlayer(World world, BlockPos pos, EntityPlayer player, boolean willHarvest)
+    public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest)
     {
         IvTileEntityMultiBlock tileEntityMultiBlock = getValidatedTotalParent(this, world, pos);
 
@@ -114,7 +114,7 @@ public abstract class IvBlockMultiblock extends Block
                 this.parentBlockHarvestItem(world, tileEntityMultiBlock, pos, world.getBlockState(pos));
         }
 
-        return super.removedByPlayer(world, pos, player, willHarvest);
+        return super.removedByPlayer(state, world, pos, player, willHarvest);
     }
 
     @Override

@@ -24,16 +24,16 @@ import ivorius.ivtoolkit.tools.EnumFacingHelper;
 import ivorius.ivtoolkit.tools.IvNBTHelper;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.util.Constants;
 import org.lwjgl.util.vector.Vector3f;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class IvTileEntityMultiBlock extends TileEntity
@@ -213,7 +213,7 @@ public class IvTileEntityMultiBlock extends TileEntity
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound tagCompound)
+    public NBTTagCompound writeToNBT(NBTTagCompound tagCompound)
     {
         super.writeToNBT(tagCompound);
 
@@ -237,16 +237,18 @@ public class IvTileEntityMultiBlock extends TileEntity
 
             tagCompound.setIntArray("childCoords", childCoordsCut);
         }
+        return tagCompound;
     }
 
+    @Nullable
     @Override
-    public Packet getDescriptionPacket()
+    public SPacketUpdateTileEntity getUpdatePacket()
     {
         return IvTileEntityHelper.getStandardDescriptionPacket(this);
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt)
     {
         readFromNBT(pkt.getNbtCompound());
     }
@@ -279,7 +281,7 @@ public class IvTileEntityMultiBlock extends TileEntity
         return IvMultiBlockHelper.getRotatedVector(vector3f, getFacing());
     }
 
-    public Vec3 getRotatedVector(Vec3 vec3)
+    public Vec3d getRotatedVector(Vec3d vec3)
     {
         return IvMultiBlockHelper.getRotatedVector(vec3, getFacing());
     }
@@ -292,7 +294,7 @@ public class IvTileEntityMultiBlock extends TileEntity
     public AxisAlignedBB getBoxAroundCenter(double width, double height, double length)
     {
         double[] center = getActiveCenterCoords();
-        return AxisAlignedBB.fromBounds(center[0] - width, center[1] - height, center[2] - length, center[0] + width, center[1] + height, center[2] + length);
+        return new AxisAlignedBB(center[0] - width, center[1] - height, center[2] - length, center[0] + width, center[1] + height, center[2] + length);
     }
 
     @Override

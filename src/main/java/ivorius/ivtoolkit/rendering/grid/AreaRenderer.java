@@ -18,9 +18,9 @@ package ivorius.ivtoolkit.rendering.grid;
 
 import ivorius.ivtoolkit.blocks.BlockArea;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.GlStateManager;
@@ -60,15 +60,15 @@ public class AreaRenderer
         if (lined)
         {
             GlStateManager.disableTexture2D();
-            drawLineCuboid(Tessellator.getInstance().getWorldRenderer(), width2 + sizeP, height2 + sizeP, length2 + sizeP, 1);
+            drawLineCuboid(Tessellator.getInstance().getBuffer(), width2 + sizeP, height2 + sizeP, length2 + sizeP, 1);
             GlStateManager.enableTexture2D();
         }
         else
-            drawCuboid(Tessellator.getInstance().getWorldRenderer(), width2 * sizeCE + sizeP, height2 * sizeCE + sizeP, length2 * sizeCE + sizeP, 1);
+            drawCuboid(Tessellator.getInstance().getBuffer(), width2 * sizeCE + sizeP, height2 * sizeCE + sizeP, length2 * sizeCE + sizeP, 1);
         GlStateManager.popMatrix();
     }
 
-    public static void drawCuboid(WorldRenderer renderer, float sizeX, float sizeY, float sizeZ, float in)
+    public static void drawCuboid(VertexBuffer renderer, float sizeX, float sizeY, float sizeZ, float in)
     {
         renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
@@ -105,7 +105,7 @@ public class AreaRenderer
         Tessellator.getInstance().draw();
     }
 
-    public static void drawLineCuboid(WorldRenderer renderer, float sizeX, float sizeY, float sizeZ, float in)
+    public static void drawLineCuboid(VertexBuffer renderer, float sizeX, float sizeY, float sizeZ, float in)
     {
         renderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION);
 

@@ -18,7 +18,7 @@ package ivorius.ivtoolkit.tools;
 
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityHanging;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 

@@ -17,8 +17,8 @@
 package ivorius.ivtoolkit.blocks;
 
 import ivorius.ivtoolkit.tools.IvStreams;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.Iterator;
 import java.util.stream.IntStream;
@@ -94,10 +94,7 @@ public class BlockArea implements Iterable<BlockPos>
 
     public AxisAlignedBB asAxisAlignedBB()
     {
-        BlockPos lower = getLowerCorner();
-        BlockPos higher = getHigherCorner();
-
-        return AxisAlignedBB.fromBounds(lower.getX(), lower.getY(), lower.getZ(), higher.getX(), higher.getY(), higher.getZ());
+        return new AxisAlignedBB(getLowerCorner(), getHigherCorner().add(1, 1, 1));
     }
 
     public Stream<BlockPos> stream()

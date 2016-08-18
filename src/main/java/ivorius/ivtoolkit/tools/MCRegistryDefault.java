@@ -32,13 +32,13 @@ public class MCRegistryDefault implements MCRegistry
     @Override
     public Item itemFromID(ResourceLocation itemID)
     {
-        return (Item) Item.itemRegistry.getObject(itemID);
+        return Item.REGISTRY.getObject(itemID);
     }
 
     @Override
     public ResourceLocation idFromItem(Item item)
     {
-        return (ResourceLocation) Item.itemRegistry.getNameForObject(item);
+        return Item.REGISTRY.getNameForObject(item);
     }
 
     @Override
@@ -50,18 +50,18 @@ public class MCRegistryDefault implements MCRegistry
     @Override
     public Block blockFromID(ResourceLocation blockID)
     {
-        return (Block) Block.blockRegistry.getObject(blockID);
+        return (Block) Block.REGISTRY.getObject(blockID);
     }
 
     @Override
     public ResourceLocation idFromBlock(Block block)
     {
-        return (ResourceLocation) Block.blockRegistry.getNameForObject(block);
+        return (ResourceLocation) Block.REGISTRY.getNameForObject(block);
     }
 
     @Override
     public TileEntity loadTileEntity(NBTTagCompound compound)
     {
-        return TileEntity.createAndLoadEntity(compound);
+        return TileEntity.create(compound);
     }
 }

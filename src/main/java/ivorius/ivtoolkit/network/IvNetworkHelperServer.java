@@ -21,8 +21,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
-import net.minecraft.server.management.PlayerManager;
+import net.minecraft.server.management.PlayerChunkMap;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.network.FMLOutboundHandler;
@@ -78,7 +79,7 @@ public class IvNetworkHelperServer
 
         for (EntityPlayerMP playerMP : playersWatching)
         {
-            playerMP.playerNetServerHandler.sendPacket(packet);
+            playerMP.connection.sendPacket(packet);
         }
     }
 
@@ -99,7 +100,7 @@ public class IvNetworkHelperServer
         ArrayList<EntityPlayerMP> playersWatching = new ArrayList<>();
 
         WorldServer server = (WorldServer) world;
-        PlayerManager playerManager = server.getPlayerManager();
+        PlayerChunkMap playerManager = server.getPlayerChunkMap();
 
         List<EntityPlayer> players = server.playerEntities;
         List<EntityPlayerMP> mpplayers = ((List) players.stream().filter(p -> p instanceof EntityPlayerMP).collect(Collectors.toList()));
@@ -109,23 +110,23 @@ public class IvNetworkHelperServer
         return playersWatching;
     }
 
-    public static void sendEEPUpdatePacketToPlayer(Entity entity, String eepKey, String context, SimpleNetworkWrapper network, EntityPlayer player, Object... params)
+    public static void sendEEPUpdatePacketToPlayer(Entity entity, String eepKey, EnumFacing facing, String context, SimpleNetworkWrapper network, EntityPlayer player, Object... params)
     {
         if (!(player instanceof EntityPlayerMP))
             throw new UnsupportedOperationException();
 
-        network.sendTo(PacketExtendedEntityPropertiesData.packetEntityData(entity, eepKey, context, params), (EntityPlayerMP) player);
+        network.sendTo(PacketEntityCapabilityData.packetEntityData(entity, eepKey, facing, context, params), (EntityPlayerMP) player);
     }
 
-    public static void sendEEPUpdatePacket(Entity entity, String eepKey, String context, SimpleNetworkWrapper network, Object... params)
+    public static void sendEEPUpdatePacket(Entity entity, String eepKey, EnumFacing facing, String context, SimpleNetworkWrapper network, Object... params)
     {
         if (entity.worldObj.isRemote)
             throw new UnsupportedOperationException();
 
         for (EntityPlayer player : ((WorldServer) entity.worldObj).getEntityTracker().getTrackingPlayers(entity))
-            sendEEPUpdatePacketToPlayer(entity, eepKey, context, network, player, params);
+            sendEEPUpdatePacketToPlayer(entity, eepKey, facing, context, network, player, params);
 
         if (entity instanceof EntityPlayerMP) // Players don't 'track' themselves
-            sendEEPUpdatePacketToPlayer(entity, eepKey, context, network, (EntityPlayer) entity, params);
+            sendEEPUpdatePacketToPlayer(entity, eepKey, facing, context, network, (EntityPlayer) entity, params);
     }
 }

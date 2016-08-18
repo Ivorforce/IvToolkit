@@ -28,6 +28,10 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -81,7 +85,7 @@ public class IvBlockCollection
     private static IBlockState[] airArray(int width, int height, int length)
     {
         IBlockState[] blocks = new IBlockState[width * height * length];
-        Arrays.fill(blocks, Blocks.air.getDefaultState());
+        Arrays.fill(blocks, Blocks.AIR.getDefaultState());
         return blocks;
     }
 
@@ -103,10 +107,10 @@ public class IvBlockCollection
     public IBlockState getBlockState(BlockPos coord)
     {
         if (!hasCoord(coord))
-            return Blocks.air.getDefaultState();
+            return Blocks.AIR.getDefaultState();
 
         IBlockState block = blockStates[indexFromCoord(coord)];
-        return block != null ? block : Blocks.air.getDefaultState();
+        return block != null ? block : Blocks.AIR.getDefaultState();
     }
 
     public void setBlockState(BlockPos coord, IBlockState state)
@@ -136,24 +140,24 @@ public class IvBlockCollection
         BlockPos sideCoord = coord.add(side.getFrontOffsetX(), side.getFrontOffsetY(), side.getFrontOffsetZ());
 
         IBlockState block = getBlockState(sideCoord);
-        return !block.getBlock().isOpaqueCube();
+        return !block.isOpaqueCube();
     }
 
-    public MovingObjectPosition rayTrace(Vec3 position, Vec3 direction)
+    public RayTraceResult rayTrace(Vec3d position, Vec3d direction)
     {
         IvRaytraceableAxisAlignedBox containingBox = new IvRaytraceableAxisAlignedBox(null, 0.001, 0.001, 0.001, width - 0.002, height - 0.002, length - 0.002);
         IvRaytracedIntersection intersection = IvRaytracer.getFirstIntersection(Collections.<IvRaytraceableObject>singletonList(containingBox), position.xCoord, position.yCoord, position.zCoord, direction.xCoord, direction.yCoord, direction.zCoord);
 
         if (intersection != null)
         {
-            position = new Vec3(intersection.getX(), intersection.getY(), intersection.getZ());
+            position = new Vec3d(intersection.getX(), intersection.getY(), intersection.getZ());
             BlockPos curCoord = new BlockPos(MathHelper.floor_double(position.xCoord), MathHelper.floor_double(position.yCoord), MathHelper.floor_double(position.zCoord));
             EnumFacing hitSide = ((EnumFacing) intersection.getHitInfo()).getOpposite();
 
             while (hasCoord(curCoord))
             {
-                if (getBlockState(curCoord).getBlock().getMaterial() != Material.air)
-                    return new MovingObjectPosition(position, hitSide.getOpposite(), new BlockPos(curCoord.getX(), curCoord.getY(), curCoord.getZ()));
+                if (getBlockState(curCoord).getMaterial() != Material.AIR)
+                    return new RayTraceResult(position, hitSide.getOpposite(), new BlockPos(curCoord.getX(), curCoord.getY(), curCoord.getZ()));
 
                 hitSide = getExitSide(position, direction);
 
@@ -161,19 +165,19 @@ public class IvBlockCollection
                 {
                     double offX = hitSide.getFrontOffsetX() > 0 ? 1.0001 : -0.0001;
                     double dirLength = ((curCoord.getX() + offX) - position.xCoord) / direction.xCoord;
-                    position = new Vec3(curCoord.getX() + offX, position.yCoord + direction.yCoord * dirLength, position.zCoord + direction.zCoord * dirLength);
+                    position = new Vec3d(curCoord.getX() + offX, position.yCoord + direction.yCoord * dirLength, position.zCoord + direction.zCoord * dirLength);
                 }
                 else if (hitSide.getFrontOffsetY() != 0)
                 {
                     double offY = hitSide.getFrontOffsetY() > 0 ? 1.0001 : -0.0001;
                     double dirLength = ((curCoord.getY() + offY) - position.yCoord) / direction.yCoord;
-                    position = new Vec3(position.xCoord + direction.xCoord * dirLength, curCoord.getY() + offY, position.zCoord + direction.zCoord * dirLength);
+                    position = new Vec3d(position.xCoord + direction.xCoord * dirLength, curCoord.getY() + offY, position.zCoord + direction.zCoord * dirLength);
                 }
                 else
                 {
                     double offZ = hitSide.getFrontOffsetZ() > 0 ? 1.0001 : -0.0001;
                     double dirLength = ((curCoord.getZ() + offZ) - position.zCoord) / direction.zCoord;
-                    position = new Vec3(position.xCoord + direction.xCoord * dirLength, position.yCoord + direction.yCoord * dirLength, curCoord.getZ() + offZ);
+                    position = new Vec3d(position.xCoord + direction.xCoord * dirLength, position.yCoord + direction.yCoord * dirLength, curCoord.getZ() + offZ);
                 }
 
                 curCoord = curCoord.add(hitSide.getFrontOffsetX(), hitSide.getFrontOffsetY(), hitSide.getFrontOffsetZ());
@@ -183,7 +187,7 @@ public class IvBlockCollection
         return null;
     }
 
-    private EnumFacing getExitSide(Vec3 position, Vec3 direction)
+    private EnumFacing getExitSide(Vec3d position, Vec3d direction)
     {
         double innerX = ((position.xCoord % 1.0) + 1.0) % 1.0;
         double innerY = ((position.yCoord % 1.0) + 1.0) % 1.0;

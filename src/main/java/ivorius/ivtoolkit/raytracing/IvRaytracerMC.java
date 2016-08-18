@@ -18,7 +18,7 @@ package ivorius.ivtoolkit.raytracing;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.renderer.GlStateManager;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public class IvRaytracerMC
         double y = entity.posY + entity.getEyeHeight();
         double z = entity.posZ;
 
-        Vec3 lookVec = entity.getLookVec();
+        Vec3d lookVec = entity.getLookVec();
         return IvRaytracer.getIntersections(objects, x, y, z, lookVec.xCoord, lookVec.yCoord, lookVec.zCoord);
     }
 
@@ -44,7 +44,7 @@ public class IvRaytracerMC
         double y = entity.posY + entity.getEyeHeight();
         double z = entity.posZ;
 
-        Vec3 lookVec = entity.getLookVec();
+        Vec3d lookVec = entity.getLookVec();
 
         List<IvRaytracedIntersection> intersections = IvRaytracer.getIntersections(objects, x, y, z, lookVec.xCoord, lookVec.yCoord, lookVec.zCoord);
 

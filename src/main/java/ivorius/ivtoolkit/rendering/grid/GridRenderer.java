@@ -17,9 +17,9 @@
 package ivorius.ivtoolkit.rendering.grid;
 
 import ivorius.ivtoolkit.rendering.IvRenderHelper;
-import ivorius.ivtoolkit.tools.WorldRendererAccessor;
+import ivorius.ivtoolkit.tools.VertexBufferAccessor;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.client.renderer.GlStateManager;
@@ -32,7 +32,7 @@ public class GridRenderer
 {
     public static void renderGrid(int lines, float spacing, float lineLength, float lineWidth)
     {
-        Tessellator.getInstance().getWorldRenderer().begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+        Tessellator.getInstance().getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
 
         for (int x = -lines; x <= lines; x++)
             for (int z = -lines; z <= lines; z++)
@@ -70,10 +70,10 @@ public class GridRenderer
         else
             z += zDir * 0.5;
 
-        WorldRenderer renderer = Tessellator.getInstance().getWorldRenderer();
+        VertexBuffer renderer = Tessellator.getInstance().getBuffer();
 
-        WorldRendererAccessor.addTranslation(renderer, x, y, z);
+        VertexBufferAccessor.addTranslation(renderer, x, y, z);
         IvRenderHelper.renderCuboid(renderer, xDir, yDir, zDir, 1f);
-        WorldRendererAccessor.addTranslation(renderer, -x, -y, -z);
+        VertexBufferAccessor.addTranslation(renderer, -x, -y, -z);
     }
 }

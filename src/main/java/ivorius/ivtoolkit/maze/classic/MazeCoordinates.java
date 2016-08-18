@@ -19,7 +19,7 @@ package ivorius.ivtoolkit.maze.classic;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Created by lukas on 13.04.15.

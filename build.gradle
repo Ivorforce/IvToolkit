@@ -11,7 +11,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
     }
 }
 
@@ -27,9 +27,9 @@ group = "ivorius.ivtoolkit" // http://maven.apache.org/guides/mini/guide-naming-
 archivesBaseName = "IvToolkit"
 
 minecraft {
-    version = "1.8.9-11.15.1.1722"
+    version = "1.9.4-12.17.0.1976"
     runDir = "eclipse"
-    mappings = "stable_22"
+    mappings = "stable_26"
     useDepAts = true
 }
 

@@ -31,7 +31,7 @@ public class PacketTileEntityClientEventHandler extends SchedulingMessageHandler
     @Override
     public WorldServer getServerWorld(PacketTileEntityClientEvent message, MessageContext ctx)
     {
-        return MinecraftServer.getServer().worldServerForDimension(message.getDimension());
+        return ctx.getServerHandler().playerEntity.getServerWorld().getMinecraftServer().worldServerForDimension(message.getDimension());
     }
 
     @Override

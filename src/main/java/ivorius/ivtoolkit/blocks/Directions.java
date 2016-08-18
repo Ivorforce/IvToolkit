@@ -18,7 +18,6 @@ package ivorius.ivtoolkit.blocks;
 
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
 import ivorius.ivtoolkit.tools.IvGsonHelper;
-import net.minecraft.util.StatCollector;
 import net.minecraft.util.EnumFacing;
 import org.apache.commons.lang3.ArrayUtils;
 
