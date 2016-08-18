@@ -51,13 +51,13 @@ public class PacketEntityCapabilityData implements IMessage
     public static <T> PacketEntityCapabilityData packetEntityData(Entity entity, String capabilityKey, EnumFacing facing, String context, Object... params)
     {
         Capability<T> capability = CapabilityUpdateRegistry.INSTANCE.capability(capabilityKey);
-        T eep = entity.getCapability(capability, facing);
+        T t = entity.getCapability(capability, facing);
 
-        if (!(eep instanceof PartialUpdateHandler))
+        if (!(t instanceof PartialUpdateHandler))
             throw new IllegalArgumentException("Capability must implement PartialUpdateHandler to send update packets!");
 
         ByteBuf buf = Unpooled.buffer();
-        ((PartialUpdateHandler) eep).writeUpdateData(buf, context, params);
+        ((PartialUpdateHandler) t).writeUpdateData(buf, context, params);
 
         return new PacketEntityCapabilityData(entity.getEntityId(), context, capabilityKey, facing, buf);
     }

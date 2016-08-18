@@ -28,7 +28,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 /**
  * Created by lukas on 02.07.14.
  */
-public class PacketExtendedEntityPropertiesDataHandler extends SchedulingMessageHandler<PacketEntityCapabilityData, IMessage>
+public class PacketEntityCapabilityDataHandler extends SchedulingMessageHandler<PacketEntityCapabilityData, IMessage>
 {
     @SideOnly(Side.CLIENT)
     @Override
@@ -47,8 +47,8 @@ public class PacketExtendedEntityPropertiesDataHandler extends SchedulingMessage
             Capability<T> capability = CapabilityUpdateRegistry.INSTANCE.capability(message.getCapabilityKey());
             T t = entity.getCapability(capability, message.getDirection());
 
-            if (t != null)
-                ((PartiallyUpdatableCapability<T>) capability).readUpdateData(t, message.getDirection(), message.getPayload(), message.getContext());
+            if (t instanceof PartialUpdateHandler)
+                ((PartialUpdateHandler) t).readUpdateData(message.getPayload(), message.getContext());
         }
     }
 }
