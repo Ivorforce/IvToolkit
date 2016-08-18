@@ -54,7 +54,7 @@ public class PacketEntityCapabilityData implements IMessage
         T eep = entity.getCapability(capability, facing);
 
         if (!(eep instanceof PartialUpdateHandler))
-            throw new IllegalArgumentException("IExtendedEntityProperties must implement IExtendedEntityPropertiesUpdateData to send update packets!");
+            throw new IllegalArgumentException("Capability must implement PartialUpdateHandler to send update packets!");
 
         ByteBuf buf = Unpooled.buffer();
         ((PartialUpdateHandler) eep).writeUpdateData(buf, context, params);
@@ -118,7 +118,7 @@ public class PacketEntityCapabilityData implements IMessage
         entityID = buf.readInt();
         context = ByteBufUtils.readUTF8String(buf);
         capabilityKey = ByteBufUtils.readUTF8String(buf);
-        direction = EnumFacing.getFront(buf.readInt());
+        direction = IvPacketHelper.maybeRead(buf, null, () -> direction = EnumFacing.getFront(buf.readInt()));
         payload = IvPacketHelper.readByteBuffer(buf);
     }
 
@@ -128,7 +128,7 @@ public class PacketEntityCapabilityData implements IMessage
         buf.writeInt(entityID);
         ByteBufUtils.writeUTF8String(buf, context);
         ByteBufUtils.writeUTF8String(buf, capabilityKey);
-        buf.writeInt(direction.getIndex());
+        IvPacketHelper.maybeWrite(buf, direction, () -> direction.getIndex());
         IvPacketHelper.writeByteBuffer(buf, payload);
     }
 

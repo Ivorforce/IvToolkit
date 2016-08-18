@@ -18,11 +18,25 @@ package ivorius.ivtoolkit.network;
 
 import io.netty.buffer.ByteBuf;
 
+import java.util.function.Supplier;
+
 /**
  * Created by lukas on 01.07.14.
  */
 public class IvPacketHelper
 {
+    public static void maybeWrite(ByteBuf dst, Object object, Runnable writer)
+    {
+        dst.writeBoolean(object != null);
+        if (object != null)
+            writer.run();
+    }
+
+    public static <T> T maybeRead(ByteBuf dst, T def, Supplier<T> reader)
+    {
+        return dst.readBoolean() ? reader.get() : def;
+    }
+
     public static void writeByteBuffer(ByteBuf dst, ByteBuf src)
     {
         int length = src.readableBytes();

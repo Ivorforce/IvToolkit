@@ -110,23 +110,23 @@ public class IvNetworkHelperServer
         return playersWatching;
     }
 
-    public static void sendEEPUpdatePacketToPlayer(Entity entity, String eepKey, EnumFacing facing, String context, SimpleNetworkWrapper network, EntityPlayer player, Object... params)
+    public static void sendEEPUpdatePacketToPlayer(Entity entity, String capabilityKey, EnumFacing facing, String context, SimpleNetworkWrapper network, EntityPlayer player, Object... params)
     {
         if (!(player instanceof EntityPlayerMP))
             throw new UnsupportedOperationException();
 
-        network.sendTo(PacketEntityCapabilityData.packetEntityData(entity, eepKey, facing, context, params), (EntityPlayerMP) player);
+        network.sendTo(PacketEntityCapabilityData.packetEntityData(entity, capabilityKey, facing, context, params), (EntityPlayerMP) player);
     }
 
-    public static void sendEEPUpdatePacket(Entity entity, String eepKey, EnumFacing facing, String context, SimpleNetworkWrapper network, Object... params)
+    public static void sendEEPUpdatePacket(Entity entity, String capabilityKey, EnumFacing facing, String context, SimpleNetworkWrapper network, Object... params)
     {
         if (entity.worldObj.isRemote)
             throw new UnsupportedOperationException();
 
         for (EntityPlayer player : ((WorldServer) entity.worldObj).getEntityTracker().getTrackingPlayers(entity))
-            sendEEPUpdatePacketToPlayer(entity, eepKey, facing, context, network, player, params);
+            sendEEPUpdatePacketToPlayer(entity, capabilityKey, facing, context, network, player, params);
 
         if (entity instanceof EntityPlayerMP) // Players don't 'track' themselves
-            sendEEPUpdatePacketToPlayer(entity, eepKey, facing, context, network, (EntityPlayer) entity, params);
+            sendEEPUpdatePacketToPlayer(entity, capabilityKey, facing, context, network, (EntityPlayer) entity, params);
     }
 }
