@@ -27,7 +27,7 @@ group = "ivorius.ivtoolkit" // http://maven.apache.org/guides/mini/guide-naming-
 archivesBaseName = "IvToolkit"
 
 minecraft {
-    version = "1.10-12.18.0.1999-1.10.0"
+    version = "1.10.2-12.18.1.2074"
     runDir = "eclipse"
     mappings = "snapshot_20160829"
     useDepAts = true
