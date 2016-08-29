@@ -18,7 +18,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'maven-publish'
 
-version = "1.2.7"
+version = "1.2.8"
 def ENV = System.getenv()
 if (ENV.DRONE_BUILD_NUMBER) {
     version += ".n" + ENV.DRONE_BUILD_NUMBER
@@ -27,9 +27,9 @@ group = "ivorius.ivtoolkit" // http://maven.apache.org/guides/mini/guide-naming-
 archivesBaseName = "IvToolkit"
 
 minecraft {
-    version = "1.9.4-12.17.0.1976"
+    version = "1.10-12.18.0.1999-1.10.0"
     runDir = "eclipse"
-    mappings = "stable_26"
+    mappings = "snapshot_20160829"
     useDepAts = true
 }
 

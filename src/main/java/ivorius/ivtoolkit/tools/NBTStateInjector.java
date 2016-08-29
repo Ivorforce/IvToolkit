@@ -20,6 +20,7 @@ import ivorius.ivtoolkit.IvToolkitCoreContainer;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTPrimitive;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
@@ -57,7 +58,7 @@ public class NBTStateInjector
 
     private static boolean hasPrimitive(NBTTagCompound compound, String key)
     {
-        return compound.hasKey(key) && compound.getTag(key) instanceof NBTBase.NBTPrimitive;
+        return compound.hasKey(key) && compound.getTag(key) instanceof NBTPrimitive;
     }
 
     public static void injectTEBlockFixTags(NBTTagCompound compound, String tileEntityID, NBTTagList list, String... keys)
