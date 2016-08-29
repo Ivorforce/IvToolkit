@@ -120,7 +120,9 @@ public class NBTStateInjector
                 String dest = fixTag.getString("tagDest");
                 String stringID = fixTag.getString("itemID");
 
-                compound.setString(dest, stringID); // Items now read Strings, so we can inject our ID directly \o/
+                Item item = registry.itemFromID(new ResourceLocation(stringID)); // Read from registry for legacy mappings
+                if (item != null)
+                    compound.setString(dest, Item.REGISTRY.getNameForObject(item).toString());  // Items now read Strings \o/
 
                 registry.modifyItemStackCompound(compound, new ResourceLocation(stringID));
                 break;
