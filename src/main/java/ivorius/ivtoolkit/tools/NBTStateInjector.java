@@ -121,7 +121,7 @@ public class NBTStateInjector
                 String stringID = fixTag.getString("itemID");
                 Item item = registry.itemFromID(new ResourceLocation(stringID));
                 if (item != null)
-                    compound.setInteger(dest, Item.getIdFromItem(item));
+                    compound.setString(dest, Item.REGISTRY.getNameForObject(item).toString()); // Items now read Strings \o/
                 else
                     IvToolkitCoreContainer.logger.warn("Failed to fix item tag from structure with ID '" + stringID + "'");
 
