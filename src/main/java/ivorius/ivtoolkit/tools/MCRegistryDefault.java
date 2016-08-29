@@ -21,6 +21,7 @@ import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 
 /**
  * Created by lukas on 30.06.14.
@@ -50,18 +51,18 @@ public class MCRegistryDefault implements MCRegistry
     @Override
     public Block blockFromID(ResourceLocation blockID)
     {
-        return (Block) Block.REGISTRY.getObject(blockID);
+        return Block.REGISTRY.getObject(blockID);
     }
 
     @Override
     public ResourceLocation idFromBlock(Block block)
     {
-        return (ResourceLocation) Block.REGISTRY.getNameForObject(block);
+        return Block.REGISTRY.getNameForObject(block);
     }
 
     @Override
-    public TileEntity loadTileEntity(NBTTagCompound compound)
+    public TileEntity loadTileEntity(World world, NBTTagCompound compound)
     {
-        return TileEntity.create(compound);
+        return TileEntity.create(world, compound);
     }
 }

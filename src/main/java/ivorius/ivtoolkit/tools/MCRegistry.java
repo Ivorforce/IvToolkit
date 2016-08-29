@@ -21,6 +21,7 @@ import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 
 /**
  * Created by lukas on 30.06.14.
@@ -37,5 +38,5 @@ public interface MCRegistry
 
     ResourceLocation idFromBlock(Block block);
 
-    TileEntity loadTileEntity(NBTTagCompound compound);
+    TileEntity loadTileEntity(World world, NBTTagCompound compound);
 }
