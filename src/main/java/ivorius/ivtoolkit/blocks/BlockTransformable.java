@@ -22,12 +22,15 @@ import net.minecraft.world.World;
 
 /**
  * Implement this if your Block needs special treatment when being transformed.
+ *
+ * This method is usually called post-default transform - the block state will already be transformed at this point.
+ * Only implement this if you have special positioning data in your tile entity that also needs transformation.
  */
 public interface BlockTransformable
 {
     /**
      * Transforms the object inside a certain bounds.
-     * Note that implementing this will delete default transforming functionality, so you need to do that yourself.
+     * Note that the mirror should be applied first.
      *
      * @param rotation The amount of times to rotate.
      * @param mirrorX If x is being mirrored.

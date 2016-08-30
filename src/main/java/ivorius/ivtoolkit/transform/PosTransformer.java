@@ -82,6 +82,16 @@ public class PosTransformer
     }
 
     @Deprecated
+    public static void transformBlock(World world, BlockPos coord, AxisAlignedTransform2D transform)
+    {
+        IBlockState state = world.getBlockState(coord);
+
+        if (state.getBlock() instanceof BlockTransformable)
+            ((BlockTransformable) state.getBlock()).transform(world, coord, state, transform.getRotation(), transform.isMirrorX());
+    }
+
+
+    @Deprecated
     public static void transformBlock(AxisAlignedTransform2D transform, World world, IBlockState state, BlockPos coord, Block block)
     {
         if (block instanceof BlockTransformable)
