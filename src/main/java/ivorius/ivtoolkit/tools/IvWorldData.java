@@ -25,6 +25,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.datafix.DataFixer;
+import net.minecraft.util.datafix.DataFixesManager;
+import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -52,16 +55,19 @@ public class IvWorldData
     public IvWorldData(NBTTagCompound compound, MCRegistry registry)
     {
         compound = (NBTTagCompound) compound.copy(); // Copy since ID fix tags are being removed when being applied
+        final DataFixer fixer = DataFixesManager.createFixer();
 
         blockCollection = new IvBlockCollection(compound.getCompoundTag("blockCollection"), registry);
 
         tileEntities = new ArrayList<>();
         tileEntities.addAll(NBTTagLists.compoundsFrom(compound, "tileEntities"));
         tileEntities.forEach(teCompound -> NBTStateInjector.recursivelyApply(teCompound, registry, false));
+        tileEntities.forEach(teCompound -> fixer.process(FixTypes.BLOCK_ENTITY, teCompound));
 
         entities = new ArrayList<>();
         entities.addAll(NBTTagLists.compoundsFrom(compound, "entities"));
         entities.forEach(entityCompound -> NBTStateInjector.recursivelyApply(entityCompound, registry, false));
+        tileEntities.forEach(teCompound -> fixer.process(FixTypes.ENTITY, teCompound));
     }
 
     public static IvWorldData capture(World world, BlockArea blockArea, boolean captureEntities)
