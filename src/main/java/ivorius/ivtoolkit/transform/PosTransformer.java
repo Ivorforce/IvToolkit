@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import ivorius.ivtoolkit.blocks.BlockTransformable;
 import ivorius.ivtoolkit.blocks.Directions;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
+import ivorius.ivtoolkit.math.MinecraftTransforms;
 import ivorius.ivtoolkit.tools.EntityCreatureAccessor;
 import ivorius.ivtoolkit.tools.EntityHangingAccessor;
 import net.minecraft.block.Block;
@@ -75,6 +76,12 @@ public class PosTransformer
         }
     }
 
+    public static IBlockState transformBlockState(IBlockState state, AxisAlignedTransform2D transform)
+    {
+        return MinecraftTransforms.map(transform, (rotation, mirror) -> state.withMirror(mirror).withRotation(rotation));
+    }
+
+    @Deprecated
     public static void transformBlock(AxisAlignedTransform2D transform, World world, IBlockState state, BlockPos coord, Block block)
     {
         if (block instanceof BlockTransformable)
@@ -83,6 +90,7 @@ public class PosTransformer
             transformBlockDefault(transform, world, state, coord, block);
     }
 
+    @Deprecated
     public static void transformBlockDefault(AxisAlignedTransform2D transform, World world, IBlockState state, BlockPos coord, Block block)
     {
         IBlockState newState = state;

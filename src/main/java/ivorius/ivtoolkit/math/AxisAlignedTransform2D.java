@@ -42,9 +42,9 @@ public class AxisAlignedTransform2D
     private final boolean mirrorX;
 
     @Deprecated
-    public AxisAlignedTransform2D(int rotation, boolean mirrorX)
+    public AxisAlignedTransform2D(int rotationClockwise, boolean mirrorX)
     {
-        this.rotation = ((rotation % 4) + 4) % 4;
+        this.rotation = ((rotationClockwise % 4) + 4) % 4;
         this.mirrorX = mirrorX;
     }
 
@@ -131,12 +131,13 @@ public class AxisAlignedTransform2D
         return rotation == 1 || rotation == 2;
     }
 
-    public int apply(int direction) // TODO Add mirror
+    public int apply(int direction)
     {
         if (direction < 0 || direction > 3)
             throw new IllegalArgumentException();
 
-        return (direction + rotation) % 4;
+        boolean mirrorApplies = mirrorX && (rotation % 2) == 1; // Mirror is applied first, so it has to be left or right to apply
+        return (direction + rotation + (mirrorApplies ? 2 : 0)) % 4;
     }
 
     public EnumFacing apply(EnumFacing facing)
