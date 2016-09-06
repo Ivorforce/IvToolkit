@@ -24,5 +24,5 @@ import javax.annotation.Nullable;
  */
 public interface ConnectionStrategy<T>
 {
-    float connect(@Nonnull MazePassage connection, @Nullable T a, @Nullable T b);
+    float connect(@Nonnull MazePassage connection, @Nullable T existing, @Nonnull T add);
 }

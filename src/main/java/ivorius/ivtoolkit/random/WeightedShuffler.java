@@ -16,12 +16,61 @@
 
 package ivorius.ivtoolkit.random;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.function.ToDoubleFunction;
 
 public class WeightedShuffler
 {
+    public static <T> Iterator<T> iterateShuffled(Random rand, List<T> items, ToDoubleFunction<T> weightFunction)
+    {
+        return new Iterator<T>()
+        {
+            double totalWeight = WeightedSelector.totalWeight(items, weightFunction);
+
+            @Override
+            public boolean hasNext()
+            {
+                return items.size() > 0;
+            }
+
+            @Override
+            public T next()
+            {
+                T next = totalWeight > 0
+                        ? WeightedSelector.select(rand, items, weightFunction, totalWeight, true)
+                        : items.remove(rand.nextInt(items.size()));
+                totalWeight -= weightFunction.applyAsDouble(next);
+                return next;
+            }
+        };
+    }
+
+    public static <T> Iterator<T> iterateShuffled(Random rand, List<WeightedSelector.SimpleItem<T>> items)
+    {
+        Iterator<WeightedSelector.SimpleItem<T>> iterator = iterateShuffled(rand, items, WeightedSelector.Item::getWeight);
+        return new Iterator<T>()
+        {
+            @Override
+            public boolean hasNext()
+            {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public T next()
+            {
+                return iterator.next().getItem();
+            }
+        };
+    }
+
+    public static <T extends WeightedSelector.Item> Iterator<T> iterateShuffledItems(Random rand, List<T> items)
+    {
+        return iterateShuffled(rand, items, WeightedSelector.Item::getWeight);
+    }
+
     public static <T extends WeightedSelector.Item> void shuffleItems(Random rand, List<T> items)
     {
         shuffleItems(rand, items, WeightedSelector.totalWeight(items));

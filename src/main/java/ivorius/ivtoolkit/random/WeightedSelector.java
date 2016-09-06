@@ -21,6 +21,7 @@ import com.google.common.collect.Collections2;
 import java.util.*;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class WeightedSelector
 {
@@ -159,6 +160,11 @@ public class WeightedSelector
             return new SimpleItem<>(weight, item);
         }
 
+        public static <T> List<SimpleItem<T>> apply(Stream<T> items, final ToDoubleFunction<T> weightFunction)
+        {
+            return items.map(input -> new SimpleItem<>(weightFunction.applyAsDouble(input), input)).collect(Collectors.toList());
+        }
+
         public static <T> Collection<SimpleItem<T>> apply(Collection<T> items, final ToDoubleFunction<T> weightFunction)
         {
             return Collections2.transform(items, item -> new SimpleItem<>(weightFunction.applyAsDouble(item), item));
@@ -166,7 +172,7 @@ public class WeightedSelector
 
         public static <T> List<SimpleItem<T>> apply(List<T> items, final ToDoubleFunction<T> weightFunction)
         {
-            return items.stream().map(input -> new SimpleItem<>(weightFunction.applyAsDouble(input), input)).collect(Collectors.toList());
+            return apply(items.stream(), weightFunction);
         }
 
         public T getItem()

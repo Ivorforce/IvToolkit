@@ -17,13 +17,14 @@
 package ivorius.ivtoolkit.maze.components;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import ivorius.ivtoolkit.IvToolkitCoreContainer;
+import ivorius.ivtoolkit.random.WeightedSelector;
 import ivorius.ivtoolkit.random.WeightedShuffler;
 import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -42,7 +43,7 @@ public class MazeComponentConnector
         List<ShiftedMazeComponent<M, C>> result = new ArrayList<>();
         ArrayDeque<Triple<MazeRoom, MazePassage, C>> exitStack = new ArrayDeque<>();
 
-        Predicate<ShiftedMazeComponent<M, C>> componentPredicate = ((Predicate<ShiftedMazeComponent<M, C>>) MazeComponents.compatibilityPredicate(maze, connectionStrategy)).and(input -> predicate.canPlace(maze, input));
+        Predicate<ShiftedMazeComponent<M, C>> componentPredicate = ((Predicate<ShiftedMazeComponent<M, C>>) input -> MazeComponents.componentsCompatible(maze, input, connectionStrategy)).and(input -> predicate.canPlace(maze, input));
 
         addAllExits(predicate, exitStack, maze.exits().entrySet());
 
@@ -80,19 +81,26 @@ public class MazeComponentConnector
             MazePassage exit = triple.getMiddle();
             C connection = triple.getRight();
 
-            List<ShiftedMazeComponent<M, C>> shuffled = Lists.newArrayList(
-                    components.stream().flatMap(MazeComponents.shiftAllFunction(exit, connection, connectionStrategy))
-                            .collect(Collectors.toList())
-            );
-            WeightedShuffler.shuffle(new Random(reversing.shuffleSeed), shuffled, shifted -> shifted.getComponent().getWeight() * MazeComponents.connectWeight(maze, shifted, connectionStrategy));
+            final ToDoubleFunction<ShiftedMazeComponent<M,C>> weightFunction = shifted -> shifted.getComponent().getWeight() * MazeComponents.connectWeight(maze, shifted, connectionStrategy);
 
-            if (reversing.triedIndices > shuffled.size())
+            List<WeightedSelector.SimpleItem<ShiftedMazeComponent<M, C>>> shiftedComponents = components.stream()
+                    .flatMap(MazeComponents.shiftAllFunction(exit, connection, connectionStrategy))
+                    .map(input -> new WeightedSelector.SimpleItem<>(weightFunction.applyAsDouble(input), input))
+                    .collect(Collectors.toCollection(ArrayList::new));
+
+            if (reversing.triedIndices >= shiftedComponents.size())
                 throw new RuntimeException("Maze component selection not static.");
 
+            Iterator<ShiftedMazeComponent<M, C>> shuffler = WeightedShuffler.iterateShuffled(new Random(reversing.shuffleSeed), shiftedComponents);
             ShiftedMazeComponent<M, C> placing = null;
-            while ((placing == null || !componentPredicate.test(placing)) && reversing.triedIndices < shuffled.size())
-                placing = shuffled.get(reversing.triedIndices++);
-            if (reversing.triedIndices >= shuffled.size()) placing = null;
+
+            for (int i = 0; i < reversing.triedIndices; i++) shuffler.next(); // Skip the tested ones
+            for (ShiftedMazeComponent<M, C> comp : (Iterable<ShiftedMazeComponent<M, C>>) () -> shuffler)
+            {
+                if (componentPredicate.test(placing = comp)) break; // Can place
+                reversing.triedIndices++;
+            }
+            if (reversing.triedIndices >= shiftedComponents.size()) placing = null; // Gone through every one, found none
 
             if (placing == null)
             {
