@@ -99,9 +99,12 @@ public class MazeComponentConnector
             for (ShiftedMazeComponent<M, C> comp : (Iterable<ShiftedMazeComponent<M, C>>) () -> shuffler)
             {
                 reversing.triedIndices++;
-                if (componentPredicate.test(placing = comp)) break; // Can place
+                if (componentPredicate.test(comp))
+                {
+                    placing = comp;
+                    break; // Can place
+                }
             }
-            if (reversing.triedIndices >= shiftedComponents.size()) placing = null; // Gone through every one, found none
 
             if (placing == null)
             {
