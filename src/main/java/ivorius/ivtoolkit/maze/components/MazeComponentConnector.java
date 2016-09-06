@@ -98,8 +98,8 @@ public class MazeComponentConnector
             for (int i = 0; i < reversing.triedIndices; i++) shuffler.next(); // Skip the tested ones
             for (ShiftedMazeComponent<M, C> comp : (Iterable<ShiftedMazeComponent<M, C>>) () -> shuffler)
             {
-                if (componentPredicate.test(placing = comp)) break; // Can place
                 reversing.triedIndices++;
+                if (componentPredicate.test(placing = comp)) break; // Can place
             }
             if (reversing.triedIndices >= shiftedComponents.size()) placing = null; // Gone through every one, found none
 
