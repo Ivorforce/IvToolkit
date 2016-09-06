@@ -43,7 +43,7 @@ public class MazeComponentConnector
         List<ShiftedMazeComponent<M, C>> result = new ArrayList<>();
         ArrayDeque<Triple<MazeRoom, MazePassage, C>> exitStack = new ArrayDeque<>();
 
-        Predicate<ShiftedMazeComponent<M, C>> componentPredicate = ((Predicate<ShiftedMazeComponent<M, C>>) input -> MazeComponents.componentsCompatible(maze, input, connectionStrategy)).and(input -> predicate.canPlace(maze, input));
+        Predicate<ShiftedMazeComponent<M, C>> componentPredicate = ((Predicate<ShiftedMazeComponent<M, C>>) input -> !MazeComponents.overlap(maze, input)).and(input -> predicate.canPlace(maze, input));
 
         addAllExits(predicate, exitStack, maze.exits().entrySet());
 
@@ -86,6 +86,7 @@ public class MazeComponentConnector
             List<WeightedSelector.SimpleItem<ShiftedMazeComponent<M, C>>> shiftedComponents = components.stream()
                     .flatMap(MazeComponents.shiftAllFunction(exit, connection, connectionStrategy))
                     .map(input -> new WeightedSelector.SimpleItem<>(weightFunction.applyAsDouble(input), input))
+                    .filter(w -> w.getWeight() >= 0)
                     .collect(Collectors.toCollection(ArrayList::new));
 
             if (reversing.triedIndices >= shiftedComponents.size())

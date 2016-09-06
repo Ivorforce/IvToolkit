@@ -51,11 +51,6 @@ public class MazeComponents
         return new ShiftedMazeComponent<>(component, shift, rooms, exits, reachability );
     }
 
-    public static <C> boolean componentsCompatible(final MazeComponent<C> existing, final MazeComponent<C> add, final ConnectionStrategy<C> strategy)
-    {
-        return !overlap(existing, add) && connectWeight(existing, add, strategy) >= 0;
-    }
-
     public static boolean overlap(MazeComponent<?> left, MazeComponent<?> right)
     {
         return Sets.intersection(left.rooms(), right.rooms()).size() > 0;
