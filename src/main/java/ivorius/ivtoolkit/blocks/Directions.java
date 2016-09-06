@@ -47,7 +47,7 @@ public class Directions
         if (arrayIndexSrc >= 0 && arrayIndexDst >= 0)
         {
             int mirrorRotations = mirrorX && ArrayUtils.contains(Directions.X_AXIS, dest) ? 2 : 0;
-            return ((arrayIndexSrc - arrayIndexDst + mirrorRotations) + HORIZONTAL.length) % HORIZONTAL.length;
+            return ((arrayIndexDst - arrayIndexSrc + mirrorRotations) + HORIZONTAL.length) % HORIZONTAL.length;
         }
 
         return null;
