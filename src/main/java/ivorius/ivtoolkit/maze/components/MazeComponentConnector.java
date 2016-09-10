@@ -89,20 +89,24 @@ public class MazeComponentConnector
                     .filter(w -> w.getWeight() >= 0)
                     .collect(Collectors.toCollection(ArrayList::new));
 
-            if (reversing.triedIndices >= shiftedComponents.size())
-                throw new RuntimeException("Maze component selection not static.");
-
-            Iterator<ShiftedMazeComponent<M, C>> shuffler = WeightedShuffler.iterateShuffled(new Random(reversing.shuffleSeed), shiftedComponents);
             ShiftedMazeComponent<M, C> placing = null;
 
-            for (int i = 0; i < reversing.triedIndices; i++) shuffler.next(); // Skip the tested ones
-            for (ShiftedMazeComponent<M, C> comp : (Iterable<ShiftedMazeComponent<M, C>>) () -> shuffler)
+            if (reversing.triedIndices > shiftedComponents.size()) // Tried more than available
+                throw new RuntimeException("Maze component selection not static.");
+            else if (reversing.triedIndices < shiftedComponents.size())
             {
-                reversing.triedIndices++;
-                if (componentPredicate.test(comp))
+                // More left to try
+                Iterator<ShiftedMazeComponent<M, C>> shuffler = WeightedShuffler.iterateShuffled(new Random(reversing.shuffleSeed), shiftedComponents);
+
+                for (int i = 0; i < reversing.triedIndices; i++) shuffler.next(); // Skip the tested ones
+                for (ShiftedMazeComponent<M, C> comp : (Iterable<ShiftedMazeComponent<M, C>>) () -> shuffler)
                 {
-                    placing = comp;
-                    break; // Can place
+                    reversing.triedIndices++;
+                    if (componentPredicate.test(comp))
+                    {
+                        placing = comp;
+                        break; // Can place
+                    }
                 }
             }
 
