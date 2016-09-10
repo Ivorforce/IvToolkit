@@ -30,22 +30,22 @@ public class MinecraftTransforms
 {
     public static AxisAlignedTransform2D from(Rotation rotation, Mirror mirror)
     {
-        return AxisAlignedTransform2D.from(from(rotation) + (mirror == Mirror.FRONT_BACK ? 2 : 0), mirror != Mirror.NONE);
+        return AxisAlignedTransform2D.from(from(rotation) + (mirror == Mirror.LEFT_RIGHT ? 2 : 0), mirror != Mirror.NONE);
     }
 
     public static Pair<Rotation, Mirror> to(AxisAlignedTransform2D transform)
     {
-        return Pair.of(to(transform.getRotation()), transform.isMirrorX() ? Mirror.LEFT_RIGHT : Mirror.NONE);
+        return Pair.of(to(transform.getRotation()), transform.isMirrorX() ? Mirror.FRONT_BACK : Mirror.NONE);
     }
 
     public static void useAs(AxisAlignedTransform2D transform, BiConsumer<Rotation, Mirror> consumer)
     {
-        consumer.accept(to(transform.getRotation()), transform.isMirrorX() ? Mirror.LEFT_RIGHT : Mirror.NONE);
+        consumer.accept(to(transform.getRotation()), transform.isMirrorX() ? Mirror.FRONT_BACK : Mirror.NONE);
     }
 
     public static <T> T map(AxisAlignedTransform2D transform, BiFunction<Rotation, Mirror, T> consumer)
     {
-        return consumer.apply(to(transform.getRotation()), transform.isMirrorX() ? Mirror.LEFT_RIGHT : Mirror.NONE);
+        return consumer.apply(to(transform.getRotation()), transform.isMirrorX() ? Mirror.FRONT_BACK : Mirror.NONE);
     }
 
     public static Rotation to(int rotation)
