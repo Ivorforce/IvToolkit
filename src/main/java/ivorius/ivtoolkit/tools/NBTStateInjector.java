@@ -17,7 +17,7 @@
 package ivorius.ivtoolkit.tools;
 
 import com.google.common.primitives.Ints;
-import ivorius.ivtoolkit.IvToolkitCoreContainer;
+import ivorius.ivtoolkit.IvToolkit;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTBase;
@@ -89,7 +89,7 @@ public class NBTStateInjector
         }
         else
         {
-            IvToolkitCoreContainer.logger.warn("Failed to apply block tag for structure with ID '" + blockID + "'");
+            IvToolkit.logger.warn("Failed to apply block tag for structure with ID '" + blockID + "'");
         }
     }
 
@@ -145,11 +145,11 @@ public class NBTStateInjector
                 if (block != null)
                     compound.setInteger(dest, Block.getIdFromBlock(block));
                 else
-                    IvToolkitCoreContainer.logger.warn("Failed to fix block tag from structure with ID '" + fixTag.getString("blockID") + "'");
+                    IvToolkit.logger.warn("Failed to fix block tag from structure with ID '" + fixTag.getString("blockID") + "'");
                 break;
             }
             default:
-                IvToolkitCoreContainer.logger.warn("Unrecognized ID fix tag in structure with type '" + type + "'");
+                IvToolkit.logger.warn("Unrecognized ID fix tag in structure with type '" + type + "'");
                 break;
         }
     }

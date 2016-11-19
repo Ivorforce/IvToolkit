@@ -14,19 +14,21 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit;
+package ivorius.ivtoolkit.util;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
- * Created by lukas on 21.03.16.
+ * Created by lukas on 07.09.16.
  */
-public class IvToolkit
+public class IvLists
 {
-    public static final String NAME = "IvToolkit";
-    public static final String VERSION = "1.2.8.5";
-    public static final String MODID = "ivtoolkit";
-
-    public static Logger logger = LogManager.getLogger(MODID);
+    @SafeVarargs
+    public static <S, D> List<D> enumerate(S obj, Function<S, D>... functions)
+    {
+        return Arrays.stream(functions).map(func -> func.apply(obj)).collect(Collectors.toList());
+    }
 }

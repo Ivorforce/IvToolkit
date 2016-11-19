@@ -17,7 +17,7 @@
 package ivorius.ivtoolkit.maze.components;
 
 import com.google.common.collect.ImmutableList;
-import ivorius.ivtoolkit.IvToolkitCoreContainer;
+import ivorius.ivtoolkit.IvToolkit;
 import ivorius.ivtoolkit.random.WeightedSelector;
 import ivorius.ivtoolkit.random.WeightedShuffler;
 import org.apache.commons.lang3.tuple.Triple;
@@ -114,8 +114,8 @@ public class MazeComponentConnector
             {
                 if (reverses == 0)
                 {
-                    IvToolkitCoreContainer.logger.warn("Did not find fitting component for maze!");
-                    IvToolkitCoreContainer.logger.warn("Suggested: X with exits " + maze.exits().entrySet().stream().filter(entryConnectsTo(room)).collect(Collectors.toList()));
+                    IvToolkit.logger.warn("Did not find fitting component for maze!");
+                    IvToolkit.logger.warn("Suggested: X with exits " + maze.exits().entrySet().stream().filter(entryConnectsTo(room)).collect(Collectors.toList()));
 
                     reversing = null;
                 }
@@ -125,8 +125,8 @@ public class MazeComponentConnector
 
                     if (placeOrder.size() == 0)
                     {
-                        IvToolkitCoreContainer.logger.warn("Maze is not completable!");
-                        IvToolkitCoreContainer.logger.warn("Switching to flawed mode.");
+                        IvToolkit.logger.warn("Maze is not completable!");
+                        IvToolkit.logger.warn("Switching to flawed mode.");
                         reverses = 0;
                         reversing = null;
                     }

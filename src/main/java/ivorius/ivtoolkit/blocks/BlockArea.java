@@ -99,13 +99,7 @@ public class BlockArea implements Iterable<BlockPos>
 
     public Stream<BlockPos> stream()
     {
-        BlockPos lower = getLowerCorner();
-        BlockPos higher = getHigherCorner();
-        return IvStreams.flatMapToObj(
-                IntStream.range(lower.getX(), higher.getX() + 1), x ->
-                        IvStreams.flatMapToObj(IntStream.range(lower.getY(), higher.getY() + 1), y ->
-                                IntStream.range(lower.getZ(), higher.getZ() + 1).mapToObj(z ->
-                                        new BlockPos(x, y, z))));
+        return BlockAreas.streamPositions(this);
     }
 
     @Override

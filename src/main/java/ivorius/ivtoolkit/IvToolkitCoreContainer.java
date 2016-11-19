@@ -31,7 +31,6 @@ import java.util.Collections;
  */
 public class IvToolkitCoreContainer extends DummyModContainer
 {
-    public static Logger logger = LogManager.getLogger(IvToolkit.MODID);
 
     public IvToolkitCoreContainer()
     {

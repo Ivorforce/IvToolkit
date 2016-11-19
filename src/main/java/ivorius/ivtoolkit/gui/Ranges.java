@@ -14,19 +14,17 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit;
+package ivorius.ivtoolkit.gui;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.minecraft.util.math.MathHelper;
 
 /**
- * Created by lukas on 21.03.16.
+ * Created by lukas on 19.11.16.
  */
-public class IvToolkit
+public class Ranges
 {
-    public static final String NAME = "IvToolkit";
-    public static final String VERSION = "1.2.8.5";
-    public static final String MODID = "ivtoolkit";
-
-    public static Logger logger = LogManager.getLogger(MODID);
+    public static IntegerRange roundedIntRange(FloatRange floatRange)
+    {
+        return new IntegerRange(MathHelper.floor_float(floatRange.getMin() + 0.5f), MathHelper.floor_float(floatRange.getMax() + 0.5f));
+    }
 }

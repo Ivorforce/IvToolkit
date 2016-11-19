@@ -14,19 +14,28 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit;
+package ivorius.ivtoolkit.lang;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import ivorius.ivtoolkit.IvToolkit;
 
 /**
  * Created by lukas on 21.03.16.
  */
-public class IvToolkit
+public class IvClasses
 {
-    public static final String NAME = "IvToolkit";
-    public static final String VERSION = "1.2.8.5";
-    public static final String MODID = "ivtoolkit";
+    public static <T> T instantiate(Class<T> clazz)
+    {
+        T t = null;
 
-    public static Logger logger = LogManager.getLogger(MODID);
+        try
+        {
+            t = clazz.newInstance();
+        }
+        catch (InstantiationException | IllegalAccessException e)
+        {
+            IvToolkit.logger.error(e);
+        }
+
+        return t;
+    }
 }

@@ -14,19 +14,19 @@
  *    limitations under the License.
  */
 
-package ivorius.ivtoolkit;
+package ivorius.ivtoolkit.util;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.stream.Stream;
 
 /**
- * Created by lukas on 21.03.16.
+ * Created by lukas on 19.09.16.
  */
-public class IvToolkit
+public class LineSelections
 {
-    public static final String NAME = "IvToolkit";
-    public static final String VERSION = "1.2.8.5";
-    public static final String MODID = "ivtoolkit";
-
-    public static Logger logger = LogManager.getLogger(MODID);
+    public static LineSelection combine(Stream<LineSelection> selections, boolean additive)
+    {
+        LineSelection selection = new LineSelection(!additive);
+        selections.forEach(s -> selection.set(s, additive, additive));
+        return selection;
+    }
 }
