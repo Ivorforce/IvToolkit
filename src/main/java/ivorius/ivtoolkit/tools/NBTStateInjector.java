@@ -16,6 +16,7 @@
 
 package ivorius.ivtoolkit.tools;
 
+import com.google.common.primitives.Ints;
 import ivorius.ivtoolkit.IvToolkitCoreContainer;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -35,7 +36,8 @@ public class NBTStateInjector
 
     public static void recursivelyInject(NBTBase nbt)
     {
-        NBTWalker.walkCompounds(nbt, cmp -> {
+        NBTWalker.walkCompounds(nbt, cmp ->
+        {
             inject(cmp);
             return true;
         });
@@ -93,7 +95,8 @@ public class NBTStateInjector
 
     public static void recursivelyApply(NBTBase nbt, MCRegistry registry, boolean remove)
     {
-        NBTWalker.walkCompounds(nbt, cmp -> {
+        NBTWalker.walkCompounds(nbt, cmp ->
+        {
             apply(cmp, registry);
             if (remove) cmp.removeTag(ID_FIX_TAG_KEY);
             return true;
@@ -107,6 +110,12 @@ public class NBTStateInjector
             NBTTagList list = compound.getTagList(ID_FIX_TAG_KEY, Constants.NBT.TAG_COMPOUND);
             for (int i = 0; i < list.tagCount(); i++)
                 applyIDFixTag(compound, registry, list.getCompoundTagAt(i));
+
+            if (compound.hasKey("id") && compound.hasKey("Count") && compound.hasKey("Damage")) // Prooobably an item stack
+            {
+                if (Ints.tryParse(compound.getString("id")) == null) // If this is null, we have a String ID
+                    registry.modifyItemStackCompound(compound, new ResourceLocation(compound.getString("id")));
+            }
         }
     }
 
@@ -119,24 +128,24 @@ public class NBTStateInjector
             case "item":
             {
                 String dest = fixTag.getString("tagDest");
-                String stringID = fixTag.getString("itemID");
+                ResourceLocation itemID = new ResourceLocation(fixTag.getString("itemID"));
 
-                Item item = registry.itemFromID(new ResourceLocation(stringID)); // Read from registry for legacy mappings
+                Item item = registry.itemFromID(itemID); // Read from registry for legacy mappings
                 if (item != null)
                     compound.setString(dest, Item.REGISTRY.getNameForObject(item).toString());  // Items now read Strings \o/
 
-                registry.modifyItemStackCompound(compound, new ResourceLocation(stringID));
                 break;
             }
             case "block":
             {
                 String dest = fixTag.getString("tagDest");
-                String stringID = fixTag.getString("blockID");
-                Block block = registry.blockFromID(new ResourceLocation(stringID));
+                ResourceLocation blockID = new ResourceLocation(fixTag.getString("blockID"));
+
+                Block block = registry.blockFromID(blockID);
                 if (block != null)
                     compound.setInteger(dest, Block.getIdFromBlock(block));
                 else
-                    IvToolkitCoreContainer.logger.warn("Failed to fix block tag from structure with ID '" + stringID + "'");
+                    IvToolkitCoreContainer.logger.warn("Failed to fix block tag from structure with ID '" + fixTag.getString("blockID") + "'");
                 break;
             }
             default:
