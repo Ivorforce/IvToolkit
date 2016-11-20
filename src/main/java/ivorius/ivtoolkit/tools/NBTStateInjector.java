@@ -110,12 +110,12 @@ public class NBTStateInjector
             NBTTagList list = compound.getTagList(ID_FIX_TAG_KEY, Constants.NBT.TAG_COMPOUND);
             for (int i = 0; i < list.tagCount(); i++)
                 applyIDFixTag(compound, registry, list.getCompoundTagAt(i));
+        }
 
-            if (compound.hasKey("id") && compound.hasKey("Count") && compound.hasKey("Damage")) // Prooobably an item stack
-            {
-                if (Ints.tryParse(compound.getString("id")) == null) // If this is null, we have a String ID
-                    registry.modifyItemStackCompound(compound, new ResourceLocation(compound.getString("id")));
-            }
+        if (compound.hasKey("id") && compound.hasKey("Count") && compound.hasKey("Damage")) // Prooobably an item stack
+        {
+            if (Ints.tryParse(compound.getString("id")) == null) // If this is null, we have a String ID
+                registry.modifyItemStackCompound(compound, new ResourceLocation(compound.getString("id")));
         }
     }
 
