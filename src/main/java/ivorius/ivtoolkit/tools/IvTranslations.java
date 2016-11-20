@@ -24,6 +24,7 @@ import java.util.List;
 /**
  * Created by lukas on 17.02.15.
  */
+@SuppressWarnings("deprecation")
 public class IvTranslations
 {
     public static boolean has(String key)

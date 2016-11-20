@@ -34,12 +34,14 @@ public class BlockStates
 
     public static IBlockState fromMetadata(Block block, int metadata)
     {
+        //noinspection deprecation
         return block.getStateFromMeta(metadata);
     }
 
     public static IBlockState readBlockState(ByteBuf buf)
     {
         Block block = Block.REGISTRY.getObject(new ResourceLocation(ByteBufUtils.readUTF8String(buf)));
+        //noinspection deprecation
         return block.getStateFromMeta(buf.readInt());
     }
 

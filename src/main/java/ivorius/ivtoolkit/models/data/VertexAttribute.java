@@ -108,6 +108,7 @@ public final class VertexAttribute
     }
 
     public static VertexAttribute ColorUnpacked () {
+        //noinspection deprecation
         return new VertexAttribute(Usage.Color, 4, GL11.GL_FLOAT, false);
     }
 

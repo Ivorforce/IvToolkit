@@ -79,7 +79,7 @@ public class IvBlockCollection
 
         blockStates = new IBlockState[width * height * length];
         for (int i = 0; i < blockStates.length; i++)
-            blockStates[i] = blocks[i].getStateFromMeta(metas[i]);
+            blockStates[i] = BlockStates.fromMetadata(blocks[i], metas[i]);
     }
 
     private static IBlockState[] airArray(int width, int height, int length)

@@ -18,11 +18,14 @@ package ivorius.ivtoolkit.lang;
 
 import ivorius.ivtoolkit.IvToolkit;
 
+import javax.annotation.Nullable;
+
 /**
  * Created by lukas on 21.03.16.
  */
 public class IvClasses
 {
+    @Nullable
     public static <T> T instantiate(Class<T> clazz)
     {
         T t = null;
@@ -34,6 +37,22 @@ public class IvClasses
         catch (InstantiationException | IllegalAccessException e)
         {
             IvToolkit.logger.error(e);
+        }
+
+        return t;
+    }
+
+    @Nullable
+    public static <T> T tryInstantiate(Class<T> clazz)
+    {
+        T t = null;
+
+        try
+        {
+            t = clazz.newInstance();
+        }
+        catch (InstantiationException | IllegalAccessException ignored)
+        {
         }
 
         return t;
