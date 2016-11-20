@@ -16,7 +16,6 @@
 
 package ivorius.ivtoolkit.blocks;
 
-import ivorius.ivtoolkit.tools.IvStreams;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 import java.util.Iterator;
@@ -111,7 +110,7 @@ public class BlockSurfaceArea implements Iterable<BlockSurfacePos>
     {
         BlockSurfacePos lower = getLowerCorner();
         BlockSurfacePos higher = getHigherCorner();
-        return IvStreams.flatMapToObj(IntStream.range(lower.x, higher.x + 1), x -> IntStream.range(lower.z, higher.z + 1).mapToObj(z -> new BlockSurfacePos(x, z)));
+        return ivorius.ivtoolkit.util.IvStreams.flatMapToObj(IntStream.range(lower.x, higher.x + 1), x -> IntStream.range(lower.z, higher.z + 1).mapToObj(z -> new BlockSurfacePos(x, z)));
     }
 
     public StructureBoundingBox toStructureBoundingBox(int minY, int maxY)

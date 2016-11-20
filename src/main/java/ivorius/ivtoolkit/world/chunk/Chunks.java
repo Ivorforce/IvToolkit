@@ -17,7 +17,6 @@
 package ivorius.ivtoolkit.world.chunk;
 
 import ivorius.ivtoolkit.blocks.BlockSurfacePos;
-import ivorius.ivtoolkit.tools.IvStreams;
 import net.minecraft.util.math.ChunkPos;
 
 import java.util.stream.IntStream;
@@ -41,6 +40,6 @@ public class Chunks
         int repeatsX = (15 - (lowestX - (chunkPos.chunkXPos << 4))) / repeatX;
         int repeatsZ = (15 - (lowestZ - (chunkPos.chunkZPos << 4))) / repeatZ;
 
-        return IvStreams.flatMapToObj(IntStream.range(0, repeatsX + 1), iX -> IntStream.range(0, repeatsZ + 1).mapToObj(iZ -> new BlockSurfacePos(lowestX + iX * repeatX, lowestZ + iZ * repeatZ)));
+        return ivorius.ivtoolkit.util.IvStreams.flatMapToObj(IntStream.range(0, repeatsX + 1), iX -> IntStream.range(0, repeatsZ + 1).mapToObj(iZ -> new BlockSurfacePos(lowestX + iX * repeatX, lowestZ + iZ * repeatZ)));
     }
 }

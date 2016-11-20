@@ -16,12 +16,10 @@
 
 package ivorius.ivtoolkit.blocks;
 
-import ivorius.ivtoolkit.tools.IvStreams;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Iterator;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**

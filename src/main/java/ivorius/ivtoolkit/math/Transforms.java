@@ -16,8 +16,6 @@
 
 package ivorius.ivtoolkit.math;
 
-import ivorius.ivtoolkit.tools.IvStreams;
-
 import javax.annotation.Nonnull;
 import java.util.function.IntPredicate;
 import java.util.stream.IntStream;
@@ -30,12 +28,12 @@ public class Transforms
 {
     public static Stream<AxisAlignedTransform2D> transformStream(IntPredicate rotate, IntPredicate mirror)
     {
-        return IvStreams.flatMapToObj(rotationStream(rotate), r -> mirrorStream(mirror).mapToObj(m -> AxisAlignedTransform2D.from(r, m != 0)));
+        return ivorius.ivtoolkit.util.IvStreams.flatMapToObj(rotationStream(rotate), r -> mirrorStream(mirror).mapToObj(m -> AxisAlignedTransform2D.from(r, m != 0)));
     }
 
     public static Stream<AxisAlignedTransform2D> transformStream(boolean rotate, boolean mirror)
     {
-        return IvStreams.flatMapToObj(rotationStream(rotate), r -> mirrorStream(mirror).mapToObj(m -> AxisAlignedTransform2D.from(r, m != 0)));
+        return ivorius.ivtoolkit.util.IvStreams.flatMapToObj(rotationStream(rotate), r -> mirrorStream(mirror).mapToObj(m -> AxisAlignedTransform2D.from(r, m != 0)));
     }
 
     @Nonnull
