@@ -32,10 +32,7 @@ public class IvInventoryHelper
         }
         else
         {
-            if (--inventory.mainInventory[var2].stackSize <= 0)
-            {
-                inventory.mainInventory[var2] = null;
-            }
+            inventory.mainInventory.get(var2).setCount(inventory.mainInventory.get(var2).getCount() - 1);
 
             return true;
         }
@@ -43,9 +40,9 @@ public class IvInventoryHelper
 
     public static int getInventorySlotContainItem(InventoryPlayer inventory, ItemStack itemStack)
     {
-        for (int var2 = 0; var2 < inventory.mainInventory.length; ++var2)
+        for (int var2 = 0; var2 < inventory.mainInventory.size(); ++var2)
         {
-            if (inventory.mainInventory[var2] != null && inventory.mainInventory[var2].isItemEqual(itemStack))
+            if (!inventory.mainInventory.get(var2).isEmpty() && inventory.mainInventory.get(var2).isItemEqual(itemStack))
             {
                 return var2;
             }
@@ -56,9 +53,9 @@ public class IvInventoryHelper
 
     public static int getInventorySlotContainItem(InventoryPlayer inventory, Item item)
     {
-        for (int var2 = 0; var2 < inventory.mainInventory.length; ++var2)
+        for (int var2 = 0; var2 < inventory.mainInventory.size(); ++var2)
         {
-            if (inventory.mainInventory[var2] != null && inventory.mainInventory[var2].getItem() == item)
+            if (!inventory.mainInventory.get(var2).isEmpty() && inventory.mainInventory.get(var2).getItem() == item)
             {
                 return var2;
             }

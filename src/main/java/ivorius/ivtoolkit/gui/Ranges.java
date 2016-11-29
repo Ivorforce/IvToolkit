@@ -25,6 +25,6 @@ public class Ranges
 {
     public static IntegerRange roundedIntRange(FloatRange floatRange)
     {
-        return new IntegerRange(MathHelper.floor_float(floatRange.getMin() + 0.5f), MathHelper.floor_float(floatRange.getMax() + 0.5f));
+        return new IntegerRange(MathHelper.floor(floatRange.getMin() + 0.5f), MathHelper.floor(floatRange.getMax() + 0.5f));
     }
 }

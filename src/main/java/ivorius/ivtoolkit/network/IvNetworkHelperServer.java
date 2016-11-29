@@ -120,10 +120,10 @@ public class IvNetworkHelperServer
 
     public static void sendEEPUpdatePacket(Entity entity, String capabilityKey, EnumFacing facing, String context, SimpleNetworkWrapper network, Object... params)
     {
-        if (entity.worldObj.isRemote)
+        if (entity.world.isRemote)
             throw new UnsupportedOperationException();
 
-        for (EntityPlayer player : ((WorldServer) entity.worldObj).getEntityTracker().getTrackingPlayers(entity))
+        for (EntityPlayer player : ((WorldServer) entity.world).getEntityTracker().getTrackingPlayers(entity))
             sendEEPUpdatePacketToPlayer(entity, capabilityKey, facing, context, network, player, params);
 
         if (entity instanceof EntityPlayerMP) // Players don't 'track' themselves

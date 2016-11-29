@@ -35,8 +35,8 @@ public class IntegerRange
     @Deprecated
     public IntegerRange(FloatRange floatRange)
     {
-        min = MathHelper.floor_float(floatRange.getMin());
-        max = MathHelper.floor_float(floatRange.getMax());
+        min = MathHelper.floor(floatRange.getMin());
+        max = MathHelper.floor(floatRange.getMax());
     }
 
     public int getMin()

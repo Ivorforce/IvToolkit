@@ -151,7 +151,7 @@ public class IvBlockCollection
         if (intersection != null)
         {
             position = new Vec3d(intersection.getX(), intersection.getY(), intersection.getZ());
-            BlockPos curCoord = new BlockPos(MathHelper.floor_double(position.xCoord), MathHelper.floor_double(position.yCoord), MathHelper.floor_double(position.zCoord));
+            BlockPos curCoord = new BlockPos(position.xCoord, position.yCoord, position.zCoord);
             EnumFacing hitSide = ((EnumFacing) intersection.getHitInfo()).getOpposite();
 
             while (hasCoord(curCoord))

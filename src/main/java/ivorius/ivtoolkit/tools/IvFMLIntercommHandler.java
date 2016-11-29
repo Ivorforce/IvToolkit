@@ -123,7 +123,7 @@ public abstract class IvFMLIntercommHandler
     {
         if (!server)
         {
-            return Minecraft.getMinecraft().theWorld.getEntityByID(compound.getInteger(entityKey));
+            return Minecraft.getMinecraft().world.getEntityByID(compound.getInteger(entityKey));
         }
         else
         {

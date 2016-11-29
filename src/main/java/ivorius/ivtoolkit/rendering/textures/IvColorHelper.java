@@ -32,7 +32,7 @@ public class IvColorHelper
 
     public static int[] getARBGInts(float[] argb)
     {
-        return new int[]{MathHelper.floor_float(argb[0] * 255.0f + 0.5f), MathHelper.floor_float(argb[1] * 255.0f + 0.5f), MathHelper.floor_float(argb[2] * 255.0f + 0.5f), MathHelper.floor_float(argb[3] * 255.0f + 0.5f)};
+        return new int[]{MathHelper.floor(argb[0] * 255.0f + 0.5f), MathHelper.floor(argb[1] * 255.0f + 0.5f), MathHelper.floor(argb[2] * 255.0f + 0.5f), MathHelper.floor(argb[3] * 255.0f + 0.5f)};
     }
 
     public static float[] getARBGFloats(int[] argb)
@@ -52,10 +52,10 @@ public class IvColorHelper
 
     public static int getARBGInt(float[] argb)
     {
-        int alpha = MathHelper.clamp_int(MathHelper.floor_float(argb[0] * 255.0f + 0.5f), 0, 255);
-        int red = MathHelper.clamp_int(MathHelper.floor_float(argb[1] * 255.0f + 0.5f), 0, 255);
-        int green = MathHelper.clamp_int(MathHelper.floor_float(argb[2] * 255.0f + 0.5f), 0, 255);
-        int blue = MathHelper.clamp_int(MathHelper.floor_float(argb[3] * 255.0f + 0.5f), 0, 255);
+        int alpha = MathHelper.clamp(MathHelper.floor(argb[0] * 255.0f + 0.5f), 0, 255);
+        int red = MathHelper.clamp(MathHelper.floor(argb[1] * 255.0f + 0.5f), 0, 255);
+        int green = MathHelper.clamp(MathHelper.floor(argb[2] * 255.0f + 0.5f), 0, 255);
+        int blue = MathHelper.clamp(MathHelper.floor(argb[3] * 255.0f + 0.5f), 0, 255);
 
         return (alpha << 24) | (red << 16) | (green << 8) | blue;
     }

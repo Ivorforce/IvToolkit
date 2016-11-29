@@ -124,7 +124,7 @@ public class IvMathHelper
 
     public static int randomLinearNumber(Random random, float number)
     {
-        return MathHelper.floor_float(number) + ((random.nextFloat() < (number % 1.0f)) ? 1 : 0);
+        return MathHelper.floor(number) + ((random.nextFloat() < (number % 1.0f)) ? 1 : 0);
     }
 
     public static float zeroToOne(float value, float min, float max)

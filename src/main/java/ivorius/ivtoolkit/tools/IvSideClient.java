@@ -30,12 +30,12 @@ public class IvSideClient
     @SideOnly(Side.CLIENT)
     public static EntityPlayer getClientPlayer()
     {
-        return Minecraft.getMinecraft().thePlayer;
+        return Minecraft.getMinecraft().player;
     }
 
     @SideOnly(Side.CLIENT)
     public static World getClientWorld()
     {
-        return Minecraft.getMinecraft().theWorld;
+        return Minecraft.getMinecraft().world;
     }
 }

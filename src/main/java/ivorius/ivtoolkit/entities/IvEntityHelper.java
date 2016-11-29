@@ -24,7 +24,7 @@ public class IvEntityHelper
 {
     public static boolean addAsCurrentItem(EntityPlayer player, ItemStack stack)
     {
-        return addAsCurrentItem(player.inventory, stack, player.worldObj.isRemote);
+        return addAsCurrentItem(player.inventory, stack, player.world.isRemote);
     }
 
     public static boolean addAsCurrentItem(InventoryPlayer inventory, ItemStack stack, boolean isRemote)

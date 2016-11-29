@@ -115,7 +115,7 @@ public class IvTileEntityMultiBlock extends TileEntity
     {
         if (parentCoords != null)
         {
-            TileEntity parentTileEntity = worldObj.getTileEntity(getActiveParentCoords());
+            TileEntity parentTileEntity = world.getTileEntity(getActiveParentCoords());
 
             if (parentTileEntity != null && this.getClass().equals(parentTileEntity.getClass()))
                 return (IvTileEntityMultiBlock) parentTileEntity;

@@ -177,11 +177,17 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
         return new int[]{max.getX() - min.getX(), max.getY() - min.getY(), max.getZ() - min.getZ()};
     }
 
+    @Deprecated
     public static boolean canPlace(World world, IBlockState state, List<BlockPos> positions, Entity entity, ItemStack stack)
+    {
+        return canPlace(world, state, positions, entity);
+    }
+
+    public static boolean canPlace(World world, IBlockState state, List<BlockPos> positions, Entity entity)
     {
         for (BlockPos position : positions)
         {
-            if (!world.canBlockBePlaced(state.getBlock(), position, false, EnumFacing.DOWN, entity, stack))
+            if (!world.mayPlace(state.getBlock(), position, false, EnumFacing.DOWN, entity))
                 return false;
         }
 

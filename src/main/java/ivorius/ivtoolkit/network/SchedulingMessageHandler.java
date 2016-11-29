@@ -40,7 +40,7 @@ public class SchedulingMessageHandler<REQ extends IMessage, REPLY extends IMessa
 
     public WorldServer getServerWorld(REQ message, MessageContext ctx)
     {
-        return (WorldServer) ctx.getServerHandler().playerEntity.worldObj;
+        return (WorldServer) ctx.getServerHandler().playerEntity.world;
     }
 
     @SideOnly(Side.CLIENT)

@@ -36,7 +36,7 @@ public class IvBytePacker
 
     public static byte[] packValues(int[] values, byte bitLength)
     {
-        byte[] packed = new byte[MathHelper.ceiling_float_int(values.length * bitLength / 8.0f)];
+        byte[] packed = new byte[MathHelper.ceil(values.length * bitLength / 8.0f)];
         int currentArrayIndex = 0;
 
         long currentVal = 0;
