@@ -35,7 +35,7 @@ public class IvOpenGLHelper
 
     public static void glValidateProgram(int program)
     {
-        Field useARBField = ReflectionHelper.findField(OpenGlHelper.class, "field_153214_y");
+        Field useARBField = ReflectionHelper.findField(OpenGlHelper.class, "arbShaders", "field_153214_y");
         useARBField.setAccessible(true);
         boolean useARB = false;
 
