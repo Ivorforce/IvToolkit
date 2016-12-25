@@ -34,7 +34,7 @@ public class EntityHangingAccessor
     {
         return hangingSetDirection != null
                 ? hangingSetDirection
-                : (hangingSetDirection = ReflectionHelper.findMethod(EntityHanging.class, null, new String[]{"func_174859_a"}, EnumFacing.class));
+                : (hangingSetDirection = ReflectionHelper.findMethod(EntityHanging.class, null, new String[]{"updateFacingWithBoundingBox", "func_174859_a"}, EnumFacing.class));
     }
 
     public static void setHangingDirection(EntityHanging entity, EnumFacing facing)
