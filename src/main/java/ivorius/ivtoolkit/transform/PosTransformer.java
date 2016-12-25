@@ -56,9 +56,6 @@ public class PosTransformer
             ((AreaTransformable) entity).transform(transform.getRotation(), transform.isMirrorX(), size);
         else
         {
-            double[] newEntityPos = transform.apply(new double[]{entity.posX, entity.posY, entity.posZ}, size);
-            entity.setPosition(newEntityPos[0], newEntityPos[1], newEntityPos[2]);
-
             if (entity instanceof EntityHanging)
             {
                 EntityHanging entityHanging = (EntityHanging) entity;
@@ -66,6 +63,11 @@ public class PosTransformer
                 BlockPos newHangingCoord = transform.apply(hangingCoord, size);
                 entityHanging.setPosition(newHangingCoord.getX(), newHangingCoord.getY(), newHangingCoord.getZ());
                 EntityHangingAccessor.setHangingDirection(entityHanging, Directions.rotate(entityHanging.facingDirection, transform));
+            }
+            else
+            {
+                double[] newEntityPos = transform.apply(new double[]{entity.posX, entity.posY, entity.posZ}, size);
+                entity.setPosition(newEntityPos[0], newEntityPos[1], newEntityPos[2]);
             }
 
             if (entity instanceof EntityCreature)

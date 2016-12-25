@@ -56,13 +56,15 @@ public class Mover
 
     public static void moveEntityDefault(Entity entity, BlockPos dist)
     {
-        entity.setPosition(entity.posX + dist.getX(), entity.posY + dist.getY(), entity.posZ + dist.getZ());
-
         if (entity instanceof EntityHanging)
         {
             EntityHanging entityHanging = (EntityHanging) entity;
             BlockPos hangingPosition = entityHanging.getHangingPosition().add(dist);
             entityHanging.setPosition(hangingPosition.getX(), hangingPosition.getY(), hangingPosition.getZ());
+        }
+        else
+        {
+            entity.setPosition(entity.posX + dist.getX(), entity.posY + dist.getY(), entity.posZ + dist.getZ());
         }
 
         if (entity instanceof EntityCreature)
