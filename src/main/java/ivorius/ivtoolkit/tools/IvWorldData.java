@@ -90,7 +90,7 @@ public class IvWorldData
             {
                 Mover.moveTileEntity(tileEntity, invertedReference);
 
-                NBTTagCompound teCompound = NBTCompoundObjectsMC.write(tileEntity);
+                NBTTagCompound teCompound = NBTCompoundObjectsMC.write(tileEntity, true);
                 NBTStateInjector.recursivelyInject(teCompound);
                 tileEntities.add(teCompound);
 
@@ -103,7 +103,7 @@ public class IvWorldData
                 .map(entity -> {
                     Mover.moveEntity(entity, invertedReference);
 
-                    NBTTagCompound entityCompound = NBTCompoundObjectsMC.write(entity);
+                    NBTTagCompound entityCompound = NBTCompoundObjectsMC.write(entity, true);
                     NBTStateInjector.recursivelyInject(entityCompound);
 
                     Mover.moveEntity(entity, referenceCoord);
