@@ -50,7 +50,7 @@ public class IvSaveAPI
     {
         try
         {
-            return (NBTTagCompound) getWriteTileEntityToTag(entity).invoke(compound, worldIndependent);
+            return (NBTTagCompound) getWriteTileEntityToTag(entity).invoke(entity, compound, worldIndependent);
         }
         catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
         {
@@ -80,7 +80,7 @@ public class IvSaveAPI
     {
         try
         {
-            return (NBTTagCompound) getWriteEntityToTag(entity).invoke(compound, worldIndependent);
+            return (NBTTagCompound) getWriteEntityToTag(entity).invoke(entity, compound, worldIndependent);
         }
         catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
         {
