@@ -149,6 +149,30 @@ public class AxisAlignedTransform2D
         return EnumFacing.HORIZONTALS[(facing.getHorizontalIndex() + rotation) % EnumFacing.HORIZONTALS.length];
     }
 
+    public BlockPos.MutableBlockPos applyOn(BlockPos.MutableBlockPos position, int[] size)
+    {
+        return applyOn(position, position, size);
+    }
+
+    public BlockPos.MutableBlockPos applyOn(BlockPos position, BlockPos.MutableBlockPos onPosition, int[] size)
+    {
+        int positionX = mirrorX ? size[0] - 1 - position.getX() : position.getX();
+
+        switch (rotation)
+        {
+            case 0:
+                return onPosition.setPos(positionX, position.getY(), position.getZ());
+            case 1:
+                return onPosition.setPos(size[2] - 1 - position.getZ(), position.getY(), positionX);
+            case 2:
+                return onPosition.setPos(size[0] - 1 - positionX, position.getY(), size[2] - 1 - position.getZ());
+            case 3:
+                return onPosition.setPos(position.getZ(), position.getY(), size[0] - 1 - positionX);
+            default:
+                throw new InternalError();
+        }
+    }
+
     public BlockPos apply(BlockPos position, int[] size)
     {
         int positionX = mirrorX ? size[0] - 1 - position.getX() : position.getX();
