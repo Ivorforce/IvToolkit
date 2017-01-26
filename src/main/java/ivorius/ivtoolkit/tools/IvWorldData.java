@@ -62,12 +62,12 @@ public class IvWorldData
         tileEntities = new ArrayList<>();
         tileEntities.addAll(NBTTagLists.compoundsFrom(compound, "tileEntities"));
         tileEntities.forEach(teCompound -> NBTStateInjector.recursivelyApply(teCompound, registry, false));
-        tileEntities.forEach(teCompound -> fixer.process(FixTypes.BLOCK_ENTITY, teCompound));
+        tileEntities.replaceAll(teCompound -> fixer.process(FixTypes.BLOCK_ENTITY, teCompound));
 
         entities = new ArrayList<>();
         entities.addAll(NBTTagLists.compoundsFrom(compound, "entities"));
         entities.forEach(entityCompound -> NBTStateInjector.recursivelyApply(entityCompound, registry, false));
-        tileEntities.forEach(teCompound -> fixer.process(FixTypes.ENTITY, teCompound));
+        tileEntities.replaceAll(teCompound -> fixer.process(FixTypes.ENTITY, teCompound));
     }
 
     public static IvWorldData capture(World world, BlockArea blockArea, boolean captureEntities)
