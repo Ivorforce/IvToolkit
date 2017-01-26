@@ -16,7 +16,6 @@
 
 package ivorius.ivtoolkit.random;
 
-import ivorius.ivtoolkit.math.IvVecMathHelper;
 import ivorius.ivtoolkit.tools.NBTCompoundObject;
 import ivorius.ivtoolkit.tools.NBTCompoundObjects;
 import net.minecraft.nbt.NBTTagCompound;
@@ -67,35 +66,38 @@ public class BlurredValueField implements NBTCompoundObject
 
     public double getValue(int... position)
     {
-        double[] pos = new double[position.length];
-        for (int i = 0; i < pos.length; i++)
-            pos[i] = position[i];
-
         double total = 0;
-        double[] inf = new double[values.size()];
-        for (int i = 0; i < inf.length; i++)
+        double[] invDist = new double[values.size()];
+        for (int i = 0; i < invDist.length; i++)
         {
             Value value = values.get(i);
 
-            double[] valPos = new double[size.length];
-            for (int j = 0; j < valPos.length; j++)
-                valPos[j] = value.pos[j];
+            double dist = 0.0;
 
-            double dist = IvVecMathHelper.distanceSQ(pos, valPos);
+            // Get distance to point
+            for (int j = 0; j < position.length; j++)
+            {
+                double d = position[j] - value.pos[j];
+                dist += d * d;
+            }
+
+            // Extremify
             dist = dist * dist;
             dist = dist * dist;
 
             if (dist <= 0.0001)
                 return value.value;
 
-            inf[i] = (double) (1.0 / dist);
-            total += inf[i];
+            invDist[i] = 1.0 / dist;
+            total += invDist[i];
         }
 
         double retVal = 0;
 
-        for (int i = 0; i < inf.length; i++)
-             retVal += values.get(i).value * (inf[i] / total);
+        total = 1D / total; // Do this just once for performance
+
+        for (int i = 0; i < invDist.length; i++)
+             retVal += values.get(i).value * invDist[i] * total;
 
         return retVal;
     }
