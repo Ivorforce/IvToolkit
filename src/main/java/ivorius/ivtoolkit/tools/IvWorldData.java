@@ -120,7 +120,13 @@ public class IvWorldData
         return entity -> !(entity instanceof EntityPlayer);
     }
 
+    @Deprecated
     public NBTTagCompound createTagCompound(BlockPos referenceCoord)
+    {
+        return createTagCompound();
+    }
+
+    public NBTTagCompound createTagCompound()
     {
         NBTTagCompound compound = new NBTTagCompound();
 
