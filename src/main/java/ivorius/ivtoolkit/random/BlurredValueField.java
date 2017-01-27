@@ -219,7 +219,10 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
 
     private int calculateChunkOffset(int d, int chunkPos)
     {
-        return offset[d] + (size[d] * chunkPos) / chunkCount[d];
+        // Because getChunkPos rounds chunk pos down, on rounding errors the
+        // lowest chunks get the biggest space -> we need to round offset up
+        int roundUpCorrection = chunkCount[d] - 1;
+        return offset[d] + ((size[d] * chunkPos) + roundUpCorrection) / chunkCount[d];
     }
 
     public boolean addValue(double value, Random random)
