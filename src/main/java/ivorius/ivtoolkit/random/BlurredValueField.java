@@ -20,6 +20,7 @@ import ivorius.ivtoolkit.tools.NBTCompoundObject;
 import ivorius.ivtoolkit.tools.NBTCompoundObjects;
 import net.minecraft.nbt.NBTTagCompound;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -95,7 +96,7 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
         }
 
         average = calculateAverage();
-        weight += value.weight;
+        weight += value.weight();
 
         return true;
     }
@@ -112,7 +113,7 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
     protected double calculateWeight()
     {
         if (chunks != null)
-            return Arrays.stream(chunks).mapToDouble(c -> c.weight).sum();
+            return Arrays.stream(chunks).mapToDouble(BlurredValueField::weight).sum();
 
         return values.size();
     }
@@ -344,6 +345,7 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
     public static class Value implements NBTCompoundObject, BlurrablePivot
     {
         private double value;
+        @Nullable
         private Double weight;
         private int[] pos;
 
