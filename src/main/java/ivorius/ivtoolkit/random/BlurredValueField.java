@@ -238,8 +238,8 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
     {
         for (int d = 0; d < pos.length; d++)
         {
-            if (bounds.offset[d] - bounds.size[d] > pos[d]
-                    || bounds.offset[d] + bounds.size[d] * 2 <= pos[d])
+            if (pos[d] < bounds.offset[d] - bounds.size[d]
+                    || pos[d] >= bounds.offset[d] + bounds.size[d] * 2)
                 return false;
         }
 
@@ -250,10 +250,8 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
     {
         if (chunks != null)
         {
-            int[] chunkPos = getChunkPos(position);
-
             // Only calculate for close ones, use average of distant ones
-            return getValue(Arrays.stream(this.chunks).map(chunk -> almostContains(chunk, chunkPos)
+            return getValue(Arrays.stream(this.chunks).map(chunk -> almostContains(chunk, position)
                     ? new Value(chunk.getValue(position), chunk.weight(), chunk.pos()) : chunk)
                     .collect(Collectors.toList()), position);
         }
