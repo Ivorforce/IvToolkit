@@ -66,7 +66,7 @@ public class PosTransformer
             }
             else
             {
-                double[] newEntityPos = transform.apply(new double[]{entity.posX, entity.posY, entity.posZ}, size);
+                double[] newEntityPos = transform.applyOn(new double[]{entity.posX, entity.posY, entity.posZ}, size);
                 entity.setPosition(newEntityPos[0], newEntityPos[1], newEntityPos[2]);
             }
 
