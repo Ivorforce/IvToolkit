@@ -123,13 +123,17 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
     {
         if (value.pos.length != size.length)
             throw new IllegalArgumentException();
-        else if (values.stream().anyMatch(v -> Arrays.equals(v.pos, value.pos)))
-            return false;
 
         if (chunks != null)
-            getChunk(value.pos).addValue(value);
+        {
+            if (!getChunk(value.pos).addValue(value))
+                return false;
+        }
         else
         {
+            if (values.stream().anyMatch(v -> Arrays.equals(v.pos, value.pos)))
+                return false;
+
             values.add(value);
 
             if (values.size() > MAX_VALUES_PER_CHUNK)
@@ -289,20 +293,25 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
 
     public double getValue(int... position)
     {
-        return getValue(relevantValues(position), position);
+        List<BlurrablePivot> relevant = new ArrayList<>();
+        addRelevantValues(position, relevant);
+        return getValue(relevant, position);
     }
 
-    protected List<? extends BlurrablePivot> relevantValues(int[] position)
+    protected void addRelevantValues(int[] position, List<BlurrablePivot> rv)
     {
         if (chunks != null)
         {
-            // Only calculate for close ones, use average of distant ones
-            return Arrays.stream(this.chunks).flatMap(chunk -> almostContains(chunk, position)
-                    ? chunk.relevantValues(position).stream() : Stream.of(chunk))
-                    .collect(Collectors.toList());
+            for (BlurredValueField chunk : chunks)
+            {
+                if (almostContains(chunk, position))
+                    chunk.addRelevantValues(position, rv);
+                else
+                    rv.add(chunk);
+            }
         }
         else
-            return values;
+            rv.addAll(values);
     }
 
     @Override
