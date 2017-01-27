@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by lukas on 12.10.14.
@@ -59,6 +60,46 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
     public BlurredValueField(int[] offset, int[] size)
     {
         setBounds(offset, size);
+    }
+
+    public static double getValue(List<? extends BlurrablePivot> values, int[] position)
+    {
+        double total = 0;
+        double[] invDist = new double[values.size()];
+        for (int i = 0; i < invDist.length; i++)
+        {
+            BlurrablePivot value = values.get(i);
+
+            double dist = 0.0;
+
+            // Get distance to point
+            for (int j = 0; j < position.length; j++)
+            {
+                double d = position[j] - value.pos()[j];
+                dist += d * d;
+            }
+
+            // Extremify
+            dist = dist * dist;
+            dist = dist * dist;
+
+            if (dist <= 0.0001)
+                return value.value();
+
+            invDist[i] = 1.0 / dist * value.weight();
+            total += invDist[i];
+        }
+
+        double retVal = 0;
+
+        total = 1D / total; // Do this just once for performance
+
+        for (int i = 0; i < invDist.length; i++)
+        {
+            retVal += values.get(i).value() * invDist[i] * total;
+        }
+
+        return retVal;
     }
 
     protected void setBounds(int[] chunkOffset, int[] chunkSize)
@@ -248,55 +289,20 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
 
     public double getValue(int... position)
     {
+        return getValue(relevantValues(position), position);
+    }
+
+    protected List<? extends BlurrablePivot> relevantValues(int[] position)
+    {
         if (chunks != null)
         {
             // Only calculate for close ones, use average of distant ones
-            return getValue(Arrays.stream(this.chunks).map(chunk -> almostContains(chunk, position)
-                    ? new Value(chunk.getValue(position), chunk.weight(), chunk.pos()) : chunk)
-                    .collect(Collectors.toList()), position);
+            return Arrays.stream(this.chunks).flatMap(chunk -> almostContains(chunk, position)
+                    ? chunk.relevantValues(position).stream() : Stream.of(chunk))
+                    .collect(Collectors.toList());
         }
-
-        return getValue(this.values, position);
-    }
-
-    public double getValue(List<? extends BlurrablePivot> values, int[] position)
-    {
-        double total = 0;
-        double[] invDist = new double[values.size()];
-        for (int i = 0; i < invDist.length; i++)
-        {
-            BlurrablePivot value = values.get(i);
-
-            double dist = 0.0;
-
-            // Get distance to point
-            for (int j = 0; j < position.length; j++)
-            {
-                double d = position[j] - value.pos()[j];
-                dist += d * d;
-            }
-
-            // Extremify
-            dist = dist * dist;
-            dist = dist * dist;
-
-            if (dist <= 0.0001)
-                return value.value();
-
-            invDist[i] = 1.0 / dist * value.weight();
-            total += invDist[i];
-        }
-
-        double retVal = 0;
-
-        total = 1D / total; // Do this just once for performance
-
-        for (int i = 0; i < invDist.length; i++)
-        {
-            retVal += values.get(i).value() * invDist[i] * total;
-        }
-
-        return retVal;
+        else
+            return values;
     }
 
     @Override
