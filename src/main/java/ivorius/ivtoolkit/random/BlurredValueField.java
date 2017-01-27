@@ -52,7 +52,7 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
 
     public BlurredValueField(int... size)
     {
-        setBounds(size, new int[size.length]);
+        setBounds(new int[size.length], size);
     }
 
     public BlurredValueField(int[] offset, int[] size)
@@ -201,8 +201,8 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
 
                 for (int i = 0; i < size.length; i++)
                 {
-                    chunkOffset[i] = (size[i] * c) / chunkPos[i];
-                    int nextOffset = (size[i] * c) / (chunkPos[i] + 1);
+                    chunkOffset[i] = offset[i] + (size[i] * chunkPos[i]) / chunksSize[i];
+                    int nextOffset = offset[i] + (size[i] * (chunkPos[i] + 1)) / chunksSize[i];
                     chunkSize[i] = nextOffset - chunkOffset[i];
                 }
 
