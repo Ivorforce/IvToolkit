@@ -20,6 +20,8 @@ import gnu.trove.function.TDoubleFunction;
 import gnu.trove.function.TIntFunction;
 import net.minecraft.util.math.MathHelper;
 
+import java.util.Arrays;
+
 /**
  * Created by lukas on 22.06.14.
  */
@@ -150,6 +152,16 @@ public class IvVecMathHelper
         }
 
         return resultVector;
+    }
+
+    public static int product(int[] vector)
+    {
+        return Arrays.stream(vector).reduce(1, (left, right) -> left * right);
+    }
+
+    public static double product(double[] vector)
+    {
+        return Arrays.stream(vector).reduce(1, (left, right) -> left * right);
     }
 
     public static double dotProduct(double[] pos1, double[] pos2)

@@ -100,6 +100,12 @@ public class NBTCompoundObjects
         return tagList;
     }
 
+    public static <T extends NBTCompoundObject> List<T> readListFrom(NBTTagCompound compound, String key, Supplier<? extends T> instantiator)
+    {
+        return readList(compound.getTagList(key, Constants.NBT.TAG_COMPOUND), instantiator);
+    }
+
+    @Deprecated
     public static <T extends NBTCompoundObject> List<T> readListFrom(NBTTagCompound compound, String key, Class<T> tClass)
     {
         return readList(compound.getTagList(key, Constants.NBT.TAG_COMPOUND), tClass);
