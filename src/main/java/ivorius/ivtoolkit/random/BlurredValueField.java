@@ -37,7 +37,7 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
 
     private List<Value> values = new ArrayList<>();
 
-    private int[] chunksSize;
+    private int[] chunkCount;
     private BlurredValueField[] chunks;
 
     private int[] offset;
@@ -121,8 +121,8 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
     protected int[] calculateCenter()
     {
         int[] center = new int[offset.length];
-        for (int i = 0; i < offset.length; i++)
-            center[i] = offset[i] + size[i] / 2;
+        for (int d = 0; d < offset.length; d++)
+            center[d] = offset[d] + size[d] / 2;
         return center;
     }
 
@@ -138,9 +138,9 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
 
     private boolean hasChunk(int[] chunkPos)
     {
-        for (int i = 0; i < chunkPos.length; i++)
+        for (int d = 0; d < chunkPos.length; d++)
         {
-            if (chunkPos[i] < 0 || chunkPos[i] >= chunksSize[i])
+            if (chunkPos[d] < 0 || chunkPos[d] >= chunkCount[d])
                 return false;
         }
         return true;
@@ -149,8 +149,8 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
     protected int[] getChunkPos(int[] pos)
     {
         int[] chunkPos = new int[pos.length];
-        for (int i = 0; i < pos.length; i++)
-            chunkPos[i] = (pos[i] - offset[i]) / chunksSize[i];
+        for (int d = 0; d < pos.length; d++)
+            chunkPos[d] = (pos[d] - offset[d]) * chunkCount[d] / (size[d]);
         return chunkPos;
     }
 
@@ -158,10 +158,10 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
     {
         int index = 0;
 
-        for (int i = 0; i < chunkPos.length; i++)
+        for (int d = 0; d < chunkPos.length; d++)
         {
-            index *= chunksSize[i];
-            index += chunkPos[i];
+            index *= chunkCount[d];
+            index += chunkPos[d];
         }
         return index;
     }
@@ -171,8 +171,8 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
         int[] chunkPos = new int[size.length];
         for (int i = chunkPos.length - 1; i >= 0; i--)
         {
-            chunkPos[i] = index % chunksSize[i];
-            index /= chunksSize[i];
+            chunkPos[i] = index % chunkCount[i];
+            index /= chunkCount[i];
         }
         return chunkPos;
     }
@@ -180,13 +180,13 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
     protected void split()
     {
         int max = 1;
-        chunksSize = new int[size.length];
+        chunkCount = new int[size.length];
 
-        for (int i = 0; i < size.length; i++)
+        for (int d = 0; d < size.length; d++)
         {
             // If size < split, splitting further makes no sense anyway
-            chunksSize[i] = Math.min(size[i], CHUNKS_SPLIT);
-            max *= chunksSize[i];
+            chunkCount[d] = Math.min(size[d], CHUNKS_SPLIT);
+            max *= chunkCount[d];
         }
 
         if (max > 1)
@@ -200,11 +200,11 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
                 int[] chunkOffset = new int[size.length];
                 int[] chunkSize = new int[size.length];
 
-                for (int i = 0; i < size.length; i++)
+                for (int d = 0; d < size.length; d++)
                 {
-                    chunkOffset[i] = offset[i] + (size[i] * chunkPos[i]) / chunksSize[i];
-                    int nextOffset = offset[i] + (size[i] * (chunkPos[i] + 1)) / chunksSize[i];
-                    chunkSize[i] = nextOffset - chunkOffset[i];
+                    chunkOffset[d] = calculateChunkOffset(d, chunkPos[d]);
+                    int nextOffset = calculateChunkOffset(d, chunkPos[d] + 1);
+                    chunkSize[d] = nextOffset - chunkOffset[d];
                 }
 
                 chunks[c] = new BlurredValueField(chunkOffset, chunkSize);
@@ -215,6 +215,11 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
             getChunk(value.pos).addValue(value);
         values.clear();
 
+    }
+
+    private int calculateChunkOffset(int d, int chunkPos)
+    {
+        return offset[d] + (size[d] * chunkPos) / chunkCount[d];
     }
 
     public boolean addValue(double value, Random random)
@@ -228,10 +233,10 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
 
     public boolean almostContains(BlurredValueField bounds, int[] pos)
     {
-        for (int i = 0; i < pos.length; i++)
+        for (int d = 0; d < pos.length; d++)
         {
-            if (bounds.offset[i] - bounds.size[i] > pos[i]
-                    || bounds.offset[i] + bounds.size[i] * 2 <= pos[i])
+            if (bounds.offset[d] - bounds.size[d] > pos[d]
+                    || bounds.offset[d] + bounds.size[d] * 2 <= pos[d])
                 return false;
         }
 
@@ -303,7 +308,7 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
         if (compound.hasKey("chunks"))
         {
             chunks = (BlurredValueField[]) NBTCompoundObjects.readListFrom(compound, "chunks", BlurredValueField::new).toArray();
-            chunksSize = compound.getIntArray("chunksSize");
+            chunkCount = compound.getIntArray("chunkCount");
         }
 
         weight = calculateWeight();
@@ -320,7 +325,7 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
         if (chunks != null)
         {
             NBTCompoundObjects.writeListTo(compound, "chunks", values);
-            compound.setIntArray("chunksSize", chunksSize);
+            compound.setIntArray("chunkCount", chunkCount);
         }
     }
 
