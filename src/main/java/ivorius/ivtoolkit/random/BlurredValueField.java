@@ -33,7 +33,7 @@ import java.util.stream.Stream;
  */
 public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
 {
-    public static final int MAX_VALUES_PER_CHUNK = 100;
+    public static final int MAX_VALUES_PER_CHUNK = 25;
     public static final int CHUNKS_SPLIT = 4;
 
     private List<Value> values = new ArrayList<>();
