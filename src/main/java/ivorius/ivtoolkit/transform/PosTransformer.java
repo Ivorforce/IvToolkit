@@ -17,22 +17,21 @@
 package ivorius.ivtoolkit.transform;
 
 import com.google.common.collect.ImmutableSet;
-import ivorius.ivtoolkit.blocks.BlockTransformable;
-import ivorius.ivtoolkit.blocks.Directions;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
 import ivorius.ivtoolkit.math.MinecraftTransforms;
 import ivorius.ivtoolkit.tools.EntityCreatureAccessor;
-import ivorius.ivtoolkit.tools.EntityHangingAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityHanging;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -47,7 +46,12 @@ public class PosTransformer
         if (tileEntity instanceof AreaTransformable)
             ((AreaTransformable) tileEntity).transform(transform.getRotation(), transform.isMirrorX(), size);
         else
+        {
+            Pair<Rotation, Mirror> mct = MinecraftTransforms.to(transform);
+            tileEntity.mirror(mct.getRight());
+            tileEntity.rotate(mct.getLeft());
             Mover.setTileEntityPos(tileEntity, transform.apply(tileEntity.getPos(), size));
+        }
     }
 
     public static void transformEntityPos(Entity entity, AxisAlignedTransform2D transform, int[] size)
@@ -56,19 +60,13 @@ public class PosTransformer
             ((AreaTransformable) entity).transform(transform.getRotation(), transform.isMirrorX(), size);
         else
         {
-            if (entity instanceof EntityHanging)
-            {
-                EntityHanging entityHanging = (EntityHanging) entity;
-                BlockPos hangingCoord = entityHanging.getHangingPosition();
-                BlockPos newHangingCoord = transform.apply(hangingCoord, size);
-                entityHanging.setPosition(newHangingCoord.getX(), newHangingCoord.getY(), newHangingCoord.getZ());
-                EntityHangingAccessor.setHangingDirection(entityHanging, Directions.rotate(entityHanging.facingDirection, transform));
-            }
-            else
-            {
-                double[] newEntityPos = transform.applyOn(new double[]{entity.posX, entity.posY, entity.posZ}, size);
-                entity.setPosition(newEntityPos[0], newEntityPos[1], newEntityPos[2]);
-            }
+            double[] newEntityPos = transform.applyOn(new double[]{entity.posX, entity.posY, entity.posZ}, size);
+
+            Pair<Rotation, Mirror> mct = MinecraftTransforms.to(transform);
+            float yaw = entity.getMirroredYaw(mct.getRight());
+            yaw = yaw + (entity.rotationYaw - entity.getRotatedYaw(mct.getLeft()));
+
+            entity.setLocationAndAngles(newEntityPos[0], newEntityPos[1], newEntityPos[2], yaw, entity.rotationPitch);
 
             if (entity instanceof EntityCreature)
             {
@@ -83,21 +81,15 @@ public class PosTransformer
         return MinecraftTransforms.map(transform, (rotation, mirror) -> state.withMirror(mirror).withRotation(rotation));
     }
 
+    @Deprecated
     public static void transformBlock(World world, BlockPos coord, AxisAlignedTransform2D transform)
     {
-        IBlockState state = world.getBlockState(coord);
-
-        if (state.getBlock() instanceof BlockTransformable)
-            ((BlockTransformable) state.getBlock()).transform(world, coord, state, transform.getRotation(), transform.isMirrorX());
     }
 
     @Deprecated
     public static void transformBlock(AxisAlignedTransform2D transform, World world, IBlockState state, BlockPos coord, Block block)
     {
-        if (block instanceof BlockTransformable)
-            ((BlockTransformable) block).transform(world, coord, state, transform.getRotation(), transform.isMirrorX());
-        else
-            transformBlockDefault(transform, world, state, coord, block);
+        transformBlockDefault(transform, world, state, coord, block);
     }
 
     @Deprecated
