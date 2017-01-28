@@ -16,8 +16,6 @@
 
 package ivorius.ivtoolkit.random;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import ivorius.ivtoolkit.tools.NBTCompoundObject;
 import ivorius.ivtoolkit.tools.NBTCompoundObjects;
 import net.minecraft.nbt.NBTTagCompound;
@@ -63,43 +61,45 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
         setBounds(offset, size);
     }
 
-    public static double getValue(Iterable<? extends BlurrablePivot> values, int count, int[] position)
+    public static double getValue(Iterable<? extends Iterable<? extends BlurrablePivot>> values, int count, int[] position)
     {
         int idx = 0;
 
         double total = 0;
         double[] invDist = new double[count];
-        for (BlurrablePivot value : values)
-        {
-            double dist = 0.0;
-
-            // Get distance to point
-            for (int j = 0; j < position.length; j++)
+        for (Iterable<? extends BlurrablePivot> collection : values)
+            for (BlurrablePivot value : collection)
             {
-                double d = position[j] - value.pos()[j];
-                dist += d * d;
+                double dist = 0.0;
+
+                // Get distance to point
+                for (int j = 0; j < position.length; j++)
+                {
+                    double d = position[j] - value.pos()[j];
+                    dist += d * d;
+                }
+
+                // Extremify
+                dist = dist * dist;
+                dist = dist * dist;
+
+                if (dist <= 0.0001)
+                    return value.value();
+
+                invDist[idx] = 1.0 / dist * value.weight();
+                total += invDist[idx++];
             }
-
-            // Extremify
-            dist = dist * dist;
-            dist = dist * dist;
-
-            if (dist <= 0.0001)
-                return value.value();
-
-            invDist[idx] = 1.0 / dist * value.weight();
-            total += invDist[idx++];
-        }
 
         double retVal = 0;
 
         total = 1D / total; // Do this just once for performance
         idx = 0;
 
-        for (BlurrablePivot value : values)
-        {
-            retVal += value.value() * invDist[idx++] * total;
-        }
+        for (Iterable<? extends BlurrablePivot> collection : values)
+            for (BlurrablePivot value : collection)
+            {
+                retVal += value.value() * invDist[idx++] * total;
+            }
 
         return retVal;
     }
@@ -309,7 +309,7 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
         List<List<? extends BlurrablePivot>> relevant = new ArrayList<>();
         int[] total = new int[1];
         addRelevantValues(position, relevant, total);
-        return getValue(Iterables.concat(relevant), total[0], position);
+        return getValue(relevant, total[0], position);
     }
 
     protected void addRelevantValues(int[] position, List<List<? extends BlurrablePivot>> rv, int[] total)
