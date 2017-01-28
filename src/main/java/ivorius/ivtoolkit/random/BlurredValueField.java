@@ -87,8 +87,8 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
             if (dist <= 0.0001)
                 return value.value();
 
-            invDist[idx++] = 1.0 / dist * value.weight();
-            total += invDist[idx];
+            invDist[idx] = 1.0 / dist * value.weight();
+            total += invDist[idx++];
         }
 
         double retVal = 0;
