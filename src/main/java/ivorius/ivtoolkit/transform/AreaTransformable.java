@@ -23,9 +23,10 @@ public interface AreaTransformable
 {
     /**
      * Transforms the object inside a certain bounds.
-     * Note that implementing this will delete default transforming functionality, so you need to do that yourself.
+     * It is expected that x is mirrored first (if mirror), and only afterwards the rotation is applied.
+     * Note that implementing this will delete default transforming functionality, so you need to do that yourself as well.
      *
-     * @param rotation The amount of times to rotate.
+     * @param rotation Clockwise rotations to perform.
      * @param mirrorX If x is being mirrored.
      * @param inBounds The bounds of the area the transformation should take place in.
      */
