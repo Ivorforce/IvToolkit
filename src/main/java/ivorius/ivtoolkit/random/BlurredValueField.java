@@ -16,17 +16,14 @@
 
 package ivorius.ivtoolkit.random;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import ivorius.ivtoolkit.tools.NBTCompoundObject;
 import ivorius.ivtoolkit.tools.NBTCompoundObjects;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.*;
 
 /**
  * Created by lukas on 12.10.14.
@@ -44,9 +41,13 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
     private int[] offset;
     private int[] size;
     private int[] center; // TODO Use double[] for accuracy?
+    private int[] neighborP1;
+    private int[] neighborP2;
 
     private double weight;
     private double average;
+
+    protected List<BlurrablePivot> asList = Collections.singletonList(this);
 
     public BlurredValueField()
     {
@@ -62,14 +63,14 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
         setBounds(offset, size);
     }
 
-    public static double getValue(List<? extends BlurrablePivot> values, int[] position)
+    public static double getValue(Iterable<? extends BlurrablePivot> values, int count, int[] position)
     {
-        double total = 0;
-        double[] invDist = new double[values.size()];
-        for (int i = 0; i < invDist.length; i++)
-        {
-            BlurrablePivot value = values.get(i);
+        int idx = 0;
 
+        double total = 0;
+        double[] invDist = new double[count];
+        for (BlurrablePivot value : values)
+        {
             double dist = 0.0;
 
             // Get distance to point
@@ -86,27 +87,51 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
             if (dist <= 0.0001)
                 return value.value();
 
-            invDist[i] = 1.0 / dist * value.weight();
-            total += invDist[i];
+            invDist[idx++] = 1.0 / dist * value.weight();
+            total += invDist[idx];
         }
 
         double retVal = 0;
 
         total = 1D / total; // Do this just once for performance
+        idx = 0;
 
-        for (int i = 0; i < invDist.length; i++)
+        for (BlurrablePivot value : values)
         {
-            retVal += values.get(i).value() * invDist[i] * total;
+            retVal += value.value() * invDist[idx++] * total;
         }
 
         return retVal;
+    }
+
+    public boolean almostContains(int[] pos)
+    {
+        for (int d = 0; d < pos.length; d++)
+        {
+            // Values cached for performance (keep in mind this is called about few hundred million times
+            if (pos[d] < neighborP1[d] || pos[d] >= neighborP2[d])
+                return false;
+        }
+
+        return true;
     }
 
     protected void setBounds(int[] chunkOffset, int[] chunkSize)
     {
         offset = chunkOffset;
         size = chunkSize;
-        center = calculateCenter();
+
+        center = new int[offset.length];
+        for (int d = 0; d < offset.length; d++)
+            center[d] = offset[d] + size[d] / 2;
+
+        neighborP1 = new int[offset.length];
+        neighborP2 = new int[offset.length];
+        for (int d = 0; d < offset.length; d++)
+        {
+            neighborP1[d] = offset[d] - size[d];
+            neighborP2[d] = offset[d] + size[d] * 2;
+        }
     }
 
     public int[] getSize()
@@ -279,39 +304,34 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
         return addValue(new Value(value, pos));
     }
 
-    public boolean almostContains(BlurredValueField bounds, int[] pos)
-    {
-        for (int d = 0; d < pos.length; d++)
-        {
-            if (pos[d] < bounds.offset[d] - bounds.size[d]
-                    || pos[d] >= bounds.offset[d] + bounds.size[d] * 2)
-                return false;
-        }
-
-        return true;
-    }
-
     public double getValue(int... position)
     {
-        List<BlurrablePivot> relevant = new ArrayList<>();
-        addRelevantValues(position, relevant);
-        return getValue(relevant, position);
+        List<List<? extends BlurrablePivot>> relevant = new ArrayList<>();
+        int[] total = new int[1];
+        addRelevantValues(position, relevant, total);
+        return getValue(Iterables.concat(relevant), total[0], position);
     }
 
-    protected void addRelevantValues(int[] position, List<BlurrablePivot> rv)
+    protected void addRelevantValues(int[] position, List<List<? extends BlurrablePivot>> rv, int[] total)
     {
         if (chunks != null)
         {
             for (BlurredValueField chunk : chunks)
             {
-                if (almostContains(chunk, position))
-                    chunk.addRelevantValues(position, rv);
+                if (chunk.almostContains(position))
+                    chunk.addRelevantValues(position, rv, total);
                 else
-                    rv.add(chunk);
+                {
+                    rv.add(chunk.asList);
+                    total[0]++;
+                }
             }
         }
         else
-            rv.addAll(values);
+        {
+            rv.add(values);
+            total[0] += values.size();
+        }
     }
 
     @Override
