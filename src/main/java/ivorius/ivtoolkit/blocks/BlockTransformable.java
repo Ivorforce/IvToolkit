@@ -30,9 +30,9 @@ public interface BlockTransformable
 {
     /**
      * Transforms the object inside a certain bounds.
-     * Note that the mirror should be applied first.
+     * It is expected that x is mirrored first (if mirror), and only afterwards the rotation is applied.
      *
-     * @param rotation The amount of times to rotate.
+     * @param rotation Clockwise rotations to perform.
      * @param mirrorX If x is being mirrored.
      */
     void transform(World world, BlockPos pos, IBlockState state, int rotation, boolean mirrorX);
