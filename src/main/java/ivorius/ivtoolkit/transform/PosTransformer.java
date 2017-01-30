@@ -48,8 +48,8 @@ public class PosTransformer
         else
         {
             Pair<Rotation, Mirror> mct = MinecraftTransforms.to(transform);
-            tileEntity.mirror(mct.getRight());
-            tileEntity.rotate(mct.getLeft());
+            tileEntity.func_189668_a(mct.getRight());
+            tileEntity.func_189667_a(mct.getLeft());
             Mover.setTileEntityPos(tileEntity, transform.apply(tileEntity.getPos(), size));
         }
     }
