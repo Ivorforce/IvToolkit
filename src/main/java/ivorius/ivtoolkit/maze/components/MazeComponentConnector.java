@@ -176,7 +176,7 @@ public class MazeComponentConnector
 
     private static <C> void addRandomly(List<Triple<MazeRoom, MazePassage, C>> exitStack, Random random, MazePassage connection, C c, MazeRoom left)
     {
-        exitStack.add(random.nextInt(exitStack.size()), Triple.of(left, connection, c));
+        exitStack.add(random.nextInt(exitStack.size() + 1), Triple.of(left, connection, c));
     }
 
     private static class ReverseInfo<M extends WeightedMazeComponent<C>, C>
