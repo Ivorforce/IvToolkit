@@ -41,11 +41,11 @@ public class MazeComponentConnector
         ReverseInfo<M, C> reversing = null;
 
         List<ShiftedMazeComponent<M, C>> result = new ArrayList<>();
-        ArrayDeque<Triple<MazeRoom, MazePassage, C>> exitStack = new ArrayDeque<>();
+        LinkedList<Triple<MazeRoom, MazePassage, C>> exitStack = new LinkedList<>();
 
         Predicate<ShiftedMazeComponent<M, C>> componentPredicate = ((Predicate<ShiftedMazeComponent<M, C>>) input -> !MazeComponents.overlap(maze, input)).and(input -> predicate.canPlace(maze, input));
 
-        addAllExits(predicate, exitStack, maze.exits().entrySet());
+        addAllExits(predicate, exitStack, maze.exits().entrySet(), random);
 
         while (exitStack.size() > 0)
         {
@@ -59,7 +59,7 @@ public class MazeComponentConnector
 
                 // Backing Up
                 reversing = new ReverseInfo<>();
-                reversing.exitStack = exitStack.clone();
+                reversing.exitStack = (LinkedList<Triple<MazeRoom, MazePassage, C>>) exitStack.clone();
                 reversing.maze = maze.copy();
                 reversing.shuffleSeed = random.nextLong();
             }
@@ -68,8 +68,8 @@ public class MazeComponentConnector
                 // Reversing
                 predicate.willUnplace(maze, reversing.placed);
 
-                exitStack = reversing.exitStack.clone(); // TODO Do a more efficient DIFF approach
-                maze.set(reversing.maze); // TODO Do a more efficient DIFF approach
+                exitStack = (LinkedList<Triple<MazeRoom, MazePassage, C>>) reversing.exitStack.clone();
+                maze.set(reversing.maze);
 
                 predicate.didUnplace(maze, reversing.placed);
 
@@ -142,7 +142,7 @@ public class MazeComponentConnector
             // Placing
             predicate.willPlace(maze, placing);
 
-            addAllExits(predicate, exitStack, placing.exits().entrySet());
+            addAllExits(predicate, exitStack, placing.exits().entrySet(), random);
             maze.add(placing);
             result.add(placing);
 
@@ -160,7 +160,7 @@ public class MazeComponentConnector
         return input -> input != null && (input.getKey().has(finalRoom));
     }
 
-    private static <M extends WeightedMazeComponent<C>, C> void addAllExits(MazePredicate<M, C> placementStrategy, Deque<Triple<MazeRoom, MazePassage, C>> exitStack, Set<Map.Entry<MazePassage, C>> entries)
+    private static <M extends WeightedMazeComponent<C>, C> void addAllExits(MazePredicate<M, C> placementStrategy, List<Triple<MazeRoom, MazePassage, C>> exitStack, Set<Map.Entry<MazePassage, C>> entries, Random random)
     {
         for (Map.Entry<MazePassage, C> exit : entries)
         {
@@ -168,10 +168,15 @@ public class MazeComponentConnector
             C c = exit.getValue();
 
             if (placementStrategy.isDirtyConnection(connection.getLeft(), connection.getRight(), c))
-                exitStack.add(Triple.of(connection.getLeft(), connection, c));
+                addRandomly(exitStack, random, connection, c, connection.getLeft());
             if (placementStrategy.isDirtyConnection(connection.getRight(), connection.getLeft(), c))
-                exitStack.add(Triple.of(connection.getRight(), connection, c));
+                addRandomly(exitStack, random, connection, c, connection.getRight());
         }
+    }
+
+    private static <C> void addRandomly(List<Triple<MazeRoom, MazePassage, C>> exitStack, Random random, MazePassage connection, C c, MazeRoom left)
+    {
+        exitStack.add(random.nextInt(exitStack.size()), Triple.of(left, connection, c));
     }
 
     private static class ReverseInfo<M extends WeightedMazeComponent<C>, C>
@@ -180,7 +185,7 @@ public class MazeComponentConnector
         public int triedIndices;
 
         public MorphingMazeComponent<C> maze;
-        public ArrayDeque<Triple<MazeRoom, MazePassage, C>> exitStack;
+        public LinkedList<Triple<MazeRoom, MazePassage, C>> exitStack;
         public ShiftedMazeComponent<M, C> placed;
     }
 }
