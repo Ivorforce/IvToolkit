@@ -127,12 +127,8 @@ public class NBTStateInjector
         {
             case "item":
             {
-                String dest = fixTag.getString("tagDest");
-                ResourceLocation itemID = new ResourceLocation(fixTag.getString("itemID"));
-
-                Item item = registry.itemFromID(itemID); // Read from registry for legacy mappings
-                if (item != null)
-                    compound.setString(dest, Item.REGISTRY.getNameForObject(item).toString());  // Items now read Strings \o/
+                // Items now read Strings \o/
+                compound.setString(fixTag.getString("tagDest"), fixTag.getString("itemID"));
 
                 break;
             }
