@@ -16,23 +16,53 @@
 
 package ivorius.ivtoolkit.world;
 
-import ivorius.ivtoolkit.blocks.IvBlockCollection;
+import ivorius.ivtoolkit.blocks.IvTileEntityHelper;
+import ivorius.ivtoolkit.tools.IvWorldData;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Random;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Created by lukas on 14.04.17.
  */
 public interface MockWorld
 {
+    static Real of(World world)
+    {
+        return new Real(world);
+    }
+
     World asWorld();
 
-    boolean setBlockState(BlockPos pos, IBlockState state, int flags);
+    boolean setBlockState(@Nonnull BlockPos pos, @Nonnull IBlockState state, int flags);
 
-    IBlockState getBlockState(BlockPos pos);
+    @Nonnull
+    IBlockState getBlockState(@Nonnull BlockPos pos);
+
+    @Nullable
+    TileEntity getTileEntity(@Nonnull BlockPos pos);
+
+    void setTileEntity(@Nonnull BlockPos pos, @Nullable TileEntity tileEntity);
+
+    List<Entity> getEntities(AxisAlignedBB bounds, @Nullable Predicate<? super Entity> predicate);
+
+    boolean addEntity(Entity entity);
+
+    boolean removeEntity(Entity entity);
 
     Random rand();
 
@@ -57,15 +87,47 @@ public interface MockWorld
         }
 
         @Override
-        public boolean setBlockState(BlockPos pos, IBlockState state, int flags)
+        public boolean setBlockState(@Nonnull BlockPos pos, @Nonnull IBlockState state, int flags)
         {
             return world.setBlockState(pos, state, flags);
         }
 
+        @Nonnull
         @Override
-        public IBlockState getBlockState(BlockPos pos)
+        public IBlockState getBlockState(@Nonnull BlockPos pos)
         {
             return world.getBlockState(pos);
+        }
+
+        @Override
+        public TileEntity getTileEntity(@Nonnull BlockPos pos)
+        {
+            return world.getTileEntity(pos);
+        }
+
+        @Override
+        public void setTileEntity(@Nonnull BlockPos pos, TileEntity tileEntity)
+        {
+            world.setTileEntity(pos, tileEntity);
+        }
+
+        @Override
+        public List<Entity> getEntities(AxisAlignedBB bounds, @Nullable Predicate<? super Entity> predicate)
+        {
+            return world.getEntitiesInAABBexcluding(null, bounds, predicate != null ? predicate::test : null);
+        }
+
+        @Override
+        public boolean addEntity(Entity entity)
+        {
+            return world.spawnEntityInWorld(entity);
+        }
+
+        @Override
+        public boolean removeEntity(Entity entity)
+        {
+            world.removeEntity(entity);
+            return true;
         }
 
         @Override
@@ -75,48 +137,45 @@ public interface MockWorld
         }
     }
 
-    class Cache implements MockWorld
+    class Cache extends Real
     {
         public WorldCache cache;
 
         public Cache(WorldCache cache)
         {
+            super(cache.world);
             this.cache = cache;
         }
 
         @Override
-        public World asWorld()
-        {
-            return cache.world;
-        }
-
-        @Override
-        public boolean setBlockState(BlockPos pos, IBlockState state, int flags)
+        public boolean setBlockState(@Nonnull BlockPos pos, @Nonnull IBlockState state, int flags)
         {
             return cache.setBlockState(pos, state, flags);
         }
 
+        @Nonnull
         @Override
-        public IBlockState getBlockState(BlockPos pos)
+        public IBlockState getBlockState(@Nonnull BlockPos pos)
         {
             return cache.getBlockState(pos);
         }
-
-        @Override
-        public Random rand()
-        {
-            return cache.world.rand;
-        }
     }
 
-    class BlockCollection implements MockWorld
+    class WorldData implements MockWorld
     {
-        public IvBlockCollection collection;
+        public IvWorldData worldData;
         public Random random = new Random();
 
-        public BlockCollection(IvBlockCollection collection)
+        public WorldData(IvWorldData worldData)
         {
-            this.collection = collection;
+            this.worldData = worldData;
+        }
+
+        public static boolean isAt(@Nonnull BlockPos pos, NBTTagCompound nbt)
+        {
+            return pos.getX() == nbt.getInteger("x")
+                    && pos.getY() == nbt.getInteger("y")
+                    && pos.getZ() == nbt.getInteger("z");
         }
 
         @Override
@@ -126,17 +185,65 @@ public interface MockWorld
         }
 
         @Override
-        public boolean setBlockState(BlockPos pos, IBlockState state, int flags)
+        public boolean setBlockState(@Nonnull BlockPos pos, @Nonnull IBlockState state, int flags)
         {
-            collection.setBlockState(pos, state);
+            worldData.blockCollection.setBlockState(pos, state);
 
             return true;
         }
 
+        @Nonnull
         @Override
-        public IBlockState getBlockState(BlockPos pos)
+        public IBlockState getBlockState(@Nonnull BlockPos pos)
         {
-            return collection.getBlockState(pos);
+            return worldData.blockCollection.getBlockState(pos);
+        }
+
+        @Override
+        public TileEntity getTileEntity(@Nonnull BlockPos pos)
+        {
+            for (NBTTagCompound nbt : worldData.tileEntities)
+            {
+                if (isAt(pos, nbt))
+                    return TileEntity.create(IvTileEntityHelper.getAnyWorld(), nbt);
+            }
+
+            return null;
+        }
+
+        @Override
+        public void setTileEntity(@Nonnull BlockPos pos, TileEntity tileEntity)
+        {
+            worldData.tileEntities.removeIf(nbt -> isAt(pos, nbt));
+            worldData.tileEntities.add(tileEntity.writeToNBT(new NBTTagCompound()));
+        }
+
+        @Override
+        public List<Entity> getEntities(AxisAlignedBB bounds, @Nullable Predicate<? super Entity> predicate)
+        {
+            return worldData.entities.stream()
+                    .filter(nbt ->
+                    {
+                        NBTTagList pos = nbt.getTagList("Pos", 6);
+                        return bounds.isVecInside(new Vec3d(pos.getDoubleAt(0), pos.getDoubleAt(1), pos.getDoubleAt(2)));
+                    })
+                    .map(nbt -> EntityList.createEntityFromNBT(nbt, IvTileEntityHelper.getAnyWorld()))
+                    .filter(predicate)
+                    .collect(Collectors.toList());
+        }
+
+        @Override
+        public boolean addEntity(Entity entity)
+        {
+            // To make sure we don't have doubles
+            removeEntity(entity);
+            return worldData.entities.add(entity.writeToNBT(new NBTTagCompound()));
+        }
+
+        @Override
+        public boolean removeEntity(Entity entity)
+        {
+            return worldData.entities.removeIf(nbt -> entity.getUniqueID().equals(nbt.getUniqueId("UUID")));
         }
 
         @Override

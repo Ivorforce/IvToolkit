@@ -16,11 +16,11 @@
 
 package ivorius.ivtoolkit.tools;
 
-import com.google.common.base.Predicate;
 import ivorius.ivtoolkit.blocks.BlockArea;
 import ivorius.ivtoolkit.blocks.BlockPositions;
 import ivorius.ivtoolkit.blocks.IvBlockCollection;
 import ivorius.ivtoolkit.transform.Mover;
+import ivorius.ivtoolkit.world.MockWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -34,6 +34,7 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -72,6 +73,11 @@ public class IvWorldData
 
     public static IvWorldData capture(World world, BlockArea blockArea, boolean captureEntities)
     {
+        return capture(MockWorld.of(world), blockArea, captureEntities);
+    }
+
+    public static IvWorldData capture(MockWorld world, BlockArea blockArea, boolean captureEntities)
+    {
         BlockPos referenceCoord = blockArea.getLowerCorner();
         BlockPos invertedReference = BlockPositions.invert(referenceCoord);
 
@@ -99,8 +105,9 @@ public class IvWorldData
         }
 
         List<NBTTagCompound> entities = captureEntities
-                ? world.getEntitiesInAABBexcluding(null, blockArea.asAxisAlignedBB(), saveableEntityPredicate()).stream()
-                .map(entity -> {
+                ? world.getEntities(blockArea.asAxisAlignedBB(), saveableEntityPredicate()).stream()
+                .map(entity ->
+                {
                     Mover.moveEntity(entity, invertedReference);
 
                     NBTTagCompound entityCompound = NBTCompoundObjectsMC.write(entity, true);
