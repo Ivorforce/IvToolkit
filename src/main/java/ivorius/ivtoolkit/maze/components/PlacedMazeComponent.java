@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Lukas Tenbrink
+ * Copyright 2017 Lukas Tenbrink
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,12 +17,26 @@
 package ivorius.ivtoolkit.maze.components;
 
 /**
- * Created by lukas on 15.04.15.
+ * Created by lukas on 14.04.17.
  */
-@Deprecated
-public interface MazeComponentPlacementStrategy<M extends MazeComponent<C>, C>
+public class PlacedMazeComponent<M extends WeightedMazeComponent<C>, C>
 {
-    boolean canPlace(ShiftedMazeComponent<M, C> component);
+    private final M component;
+    private final MazeRoom shift;
 
-    boolean shouldContinue(MazeRoom dest, MazeRoom source, C c);
+    public PlacedMazeComponent(M component, MazeRoom shift)
+    {
+        this.component = component;
+        this.shift = shift;
+    }
+
+    public M component()
+    {
+        return component;
+    }
+
+    public MazeRoom shift()
+    {
+        return shift;
+    }
 }

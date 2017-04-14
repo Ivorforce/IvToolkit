@@ -19,17 +19,17 @@ package ivorius.ivtoolkit.maze.components;
 /**
  * Created by lukas on 30.09.15.
  */
-public interface MazePredicate<M extends MazeComponent<C>, C>
+public interface MazePredicate<C>
 {
-    boolean canPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component);
+    boolean canPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<?, C> component);
 
-    void willPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component);
+    void willPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<?, C> component);
 
-    void didPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component);
+    void didPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<?, C> component);
 
-    void willUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component);
+    void willUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<?, C> component);
 
-    void didUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component);
+    void didUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<?, C> component);
 
     boolean isDirtyConnection(MazeRoom dest, MazeRoom source, C c);
 }
