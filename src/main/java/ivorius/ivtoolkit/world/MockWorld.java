@@ -21,13 +21,20 @@ import ivorius.ivtoolkit.tools.IvWorldData;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.init.Biomes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldType;
+import net.minecraft.world.biome.Biome;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,7 +46,7 @@ import java.util.stream.Collectors;
 /**
  * Created by lukas on 14.04.17.
  */
-public interface MockWorld
+public interface MockWorld extends IBlockAccess
 {
     static Real of(World world)
     {
@@ -69,6 +76,41 @@ public interface MockWorld
     default boolean setBlockState(BlockPos coord, IBlockState block)
     {
         return setBlockState(coord, block, 3);
+    }
+
+    @SideOnly(Side.CLIENT)
+    default int getCombinedLight(BlockPos pos, int lightValue)
+    {
+        return 0;
+    }
+
+    default boolean isAirBlock(BlockPos pos)
+    {
+        IBlockState state = getBlockState(pos);
+        return state.getBlock().isAir(state, this, pos);
+    }
+
+    @SideOnly(Side.CLIENT)
+    default Biome getBiome(BlockPos pos)
+    {
+        return Biomes.DEFAULT;
+    }
+
+
+    default int getStrongPower(BlockPos pos, EnumFacing direction)
+    {
+        return 0;
+    }
+
+    @SideOnly(Side.CLIENT)
+    default WorldType getWorldType()
+    {
+        return WorldType.CUSTOMIZED;
+    }
+
+    default boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default)
+    {
+        return getBlockState(pos).isSideSolid(this, pos, side);
     }
 
     class Real implements MockWorld
@@ -134,6 +176,30 @@ public interface MockWorld
         public Random rand()
         {
             return world.rand;
+        }
+
+        @Override
+        public int getCombinedLight(BlockPos pos, int lightValue)
+        {
+            return world.getCombinedLight(pos, lightValue);
+        }
+
+        @Override
+        public Biome getBiome(BlockPos pos)
+        {
+            return world.getBiome(pos);
+        }
+
+        @Override
+        public int getStrongPower(BlockPos pos, EnumFacing direction)
+        {
+            return world.getStrongPower(pos, direction);
+        }
+
+        @Override
+        public WorldType getWorldType()
+        {
+            return world.getWorldType();
         }
     }
 
