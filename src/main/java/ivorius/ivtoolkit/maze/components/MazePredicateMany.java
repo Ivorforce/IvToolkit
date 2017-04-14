@@ -16,9 +16,6 @@
 
 package ivorius.ivtoolkit.maze.components;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,51 +23,51 @@ import java.util.List;
 /**
  * Created by lukas on 30.09.15.
  */
-public class MazePredicateMany<M extends MazeComponent<C>, C> implements MazePredicate<M, C>
+public class MazePredicateMany<C> implements MazePredicate<C>
 {
-    public final List<MazePredicate<M, C>> predicates = new ArrayList<>();
+    public final List<MazePredicate<C>> predicates = new ArrayList<>();
 
     public MazePredicateMany()
     {
     }
 
-    public MazePredicateMany(List<MazePredicate<M, C>> predicates)
+    public MazePredicateMany(List<MazePredicate<C>> predicates)
     {
         this.predicates.addAll(predicates);
     }
 
     @SafeVarargs
-    public MazePredicateMany(MazePredicate<M, C>... predicates)
+    public MazePredicateMany(MazePredicate<C>... predicates)
     {
         Collections.addAll(this.predicates, predicates);
     }
 
     @Override
-    public boolean canPlace(final MorphingMazeComponent<C> maze, final ShiftedMazeComponent<M, C> component)
+    public boolean canPlace(final MorphingMazeComponent<C> maze, final ShiftedMazeComponent<?, C> component)
     {
         return predicates.stream().allMatch(p -> p.canPlace(maze, component));
     }
 
     @Override
-    public void willPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
+    public void willPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<?, C> component)
     {
         predicates.forEach(p -> p.willPlace(maze, component));
     }
 
     @Override
-    public void didPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
+    public void didPlace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<?, C> component)
     {
         predicates.forEach(p -> p.didPlace(maze, component));
     }
 
     @Override
-    public void willUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
+    public void willUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<?, C> component)
     {
         predicates.forEach(p -> p.willUnplace(maze, component));
     }
 
     @Override
-    public void didUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<M, C> component)
+    public void didUnplace(MorphingMazeComponent<C> maze, ShiftedMazeComponent<?, C> component)
     {
         predicates.forEach(p -> p.didUnplace(maze, component));
     }

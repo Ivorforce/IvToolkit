@@ -16,10 +16,11 @@
 
 package ivorius.ivtoolkit.maze.components;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import ivorius.ivtoolkit.IvToolkit;
 import ivorius.ivtoolkit.random.WeightedSelector;
 import ivorius.ivtoolkit.random.WeightedShuffler;
+import ivorius.ivtoolkit.util.IvFunctions;
 import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.*;
@@ -34,13 +35,25 @@ public class MazeComponentConnector
 {
     public static int INFINITE_REVERSES = -1;
 
-    public static <M extends WeightedMazeComponent<C>, C> List<ShiftedMazeComponent<M, C>> randomlyConnect(MorphingMazeComponent<C> maze, List<M> components,
-                                                                                                           ConnectionStrategy<C> connectionStrategy, final MazePredicate<M, C> predicate, Random random, int reverses)
+    public static <M extends WeightedMazeComponent<C>, C> List<PlacedMazeComponent<M, C>> connect(MorphingMazeComponent<C> maze, List<M> components,
+                                                                                                  ConnectionStrategy<C> connectionStrategy, final MazePredicate<C> predicate, Random random, int reverses)
+    {
+        // Group components that are the same together, and choose one after connecting
+        List<MultiMazeComponent<M, C>> multis = IvFunctions.group(components, c -> Triple.of(c.rooms(), c.exits(), c.reachability())).stream()
+                .map(c -> new MultiMazeComponent<>(Lists.newArrayList(c))).collect(Collectors.toList());
+
+        return connectMulti(maze, multis, connectionStrategy, predicate, random, reverses).stream()
+                .map(placed -> placed.component().place(placed.shift(), random))
+                .collect(Collectors.toList());
+    }
+
+    protected static <M extends MultiMazeComponent<MO, C>, MO extends WeightedMazeComponent<C>, C> List<PlacedMazeComponent<M, C>> connectMulti(MorphingMazeComponent<C> maze, List<M> components,
+                                                                                                                                                ConnectionStrategy<C> connectionStrategy, final MazePredicate<C> predicate, Random random, int reverses)
     {
         List<ReverseInfo<M, C>> placeOrder = new ArrayList<>();
         ReverseInfo<M, C> reversing = null;
 
-        List<ShiftedMazeComponent<M, C>> result = new ArrayList<>();
+        List<PlacedMazeComponent<M, C>> result = new ArrayList<>();
         LinkedList<Triple<MazeRoom, MazePassage, C>> exitStack = new LinkedList<>();
 
         Predicate<ShiftedMazeComponent<M, C>> componentPredicate = ((Predicate<ShiftedMazeComponent<M, C>>) input -> !MazeComponents.overlap(maze, input)).and(input -> predicate.canPlace(maze, input));
@@ -81,7 +94,7 @@ public class MazeComponentConnector
             MazePassage exit = triple.getMiddle();
             C connection = triple.getRight();
 
-            final ToDoubleFunction<ShiftedMazeComponent<M,C>> weightFunction = shifted -> shifted.getComponent().getWeight() * MazeComponents.connectWeight(maze, shifted, connectionStrategy);
+            final ToDoubleFunction<ShiftedMazeComponent<M, C>> weightFunction = shifted -> shifted.getComponent().getWeight() * MazeComponents.connectWeight(maze, shifted, connectionStrategy);
 
             List<WeightedSelector.SimpleItem<ShiftedMazeComponent<M, C>>> shiftedComponents = components.stream()
                     .flatMap(MazeComponents.shiftAllFunction(exit, connection, connectionStrategy))
@@ -144,7 +157,7 @@ public class MazeComponentConnector
 
             addAllExits(predicate, exitStack, placing.exits().entrySet(), random);
             maze.add(placing);
-            result.add(placing);
+            result.add(new PlacedMazeComponent<M, C>(placing.getComponent(), placing.getShift()));
 
             predicate.didPlace(maze, placing);
 
@@ -152,7 +165,7 @@ public class MazeComponentConnector
             reversing = null;
         }
 
-        return ImmutableList.<ShiftedMazeComponent<M, C>>builder().addAll(result).build();
+        return result;
     }
 
     private static Predicate<Map.Entry<MazePassage, ?>> entryConnectsTo(final MazeRoom finalRoom)
@@ -160,7 +173,7 @@ public class MazeComponentConnector
         return input -> input != null && (input.getKey().has(finalRoom));
     }
 
-    private static <M extends WeightedMazeComponent<C>, C> void addAllExits(MazePredicate<M, C> placementStrategy, List<Triple<MazeRoom, MazePassage, C>> exitStack, Set<Map.Entry<MazePassage, C>> entries, Random random)
+    private static <M extends WeightedMazeComponent<C>, C> void addAllExits(MazePredicate<C> placementStrategy, List<Triple<MazeRoom, MazePassage, C>> exitStack, Set<Map.Entry<MazePassage, C>> entries, Random random)
     {
         for (Map.Entry<MazePassage, C> exit : entries)
         {
