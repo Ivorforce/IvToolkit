@@ -45,6 +45,17 @@ public class WeightedSelector
         return items.stream().anyMatch(item -> weightFunction.applyAsDouble(item) > 0);
     }
 
+    public static <T> T selectWeightless(Random rand, Collection<T> items, int counted)
+    {
+        counted = rand.nextInt(counted);
+        for (Iterator<T> iterator = items.iterator(); true; )
+        {
+            T item = iterator.next();
+            if (counted-- == 0 || !iterator.hasNext())
+                return item;
+        }
+    }
+
     public static <T extends Item> T selectItem(Random rand, Collection<T> items)
     {
         return selectItem(rand, items, totalWeight(items));
@@ -66,18 +77,20 @@ public class WeightedSelector
             throw new IndexOutOfBoundsException();
 
         double random = rand.nextDouble() * totalWeight;
-        T last = null;
-        for (Iterator<T> iterator = items.iterator(); true;)
+        int counted = 0;
+        for (Iterator<T> iterator = items.iterator(); iterator.hasNext(); counted++)
         {
-            last = iterator.next();
-            random -= last.getWeight();
-            if (random <= 0.0 || !iterator.hasNext())
+            T t = iterator.next();
+            random -= t.getWeight();
+            if (random <= 0.0)
             {
                 if (remove)
                     iterator.remove();
-                return last;
+                return t;
             }
         }
+
+        return selectWeightless(rand, items, counted);
     }
 
     public static <T> T select(Random rand, Collection<T> items, final ToDoubleFunction<T> weightFunction)
@@ -101,18 +114,20 @@ public class WeightedSelector
             throw new IndexOutOfBoundsException();
 
         double random = rand.nextDouble() * totalWeight;
-        T last = null;
-        for (Iterator<T> iterator = items.iterator(); true; )
+        int counted = 0;
+        for (Iterator<T> iterator = items.iterator(); iterator.hasNext(); counted++)
         {
-            last = iterator.next();
-            random -= weightFunction.applyAsDouble(last);
-            if (random <= 0.0 || !iterator.hasNext())
+            T t = iterator.next();
+            random -= weightFunction.applyAsDouble(t);
+            if (random <= 0.0)
             {
                 if (remove)
                     iterator.remove();
-                return last;
+                return t;
             }
         }
+
+        return selectWeightless(rand, items, counted);
     }
 
     public static <T> T select(Random rand, Collection<SimpleItem<T>> items)
