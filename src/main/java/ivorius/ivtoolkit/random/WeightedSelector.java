@@ -67,19 +67,17 @@ public class WeightedSelector
 
         double random = rand.nextDouble() * totalWeight;
         T last = null;
-        for (Iterator<T> iterator = items.iterator(); iterator.hasNext(); )
+        for (Iterator<T> iterator = items.iterator(); true;)
         {
             last = iterator.next();
             random -= last.getWeight();
-            if (random <= 0.0)
+            if (random <= 0.0 || !iterator.hasNext())
             {
                 if (remove)
                     iterator.remove();
                 return last;
             }
         }
-
-        return last;
     }
 
     public static <T> T select(Random rand, Collection<T> items, final ToDoubleFunction<T> weightFunction)
@@ -104,19 +102,17 @@ public class WeightedSelector
 
         double random = rand.nextDouble() * totalWeight;
         T last = null;
-        for (Iterator<T> iterator = items.iterator(); iterator.hasNext(); )
+        for (Iterator<T> iterator = items.iterator(); true; )
         {
             last = iterator.next();
             random -= weightFunction.applyAsDouble(last);
-            if (random <= 0.0)
+            if (random <= 0.0 || !iterator.hasNext())
             {
                 if (remove)
                     iterator.remove();
                 return last;
             }
         }
-
-        return last;
     }
 
     public static <T> T select(Random rand, Collection<SimpleItem<T>> items)
