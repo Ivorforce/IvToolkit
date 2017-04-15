@@ -38,7 +38,7 @@ public class WeightedShuffler
             @Override
             public T next()
             {
-                T next = totalWeight > 0
+                T next = totalWeight > 0.0000001
                         ? WeightedSelector.select(rand, items, weightFunction, totalWeight, true)
                         : items.remove(rand.nextInt(items.size()));
                 totalWeight -= weightFunction.applyAsDouble(next);
