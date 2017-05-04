@@ -324,7 +324,8 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
 
         if (compound.hasKey("chunks"))
         {
-            chunks = (BlurredValueField[]) NBTCompoundObjects.readListFrom(compound, "chunks", BlurredValueField::new).toArray();
+            chunks = NBTCompoundObjects.readListFrom(compound, "chunks", BlurredValueField::new).stream()
+                    .toArray(BlurredValueField[]::new);
             chunkCount = compound.getIntArray("chunkCount");
         }
 
