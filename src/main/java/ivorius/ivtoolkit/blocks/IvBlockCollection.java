@@ -56,7 +56,10 @@ public class IvBlockCollection
 
     public IvBlockCollection(IBlockState[] blockStates, int width, int height, int length)
     {
-        this.blockStates = blockStates;
+        if (blockStates.length != width * height * length)
+            throw new IllegalArgumentException();
+
+        this.blockStates = blockStates.clone();
         this.width = width;
         this.height = height;
         this.length = length;
@@ -229,6 +232,11 @@ public class IvBlockCollection
         compound.setTag("mapping", mapper.createTagList());
         compound.setTag("blocks", mapper.createNBTForBlocks(blockList));
         return compound;
+    }
+
+    public IvBlockCollection copy()
+    {
+        return new IvBlockCollection(blockStates, width, height, length);
     }
 
     @Override
