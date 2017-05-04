@@ -162,7 +162,7 @@ public interface MockWorld extends IBlockAccess
         @Override
         public boolean addEntity(Entity entity)
         {
-            return world.spawnEntity(entity);
+            return world.spawnEntityInWorld(entity);
         }
 
         @Override
