@@ -54,7 +54,7 @@ public class GuiSliderMultivalue extends GuiButton
         {
             if (this.mousePressedInsideIndex >= 0)
             {
-                values[mousePressedInsideIndex] = (float) (x - (this.xPosition + 4)) / (float) (this.width - 8);
+                values[mousePressedInsideIndex] = (float) (x - (this.x + 4)) / (float) (this.width - 8);
                 values[mousePressedInsideIndex] = (values[mousePressedInsideIndex]) * (maxValue - minValue) + minValue;
 
                 if (values[mousePressedInsideIndex] < minValue)
@@ -75,8 +75,8 @@ public class GuiSliderMultivalue extends GuiButton
             for (float value : values)
             {
                 float drawVal = (value - this.minValue) / (this.maxValue - this.minValue);
-                this.drawTexturedModalRect(this.xPosition + (int) (drawVal * (float) (this.width - 8)), this.yPosition, 0, 66, 4, height);
-                this.drawTexturedModalRect(this.xPosition + (int) (drawVal * (float) (this.width - 8)) + 4, this.yPosition, 196, 66, 4, height);
+                this.drawTexturedModalRect(this.x + (int) (drawVal * (float) (this.width - 8)), this.y, 0, 66, 4, height);
+                this.drawTexturedModalRect(this.x + (int) (drawVal * (float) (this.width - 8)) + 4, this.y, 196, 66, 4, height);
             }
         }
     }
@@ -86,7 +86,7 @@ public class GuiSliderMultivalue extends GuiButton
     {
         if (super.mousePressed(mc, x, y))
         {
-            float value = (float) (x - (this.xPosition + 4)) / (float) (this.width - 8);
+            float value = (float) (x - (this.x + 4)) / (float) (this.width - 8);
             value = value * (maxValue - minValue) + minValue;
 
             float nearestDist = -1;

@@ -291,7 +291,7 @@ public interface MockWorld extends IBlockAccess
                     .filter(nbt ->
                     {
                         NBTTagList pos = nbt.getTagList("Pos", 6);
-                        return bounds.isVecInside(new Vec3d(pos.getDoubleAt(0), pos.getDoubleAt(1), pos.getDoubleAt(2)));
+                        return bounds.contains(new Vec3d(pos.getDoubleAt(0), pos.getDoubleAt(1), pos.getDoubleAt(2)));
                     })
                     .map(nbt -> EntityList.createEntityFromNBT(nbt, IvTileEntityHelper.getAnyWorld()))
                     .filter(predicate)

@@ -17,9 +17,9 @@
 package ivorius.ivtoolkit.bezier;
 
 import ivorius.ivtoolkit.math.IvMathHelper;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
@@ -76,7 +76,7 @@ public class IvBezierPath3DRendererTexture
             path.buildDistances();
         }
 
-        VertexBuffer renderer = Tessellator.getInstance().getBuffer();
+        BufferBuilder renderer = Tessellator.getInstance().getBuffer();
 
         GlStateManager.enableBlend();
         OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);

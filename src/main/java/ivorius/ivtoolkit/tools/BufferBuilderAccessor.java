@@ -16,8 +16,7 @@
 
 package ivorius.ivtoolkit.tools;
 
-import net.minecraft.client.renderer.VertexBuffer;
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.lang.reflect.Field;
@@ -25,7 +24,7 @@ import java.lang.reflect.Field;
 /**
  * Created by lukas on 22.07.15.
  */
-public class VertexBufferAccessor
+public class BufferBuilderAccessor
 {
     protected static Field xOffset;
     protected static Field yOffset;
@@ -35,24 +34,24 @@ public class VertexBufferAccessor
     {
         return xOffset != null
                 ? xOffset
-                : (xOffset = ReflectionHelper.findField(VertexBuffer.class, "xOffset", "field_179004_l"));
+                : (xOffset = ReflectionHelper.findField(BufferBuilder.class, "xOffset", "field_179004_l"));
     }
 
     protected static Field getYOffset()
     {
         return yOffset != null
                 ? yOffset
-                : (yOffset = ReflectionHelper.findField(VertexBuffer.class, "yOffset", "field_179005_m"));
+                : (yOffset = ReflectionHelper.findField(BufferBuilder.class, "yOffset", "field_179005_m"));
     }
 
     protected static Field getZOffset()
     {
         return zOffset != null
                 ? zOffset
-                : (zOffset = ReflectionHelper.findField(VertexBuffer.class, "zOffset", "field_179002_n"));
+                : (zOffset = ReflectionHelper.findField(BufferBuilder.class, "zOffset", "field_179002_n"));
     }
 
-    public static void addTranslation(VertexBuffer renderer, double x, double y, double z)
+    public static void addTranslation(BufferBuilder renderer, double x, double y, double z)
     {
         try
         {

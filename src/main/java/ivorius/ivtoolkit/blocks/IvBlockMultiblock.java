@@ -88,7 +88,7 @@ public abstract class IvBlockMultiblock extends Block
     {
         world.playBroadcastSound(2001, pos, Block.getStateId(world.getBlockState(pos)));
 //        if (world.isRemote)
-//            Minecraft.getMinecraft().effectRenderer.addBlockDestroyEffects(parentTE.xCoord, parentTE.yCoord, parentTE.zCoord, parentTE.getBlockType(), parentTE.getBlockMetadata());
+//            Minecraft.getMinecraft().effectRenderer.addBlockDestroyEffects(parentTE.x, parentTE.y, parentTE.z, parentTE.getBlockType(), parentTE.getBlockMetadata());
     }
 
     public void destroyParentOf(IvTileEntityMultiBlock tileEntityMultiBlock)

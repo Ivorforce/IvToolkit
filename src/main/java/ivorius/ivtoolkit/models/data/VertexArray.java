@@ -30,7 +30,7 @@ import java.nio.FloatBuffer;
  * </p>
  * 
  * <p>
- * This class does not support shaders and for that matter OpenGL ES 2.0. For this {@link VertexBufferObject}s are needed.
+ * This class does not support shaders and for that matter OpenGL ES 2.0. For this {@link BufferBuilderObject}s are needed.
  * </p>
  * 
  * @author mzechner, Dave Clayton <contact@redskyforge.com> */

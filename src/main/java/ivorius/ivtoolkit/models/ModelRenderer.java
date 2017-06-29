@@ -28,9 +28,9 @@ import ivorius.ivtoolkit.models.data.VertexData;
 import ivorius.ivtoolkit.models.textures.Texture;
 import ivorius.ivtoolkit.models.utils.MathUtils;
 import ivorius.ivtoolkit.models.utils.MatrixMathUtils;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.util.vector.Matrix4f;
@@ -53,7 +53,7 @@ public class ModelRenderer
 
     public static void renderModelDirectly(Model model)
     {
-        VertexBuffer renderer = Tessellator.getInstance().getBuffer();
+        BufferBuilder renderer = Tessellator.getInstance().getBuffer();
 
         model.calculateTransforms();
 
@@ -72,7 +72,7 @@ public class ModelRenderer
         });
     }
 
-    private static void renderNodePart(VertexBuffer renderer, NodePart nodePart)
+    private static void renderNodePart(BufferBuilder renderer, NodePart nodePart)
     {
         MeshPart meshPart = nodePart.meshPart;
         Material material = nodePart.material;

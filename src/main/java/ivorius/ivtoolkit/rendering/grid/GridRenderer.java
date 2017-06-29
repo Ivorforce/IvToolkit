@@ -17,9 +17,9 @@
 package ivorius.ivtoolkit.rendering.grid;
 
 import ivorius.ivtoolkit.rendering.IvRenderHelper;
-import ivorius.ivtoolkit.tools.VertexBufferAccessor;
+import ivorius.ivtoolkit.tools.BufferBuilderAccessor;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.client.renderer.GlStateManager;
@@ -70,10 +70,10 @@ public class GridRenderer
         else
             z += zDir * 0.5;
 
-        VertexBuffer renderer = Tessellator.getInstance().getBuffer();
+        BufferBuilder renderer = Tessellator.getInstance().getBuffer();
 
-        VertexBufferAccessor.addTranslation(renderer, x, y, z);
+        BufferBuilderAccessor.addTranslation(renderer, x, y, z);
         IvRenderHelper.renderCuboid(renderer, xDir, yDir, zDir, 1f);
-        VertexBufferAccessor.addTranslation(renderer, -x, -y, -z);
+        BufferBuilderAccessor.addTranslation(renderer, -x, -y, -z);
     }
 }

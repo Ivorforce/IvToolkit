@@ -127,7 +127,7 @@ public abstract class IvFMLIntercommHandler
         }
         else
         {
-            return FMLCommonHandler.instance().getSidedDelegate().getServer().worldServerForDimension(compound.getInteger(worldKey)).getEntityByID(compound.getInteger(entityKey));
+            return FMLCommonHandler.instance().getSidedDelegate().getServer().getWorld(compound.getInteger(worldKey)).getEntityByID(compound.getInteger(entityKey));
         }
     }
 

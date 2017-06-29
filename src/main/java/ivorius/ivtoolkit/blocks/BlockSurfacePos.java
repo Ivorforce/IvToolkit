@@ -43,7 +43,7 @@ public class BlockSurfacePos
 
     public static BlockSurfacePos from(ChunkPos chunkCoords, int x, int z)
     {
-        return new BlockSurfacePos(chunkCoords.chunkXPos << 4 + x, chunkCoords.chunkZPos << 4 + z);
+        return new BlockSurfacePos(chunkCoords.x << 4 + x, chunkCoords.z << 4 + z);
     }
 
     public static BlockSurfacePos from(BlockPos pos)

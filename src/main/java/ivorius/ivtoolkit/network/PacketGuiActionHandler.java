@@ -32,7 +32,7 @@ public class PacketGuiActionHandler extends SchedulingMessageHandler<PacketGuiAc
     {
         NetHandlerPlayServer netHandler = ctx.getServerHandler();
 
-        Container container = netHandler.playerEntity.openContainer;
+        Container container = netHandler.player.openContainer;
         if (container instanceof PacketGuiAction.ActionHandler)
         {
             ((PacketGuiAction.ActionHandler) container).handleAction(message.getContext(), message.getPayload());

@@ -16,8 +16,8 @@
 
 package ivorius.ivtoolkit.raytracing;
 
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 import java.util.List;
@@ -218,7 +218,7 @@ public class IvRaytraceableAxisAlignedSurface extends IvRaytraceableObject
     @Override
     public void drawOutlines()
     {
-        VertexBuffer renderer = Tessellator.getInstance().getBuffer();
+        BufferBuilder renderer = Tessellator.getInstance().getBuffer();
 
         renderer.begin(3, DefaultVertexFormats.POSITION);
         if (width == 0)

@@ -149,12 +149,12 @@ public class IvBlockCollection
     public RayTraceResult rayTrace(Vec3d position, Vec3d direction)
     {
         IvRaytraceableAxisAlignedBox containingBox = new IvRaytraceableAxisAlignedBox(null, 0.001, 0.001, 0.001, width - 0.002, height - 0.002, length - 0.002);
-        IvRaytracedIntersection intersection = IvRaytracer.getFirstIntersection(Collections.<IvRaytraceableObject>singletonList(containingBox), position.xCoord, position.yCoord, position.zCoord, direction.xCoord, direction.yCoord, direction.zCoord);
+        IvRaytracedIntersection intersection = IvRaytracer.getFirstIntersection(Collections.<IvRaytraceableObject>singletonList(containingBox), position.x, position.y, position.z, direction.x, direction.y, direction.z);
 
         if (intersection != null)
         {
             position = new Vec3d(intersection.getX(), intersection.getY(), intersection.getZ());
-            BlockPos curCoord = new BlockPos(position.xCoord, position.yCoord, position.zCoord);
+            BlockPos curCoord = new BlockPos(position.x, position.y, position.z);
             EnumFacing hitSide = ((EnumFacing) intersection.getHitInfo()).getOpposite();
 
             while (hasCoord(curCoord))
@@ -167,20 +167,20 @@ public class IvBlockCollection
                 if (hitSide.getFrontOffsetX() != 0)
                 {
                     double offX = hitSide.getFrontOffsetX() > 0 ? 1.0001 : -0.0001;
-                    double dirLength = ((curCoord.getX() + offX) - position.xCoord) / direction.xCoord;
-                    position = new Vec3d(curCoord.getX() + offX, position.yCoord + direction.yCoord * dirLength, position.zCoord + direction.zCoord * dirLength);
+                    double dirLength = ((curCoord.getX() + offX) - position.x) / direction.x;
+                    position = new Vec3d(curCoord.getX() + offX, position.y + direction.y * dirLength, position.z + direction.z * dirLength);
                 }
                 else if (hitSide.getFrontOffsetY() != 0)
                 {
                     double offY = hitSide.getFrontOffsetY() > 0 ? 1.0001 : -0.0001;
-                    double dirLength = ((curCoord.getY() + offY) - position.yCoord) / direction.yCoord;
-                    position = new Vec3d(position.xCoord + direction.xCoord * dirLength, curCoord.getY() + offY, position.zCoord + direction.zCoord * dirLength);
+                    double dirLength = ((curCoord.getY() + offY) - position.y) / direction.y;
+                    position = new Vec3d(position.x + direction.x * dirLength, curCoord.getY() + offY, position.z + direction.z * dirLength);
                 }
                 else
                 {
                     double offZ = hitSide.getFrontOffsetZ() > 0 ? 1.0001 : -0.0001;
-                    double dirLength = ((curCoord.getZ() + offZ) - position.zCoord) / direction.zCoord;
-                    position = new Vec3d(position.xCoord + direction.xCoord * dirLength, position.yCoord + direction.yCoord * dirLength, curCoord.getZ() + offZ);
+                    double dirLength = ((curCoord.getZ() + offZ) - position.z) / direction.z;
+                    position = new Vec3d(position.x + direction.x * dirLength, position.y + direction.y * dirLength, curCoord.getZ() + offZ);
                 }
 
                 curCoord = curCoord.add(hitSide.getFrontOffsetX(), hitSide.getFrontOffsetY(), hitSide.getFrontOffsetZ());
@@ -192,20 +192,20 @@ public class IvBlockCollection
 
     private EnumFacing getExitSide(Vec3d position, Vec3d direction)
     {
-        double innerX = ((position.xCoord % 1.0) + 1.0) % 1.0;
-        double innerY = ((position.yCoord % 1.0) + 1.0) % 1.0;
-        double innerZ = ((position.zCoord % 1.0) + 1.0) % 1.0;
+        double innerX = ((position.x % 1.0) + 1.0) % 1.0;
+        double innerY = ((position.y % 1.0) + 1.0) % 1.0;
+        double innerZ = ((position.z % 1.0) + 1.0) % 1.0;
 
-        double xDist = direction.xCoord > 0.0 ? ((1.0 - innerX) / direction.xCoord) : (innerX / -direction.xCoord);
-        double yDist = direction.yCoord > 0.0 ? ((1.0 - innerY) / direction.yCoord) : (innerY / -direction.yCoord);
-        double zDist = direction.zCoord > 0.0 ? ((1.0 - innerZ) / direction.zCoord) : (innerZ / -direction.zCoord);
+        double xDist = direction.x > 0.0 ? ((1.0 - innerX) / direction.x) : (innerX / -direction.x);
+        double yDist = direction.y > 0.0 ? ((1.0 - innerY) / direction.y) : (innerY / -direction.y);
+        double zDist = direction.z > 0.0 ? ((1.0 - innerZ) / direction.z) : (innerZ / -direction.z);
 
         if (xDist < yDist && xDist < zDist)
-            return direction.xCoord > 0.0 ? EnumFacing.EAST : EnumFacing.WEST;
+            return direction.x > 0.0 ? EnumFacing.EAST : EnumFacing.WEST;
         else if (yDist < zDist)
-            return direction.yCoord > 0.0 ? EnumFacing.UP : EnumFacing.DOWN;
+            return direction.y > 0.0 ? EnumFacing.UP : EnumFacing.DOWN;
         else
-            return direction.zCoord > 0.0 ? EnumFacing.SOUTH : EnumFacing.NORTH;
+            return direction.z > 0.0 ? EnumFacing.SOUTH : EnumFacing.NORTH;
     }
 
     public int getBlockMultiplicity()

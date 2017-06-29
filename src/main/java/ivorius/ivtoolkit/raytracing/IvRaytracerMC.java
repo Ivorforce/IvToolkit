@@ -35,7 +35,7 @@ public class IvRaytracerMC
         double z = entity.posZ;
 
         Vec3d lookVec = entity.getLookVec();
-        return IvRaytracer.getIntersections(objects, x, y, z, lookVec.xCoord, lookVec.yCoord, lookVec.zCoord);
+        return IvRaytracer.getIntersections(objects, x, y, z, lookVec.x, lookVec.y, lookVec.z);
     }
 
     public static IvRaytracedIntersection getFirstIntersection(List<IvRaytraceableObject> objects, Entity entity)
@@ -46,9 +46,9 @@ public class IvRaytracerMC
 
         Vec3d lookVec = entity.getLookVec();
 
-        List<IvRaytracedIntersection> intersections = IvRaytracer.getIntersections(objects, x, y, z, lookVec.xCoord, lookVec.yCoord, lookVec.zCoord);
+        List<IvRaytracedIntersection> intersections = IvRaytracer.getIntersections(objects, x, y, z, lookVec.x, lookVec.y, lookVec.z);
 
-        return IvRaytracer.findFirstIntersection(intersections, x, y, z, lookVec.xCoord, lookVec.yCoord, lookVec.zCoord);
+        return IvRaytracer.findFirstIntersection(intersections, x, y, z, lookVec.x, lookVec.y, lookVec.z);
     }
 
     public static void drawStandardOutlinesFromTileEntity(List<IvRaytraceableObject> objects, double d, double d1, double d2, TileEntity tileEntity)

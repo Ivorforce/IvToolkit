@@ -33,7 +33,7 @@ public class Mesh implements Disposable
 
     public Mesh(boolean isStatic, int maxVertices, int maxIndices, VertexAttributes attributes)
     {
-        vertices = new VertexBufferObject(isStatic, maxVertices, attributes);
+        vertices = new BufferBuilderObject(isStatic, maxVertices, attributes);
         indices = new IndexBufferObject(isStatic, maxIndices);
     }
 

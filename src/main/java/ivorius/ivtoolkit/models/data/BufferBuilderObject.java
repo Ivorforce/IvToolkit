@@ -45,12 +45,12 @@ import java.nio.FloatBuffer;
  * </p>
  * <p/>
  * <p>
- * VertexBufferObjects must be disposed via the {@link #dispose()} method when no longer needed
+ * BufferBuilderObjects must be disposed via the {@link #dispose()} method when no longer needed
  * </p>
  *
  * @author mzechner, Dave Clayton <contact@redskyforge.com>
  */
-public class VertexBufferObject implements VertexData
+public class BufferBuilderObject implements VertexData
 {
     final VertexAttributes attributes;
     final FloatBuffer buffer;
@@ -62,25 +62,25 @@ public class VertexBufferObject implements VertexData
     boolean isBound = false;
 
     /**
-     * Constructs a new interleaved VertexBufferObject.
+     * Constructs a new interleaved BufferBuilderObject.
      *
      * @param isStatic    whether the vertex data is static.
      * @param numVertices the maximum number of vertices
      * @param attributes  the {@link VertexAttribute}s.
      */
-    public VertexBufferObject(boolean isStatic, int numVertices, VertexAttribute... attributes)
+    public BufferBuilderObject(boolean isStatic, int numVertices, VertexAttribute... attributes)
     {
         this(isStatic, numVertices, new VertexAttributes(attributes));
     }
 
     /**
-     * Constructs a new interleaved VertexBufferObject.
+     * Constructs a new interleaved BufferBuilderObject.
      *
      * @param isStatic    whether the vertex data is static.
      * @param numVertices the maximum number of vertices
      * @param attributes  the {@link VertexAttributes}.
      */
-    public VertexBufferObject(boolean isStatic, int numVertices, VertexAttributes attributes)
+    public BufferBuilderObject(boolean isStatic, int numVertices, VertexAttributes attributes)
     {
         this.isStatic = isStatic;
         this.attributes = attributes;
@@ -155,7 +155,7 @@ public class VertexBufferObject implements VertexData
     }
 
     /**
-     * Invalidates the VertexBufferObject so a new OpenGL buffer handle is created. Use this in case of a context loss.
+     * Invalidates the BufferBuilderObject so a new OpenGL buffer handle is created. Use this in case of a context loss.
      */
     public void invalidate()
     {
@@ -164,7 +164,7 @@ public class VertexBufferObject implements VertexData
     }
 
     /**
-     * Disposes of all resources this VertexBufferObject uses.
+     * Disposes of all resources this BufferBuilderObject uses.
      */
     @Override
     public void dispose()

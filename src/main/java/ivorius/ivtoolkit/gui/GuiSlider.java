@@ -53,7 +53,7 @@ public class GuiSlider extends GuiButton
         {
             if (this.mousePressedInside)
             {
-                this.value = (float) (x - (this.xPosition + 4)) / (float) (this.width - 8);
+                this.value = (float) (x - (this.x + 4)) / (float) (this.width - 8);
                 this.value = (this.value) * (maxValue - minValue) + minValue;
 
                 if (this.value < minValue)
@@ -71,8 +71,8 @@ public class GuiSlider extends GuiButton
 
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             float drawVal = (this.value - this.minValue) / (this.maxValue - this.minValue);
-            this.drawTexturedModalRect(this.xPosition + (int) (drawVal * (float) (this.width - 8)), this.yPosition, 0, 66, 4, height);
-            this.drawTexturedModalRect(this.xPosition + (int) (drawVal * (float) (this.width - 8)) + 4, this.yPosition, 196, 66, 4, height);
+            this.drawTexturedModalRect(this.x + (int) (drawVal * (float) (this.width - 8)), this.y, 0, 66, 4, height);
+            this.drawTexturedModalRect(this.x + (int) (drawVal * (float) (this.width - 8)) + 4, this.y, 196, 66, 4, height);
         }
     }
 
@@ -81,7 +81,7 @@ public class GuiSlider extends GuiButton
     {
         if (super.mousePressed(mc, x, y))
         {
-            this.value = (float) (x - (this.xPosition + 4)) / (float) (this.width - 8);
+            this.value = (float) (x - (this.x + 4)) / (float) (this.width - 8);
             this.value = (this.value) * (maxValue - minValue) + minValue;
 
             if (this.value < minValue)

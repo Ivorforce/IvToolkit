@@ -370,13 +370,13 @@ public class IvMultiBlockHelper implements Iterable<BlockPos>
         switch (facing)
         {
             case SOUTH:
-                return new Vec3d(vec3.xCoord, vec3.yCoord, vec3.zCoord);
+                return new Vec3d(vec3.x, vec3.y, vec3.z);
             case WEST:
-                return new Vec3d(-vec3.zCoord, vec3.yCoord, vec3.xCoord);
+                return new Vec3d(-vec3.z, vec3.y, vec3.x);
             case NORTH:
-                return new Vec3d(-vec3.xCoord, vec3.yCoord, -vec3.zCoord);
+                return new Vec3d(-vec3.x, vec3.y, -vec3.z);
             case EAST:
-                return new Vec3d(vec3.zCoord, vec3.yCoord, -vec3.xCoord);
+                return new Vec3d(vec3.z, vec3.y, -vec3.x);
         }
 
         return null;
