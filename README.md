@@ -1,9 +1,10 @@
+
 IvToolkit
 ============
 
-[![Build Status](https://drone.io/github.com/Ivorforce/IvToolkit/status.png)](https://drone.io/github.com/Ivorforce/IvToolkit/files)
-![Curse Version](http://cf.way2muchnoise.eu/versions/224535_latest.svg)
-![Curse Downloads](http://cf.way2muchnoise.eu/full_224535_downloads.svg)
+[![Build Status](https://cloud.drone.io/api/badges/Ivorforce/IvToolkit/status.svg)](https://cloud.drone.io/Ivorforce/IvToolkit)
+![Curse Version](http://cf.way2muchnoise.eu/versions/224535.svg)
+![Curse Downloads](http://cf.way2muchnoise.eu/224535.svg)
 
 [Download](https://mods.curse.com/mc-mods/minecraft/224535-ivtoolkit) |  [Forum](http://www.minecraftforum.net/topic/563257-172-ivorius-mods-drugs-statues-flags-boxes-of-doom-hamsters/) 
 

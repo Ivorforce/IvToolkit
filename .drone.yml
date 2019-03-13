@@ -3,7 +3,7 @@ name: default
 
 steps:
   - name: build
-    image: gradle:jdk8
+    image: openjdk:8
     commands:
-      - gradle setupDevWorkspace
-      - gradle build
+      - ./gradlew setupDevWorkspace
+      - ./gradlew build
