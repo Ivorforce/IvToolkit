@@ -16,7 +16,7 @@
 
 package ivorius.ivtoolkit.tools;
 
-import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.INBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
@@ -26,7 +26,7 @@ import net.minecraftforge.common.util.Constants;
  */
 public class NBTWalker
 {
-    public static boolean walk(NBTBase tag, Visitor<NBTBase> consumer)
+    public static boolean walk(INBTBase tag, Visitor<INBTBase> consumer)
     {
         if (tag instanceof NBTTagCompound)
             return walk((NBTTagCompound) tag, consumer);
@@ -36,17 +36,17 @@ public class NBTWalker
             return consumer.visit(tag);
     }
 
-    public static boolean walk(NBTTagCompound compound, Visitor<NBTBase> consumer)
+    public static boolean walk(NBTTagCompound compound, Visitor<INBTBase> consumer)
     {
-        return consumer.visit(compound) && compound.getKeySet().stream().allMatch(key -> walk(compound.getTag(key), consumer));
+        return consumer.visit(compound) && compound.keySet().stream().allMatch(key -> walk(compound.getTag(key), consumer));
     }
 
-    public static boolean walk(NBTTagList list, Visitor<NBTBase> consumer)
+    public static boolean walk(NBTTagList list, Visitor<INBTBase> consumer)
     {
         return consumer.visit(list) && NBTTagLists.nbtBases(list).stream().allMatch(nbt -> walk(nbt, consumer));
     }
 
-    public static boolean walkCompounds(NBTBase tag, Visitor<NBTTagCompound> consumer)
+    public static boolean walkCompounds(INBTBase tag, Visitor<NBTTagCompound> consumer)
     {
         if (tag instanceof NBTTagCompound)
             return walkCompounds((NBTTagCompound) tag, consumer);
@@ -58,7 +58,7 @@ public class NBTWalker
 
     public static boolean walkCompounds(NBTTagCompound compound, Visitor<NBTTagCompound> consumer)
     {
-        return consumer.visit(compound) && compound.getKeySet().stream().allMatch(key -> walkCompounds(compound.getTag(key), consumer));
+        return consumer.visit(compound) && compound.keySet().stream().allMatch(key -> walkCompounds(compound.getTag(key), consumer));
     }
 
     public static boolean walkCompounds(NBTTagList list, Visitor<NBTTagCompound> consumer)

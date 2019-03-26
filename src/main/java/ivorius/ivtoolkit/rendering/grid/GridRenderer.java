@@ -22,7 +22,6 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -51,9 +50,9 @@ public class GridRenderer
 
     public static void renderLine(float x, float y, float z, EnumFacing direction, float length, float size)
     {
-        float xDir = direction.getFrontOffsetX() * length;
-        float yDir = direction.getFrontOffsetY() * length;
-        float zDir = direction.getFrontOffsetZ() * length;
+        float xDir = direction.getXOffset() * length;
+        float yDir = direction.getYOffset() * length;
+        float zDir = direction.getZOffset() * length;
 
         if (xDir == 0)
             xDir = size;

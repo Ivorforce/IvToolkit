@@ -16,6 +16,7 @@
 
 package ivorius.ivtoolkit.tools;
 
+import com.mojang.datafixers.DataFixer;
 import ivorius.ivtoolkit.blocks.BlockArea;
 import ivorius.ivtoolkit.blocks.BlockPositions;
 import ivorius.ivtoolkit.blocks.IvBlockCollection;
@@ -24,10 +25,10 @@ import ivorius.ivtoolkit.world.MockWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.datafix.DataFixesManager;
-import net.minecraft.util.datafix.FixTypes;
+import net.minecraft.util.datafix.TypeReferences;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -56,19 +57,19 @@ public class IvWorldData
     public IvWorldData(NBTTagCompound compound, MCRegistry registry)
     {
         compound = compound.copy(); // Copy since ID fix tags are being removed when being applied
-        final DataFixer fixer = DataFixesManager.createFixer();
+        final DataFixer fixer = DataFixesManager.getDataFixer();
 
-        blockCollection = new IvBlockCollection(compound.getCompoundTag("blockCollection"), registry);
+        blockCollection = new IvBlockCollection(compound.getCompound("blockCollection"), registry);
 
         tileEntities = new ArrayList<>();
         tileEntities.addAll(NBTTagLists.compoundsFrom(compound, "tileEntities"));
         tileEntities.forEach(teCompound -> NBTStateInjector.recursivelyApply(teCompound, registry, false));
-        tileEntities.replaceAll(teCompound -> fixer.process(FixTypes.BLOCK_ENTITY, teCompound));
+        tileEntities.replaceAll(teCompound -> NBTUtil.update(fixer, TypeReferences.BLOCK_ENTITY, teCompound, 0));
 
         entities = new ArrayList<>();
         entities.addAll(NBTTagLists.compoundsFrom(compound, "entities"));
         entities.forEach(entityCompound -> NBTStateInjector.recursivelyApply(entityCompound, registry, false));
-        tileEntities.replaceAll(teCompound -> fixer.process(FixTypes.ENTITY, teCompound));
+        tileEntities.replaceAll(teCompound -> NBTUtil.update(fixer, TypeReferences.ENTITY, teCompound, 0));
     }
 
     public static IvWorldData capture(World world, BlockArea blockArea, boolean captureEntities)
@@ -127,17 +128,11 @@ public class IvWorldData
         return entity -> !(entity instanceof EntityPlayer);
     }
 
-    @Deprecated
-    public NBTTagCompound createTagCompound(BlockPos referenceCoord)
-    {
-        return createTagCompound();
-    }
-
-    public NBTTagCompound createTagCompound()
+    public NBTTagCompound createTagCompound(MCRegistry registry)
     {
         NBTTagCompound compound = new NBTTagCompound();
 
-        compound.setTag("blockCollection", blockCollection.createTagCompound());
+        compound.setTag("blockCollection", blockCollection.createTagCompound(registry));
         compound.setTag("tileEntities", NBTTagLists.write(tileEntities));
         compound.setTag("entities", NBTTagLists.write(entities));
 

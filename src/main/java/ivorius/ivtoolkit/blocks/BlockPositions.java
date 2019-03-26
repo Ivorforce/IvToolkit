@@ -48,23 +48,23 @@ public final class BlockPositions
 
     public static BlockPos readWithBase(NBTTagCompound compound, String keyBase)
     {
-        return new BlockPos(compound.getInteger(keyBase + "_x"), compound.getInteger(keyBase + "_y"), compound.getInteger(keyBase + "_z"));
+        return new BlockPos(compound.getInt(keyBase + "_x"), compound.getInt(keyBase + "_y"), compound.getInt(keyBase + "_z"));
     }
 
     public static void writeToNBT(String keyBase, BlockPos coord, NBTTagCompound compound)
     {
         if (coord != null)
         {
-            compound.setInteger(keyBase + "_x", coord.getX());
-            compound.setInteger(keyBase + "_y", coord.getY());
-            compound.setInteger(keyBase + "_z", coord.getZ());
+            compound.setInt(keyBase + "_x", coord.getX());
+            compound.setInt(keyBase + "_y", coord.getY());
+            compound.setInt(keyBase + "_z", coord.getZ());
         }
     }
 
     public static BlockPos readFromNBT(String keyBase, NBTTagCompound compound)
     {
         return compound.hasKey(keyBase + "_x") && compound.hasKey(keyBase + "_y") && compound.hasKey(keyBase + "_z")
-                ? new BlockPos(compound.getInteger(keyBase + "_x"), compound.getInteger(keyBase + "_y"), compound.getInteger(keyBase + "_z"))
+                ? new BlockPos(compound.getInt(keyBase + "_x"), compound.getInt(keyBase + "_y"), compound.getInt(keyBase + "_z"))
                 : null;
 
     }

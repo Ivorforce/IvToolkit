@@ -19,20 +19,26 @@ package ivorius.ivtoolkit.network;
 import ivorius.ivtoolkit.tools.IvSideClient;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 /**
  * Created by lukas on 02.07.14.
  */
-public class PacketTileEntityDataHandler extends SchedulingMessageHandler<PacketTileEntityData, IMessage>
+public class PacketTileEntityDataHandler
 {
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void processClient(PacketTileEntityData message, MessageContext ctx)
+    public static void handle(PacketTileEntityData packet, Supplier<NetworkEvent.Context> supplier)
+    {
+        NetworkEvent.Context context = supplier.get();
+
+        SchedulingMessageHandler.schedule(context, () -> handleClient(packet, context));
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    protected static <T> void handleClient(PacketTileEntityData message, NetworkEvent.Context context)
     {
         World world = IvSideClient.getClientWorld();
         TileEntity entity = world.getTileEntity(message.getPos());

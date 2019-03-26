@@ -16,30 +16,35 @@
 
 package ivorius.ivtoolkit.network;
 
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 /**
  * Created by lukas on 02.07.14.
  */
-public class PacketTileEntityClientEventHandler extends SchedulingMessageHandler<PacketTileEntityClientEvent, IMessage>
+public class PacketTileEntityClientEventHandler
 {
-    @Override
-    public WorldServer getServerWorld(PacketTileEntityClientEvent message, MessageContext ctx)
+    public static WorldServer getServerWorld(PacketTileEntityClientEvent message, NetworkEvent.Context ctx)
     {
-        return ctx.getServerHandler().player.getServerWorld().getMinecraftServer().getWorld(message.getDimension());
+        return ctx.getSender().getServerWorld().getServer().getWorld(message.getDimension());
     }
 
-    @Override
-    public void processServer(PacketTileEntityClientEvent message, MessageContext ctx, WorldServer world)
+    public static void handle(PacketTileEntityClientEvent packet, Supplier<NetworkEvent.Context> supplier)
     {
+        NetworkEvent.Context context = supplier.get();
+
+        SchedulingMessageHandler.schedule(context, () -> handleServer(packet, context));
+    }
+
+    protected static <T> void handleServer(PacketTileEntityClientEvent message, NetworkEvent.Context context)
+    {
+        WorldServer world = getServerWorld(message, context);
         TileEntity entity = world.getTileEntity(message.getPos());
 
         if (entity != null)
-            ((ClientEventHandler) entity).onClientEvent(message.getPayload(), message.getContext(), ctx.getServerHandler().player);
+            ((ClientEventHandler) entity).onClientEvent(message.getPayload(), message.getContext(), context.getSender());
     }
 }

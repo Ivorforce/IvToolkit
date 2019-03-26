@@ -19,13 +19,13 @@ package ivorius.ivtoolkit.network;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 /**
  * Created by lukas on 01.07.14.
  */
-public class PacketEntityData implements IMessage
+public class PacketEntityData implements IvPacket
 {
     private int entityID;
     private String context;
@@ -80,18 +80,18 @@ public class PacketEntityData implements IMessage
     }
 
     @Override
-    public void fromBytes(ByteBuf buf)
+    public void encode(PacketBuffer buf)
     {
         entityID = buf.readInt();
-        context = ByteBufUtils.readUTF8String(buf);
+        context = buf.readString(1000);
         payload = IvPacketHelper.readByteBuffer(buf);
     }
 
     @Override
-    public void toBytes(ByteBuf buf)
+    public void decode(PacketBuffer buf)
     {
         buf.writeInt(entityID);
-        ByteBufUtils.writeUTF8String(buf, context);
+        buf.writeString(context);
         IvPacketHelper.writeByteBuffer(buf, payload);
     }
 

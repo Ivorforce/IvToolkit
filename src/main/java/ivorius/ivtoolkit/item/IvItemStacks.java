@@ -26,29 +26,29 @@ public class IvItemStacks
 {
     public static int getNBT(ItemStack stack, String key, int defaultValue)
     {
-        return stack.hasTagCompound() && stack.getTagCompound().hasKey(key, Constants.NBT.TAG_INT)
-                ? stack.getTagCompound().getInteger(key)
+        return stack.hasTag() && stack.getTag().contains(key, Constants.NBT.TAG_INT)
+                ? stack.getTag().getInt(key)
                 : defaultValue;
     }
 
     public static long getNBT(ItemStack stack, String key, long defaultValue)
     {
-        return stack.hasTagCompound() && stack.getTagCompound().hasKey(key, Constants.NBT.TAG_LONG)
-                ? stack.getTagCompound().getLong(key)
+        return stack.hasTag() && stack.getTag().contains(key, Constants.NBT.TAG_LONG)
+                ? stack.getTag().getLong(key)
                 : defaultValue;
     }
 
     public static float getNBT(ItemStack stack, String key, float defaultValue)
     {
-        return stack.hasTagCompound() && stack.getTagCompound().hasKey(key, Constants.NBT.TAG_FLOAT)
-                ? stack.getTagCompound().getFloat(key)
+        return stack.hasTag() && stack.getTag().contains(key, Constants.NBT.TAG_FLOAT)
+                ? stack.getTag().getFloat(key)
                 : defaultValue;
     }
 
     public static double getNBT(ItemStack stack, String key, double defaultValue)
     {
-        return stack.hasTagCompound() && stack.getTagCompound().hasKey(key, Constants.NBT.TAG_DOUBLE)
-                ? stack.getTagCompound().getDouble(key)
+        return stack.hasTag() && stack.getTag().contains(key, Constants.NBT.TAG_DOUBLE)
+                ? stack.getTag().getDouble(key)
                 : defaultValue;
     }
 }

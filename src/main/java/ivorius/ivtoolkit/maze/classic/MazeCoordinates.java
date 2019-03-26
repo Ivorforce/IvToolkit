@@ -16,8 +16,8 @@
 
 package ivorius.ivtoolkit.maze.classic;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
 import net.minecraft.util.math.BlockPos;
 
@@ -26,8 +26,8 @@ import net.minecraft.util.math.BlockPos;
  */
 public class MazeCoordinates
 {
-    private static TIntObjectMap<MazeRoom[]> cachedNeighborRoomsBlueprints = new TIntObjectHashMap<>();
-    private static TIntObjectMap<MazePath[]> cachedNeighborPathBlueprints = new TIntObjectHashMap<>();
+    private static Int2ObjectMap<MazeRoom[]> cachedNeighborRoomsBlueprints = new Int2ObjectOpenHashMap<>();
+    private static Int2ObjectMap<MazePath[]> cachedNeighborPathBlueprints = new Int2ObjectOpenHashMap<>();
 
     public static MazeRoom rotatedRoom(MazeRoom room, AxisAlignedTransform2D transform, int[] size)
     {

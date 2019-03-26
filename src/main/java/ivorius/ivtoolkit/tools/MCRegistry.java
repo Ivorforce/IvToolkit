@@ -38,5 +38,5 @@ public interface MCRegistry
 
     ResourceLocation idFromBlock(Block block);
 
-    TileEntity loadTileEntity(World world, NBTTagCompound compound);
+    TileEntity loadTileEntity(NBTTagCompound compound);
 }

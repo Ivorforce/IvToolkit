@@ -16,8 +16,6 @@
 
 package ivorius.ivtoolkit.math;
 
-import gnu.trove.function.TDoubleFunction;
-import gnu.trove.function.TIntFunction;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.Arrays;

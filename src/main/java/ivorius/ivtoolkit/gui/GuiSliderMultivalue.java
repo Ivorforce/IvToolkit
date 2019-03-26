@@ -48,7 +48,7 @@ public class GuiSliderMultivalue extends GuiButton
     }
 
     @Override
-    protected void mouseDragged(Minecraft mc, int x, int y) // Is actually some kind of draw method
+    protected void renderBg(Minecraft mc, int mouseX, int mouseY)
     {
         if (this.visible)
         {
@@ -70,7 +70,7 @@ public class GuiSliderMultivalue extends GuiButton
                 notifyOfChanges();
             }
 
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
             for (float value : values)
             {
@@ -82,51 +82,36 @@ public class GuiSliderMultivalue extends GuiButton
     }
 
     @Override
-    public boolean mousePressed(Minecraft mc, int x, int y)
+    protected void onDrag(double mouseX, double mouseY, double mouseDX, double mouseDY)
     {
-        if (super.mousePressed(mc, x, y))
+        float value = (float) (x - (this.x + 4)) / (float) (this.width - 8);
+        value = value * (maxValue - minValue) + minValue;
+
+        float nearestDist = -1;
+        for (int i = 0; i < values.length; i++)
         {
-            float value = (float) (x - (this.x + 4)) / (float) (this.width - 8);
-            value = value * (maxValue - minValue) + minValue;
+            float dist = Math.abs(values[i] - value);
 
-            float nearestDist = -1;
-            for (int i = 0; i < values.length; i++)
+            if (dist < nearestDist || nearestDist < 0)
             {
-                float dist = Math.abs(values[i] - value);
-
-                if (dist < nearestDist || nearestDist < 0)
-                {
-                    mousePressedInsideIndex = i;
-                    nearestDist = dist;
-                }
+                mousePressedInsideIndex = i;
+                nearestDist = dist;
             }
-
-            values[mousePressedInsideIndex] = value;
-
-            if (values[mousePressedInsideIndex] < minValue)
-            {
-                values[mousePressedInsideIndex] = minValue;
-            }
-
-            if (values[mousePressedInsideIndex] > maxValue)
-            {
-                values[mousePressedInsideIndex] = maxValue;
-            }
-
-            notifyOfChanges();
-
-            return true;
         }
-        else
+
+        values[mousePressedInsideIndex] = value;
+
+        if (values[mousePressedInsideIndex] < minValue)
         {
-            return false;
+            values[mousePressedInsideIndex] = minValue;
         }
-    }
 
-    @Override
-    public void mouseReleased(int x, int y)
-    {
-        this.mousePressedInsideIndex = -1;
+        if (values[mousePressedInsideIndex] > maxValue)
+        {
+            values[mousePressedInsideIndex] = maxValue;
+        }
+
+        notifyOfChanges();
     }
 
     private void notifyOfChanges()

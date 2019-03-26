@@ -38,7 +38,7 @@ public class NBTCompoundObjectsMC
         if (IvSaveAPI.canWriteEntityToTag(entity))
             IvSaveAPI.writeEntityToTag(entity, compound, worldIndependent);
         else
-            entity.writeToNBTOptional(compound);
+            entity.writeUnlessPassenger(compound);
 
         return compound;
     }
@@ -55,7 +55,7 @@ public class NBTCompoundObjectsMC
         if (IvSaveAPI.canWriteTileEntityToTag(entity))
             IvSaveAPI.writeTileEntityToTag(entity, compound, worldIndependent);
         else
-            entity.writeToNBT(compound);
+            entity.write(compound);
 
         return compound;
     }

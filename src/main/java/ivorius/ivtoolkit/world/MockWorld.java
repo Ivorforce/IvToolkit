@@ -20,8 +20,10 @@ import ivorius.ivtoolkit.blocks.IvTileEntityHelper;
 import ivorius.ivtoolkit.tools.IvWorldData;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityType;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.init.Biomes;
+import net.minecraft.init.Fluids;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
@@ -29,12 +31,12 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -46,7 +48,7 @@ import java.util.stream.Collectors;
 /**
  * Created by lukas on 14.04.17.
  */
-public interface MockWorld extends IBlockAccess
+public interface MockWorld extends IBlockReader
 {
     static Real of(World world)
     {
@@ -78,7 +80,7 @@ public interface MockWorld extends IBlockAccess
         return setBlockState(coord, block, 3);
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     default int getCombinedLight(BlockPos pos, int lightValue)
     {
         return 0;
@@ -90,7 +92,7 @@ public interface MockWorld extends IBlockAccess
         return state.getBlock().isAir(state, this, pos);
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     default Biome getBiome(BlockPos pos)
     {
         return Biomes.DEFAULT;
@@ -102,15 +104,10 @@ public interface MockWorld extends IBlockAccess
         return 0;
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     default WorldType getWorldType()
     {
         return WorldType.CUSTOMIZED;
-    }
-
-    default boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default)
-    {
-        return getBlockState(pos).isSideSolid(this, pos, side);
     }
 
     class Real implements MockWorld
@@ -139,6 +136,18 @@ public interface MockWorld extends IBlockAccess
         public IBlockState getBlockState(@Nonnull BlockPos pos)
         {
             return world.getBlockState(pos);
+        }
+
+        @Override
+        public IFluidState getFluidState(BlockPos pos)
+        {
+            return world.getFluidState(pos);
+        }
+
+        @Override
+        public int getMaxLightLevel()
+        {
+            return world.getMaxLightLevel();
         }
 
         @Override
@@ -239,9 +248,9 @@ public interface MockWorld extends IBlockAccess
 
         public static boolean isAt(@Nonnull BlockPos pos, NBTTagCompound nbt)
         {
-            return pos.getX() == nbt.getInteger("x")
-                    && pos.getY() == nbt.getInteger("y")
-                    && pos.getZ() == nbt.getInteger("z");
+            return pos.getX() == nbt.getInt("x")
+                    && pos.getY() == nbt.getInt("y")
+                    && pos.getZ() == nbt.getInt("z");
         }
 
         @Override
@@ -266,12 +275,17 @@ public interface MockWorld extends IBlockAccess
         }
 
         @Override
+        public IFluidState getFluidState(BlockPos pos)
+        {
+            return Fluids.EMPTY.getDefaultState();
+        }
+
+        @Override
         public TileEntity getTileEntity(@Nonnull BlockPos pos)
         {
-            for (NBTTagCompound nbt : worldData.tileEntities)
-            {
+            for (NBTTagCompound nbt : worldData.tileEntities) {
                 if (isAt(pos, nbt))
-                    return TileEntity.create(IvTileEntityHelper.getAnyWorld(), nbt);
+                    return TileEntity.create(nbt);
             }
 
             return null;
@@ -281,7 +295,7 @@ public interface MockWorld extends IBlockAccess
         public void setTileEntity(@Nonnull BlockPos pos, TileEntity tileEntity)
         {
             worldData.tileEntities.removeIf(nbt -> isAt(pos, nbt));
-            worldData.tileEntities.add(tileEntity.writeToNBT(new NBTTagCompound()));
+            worldData.tileEntities.add(tileEntity.write(new NBTTagCompound()));
         }
 
         @Override
@@ -290,10 +304,10 @@ public interface MockWorld extends IBlockAccess
             return worldData.entities.stream()
                     .filter(nbt ->
                     {
-                        NBTTagList pos = nbt.getTagList("Pos", 6);
-                        return bounds.contains(new Vec3d(pos.getDoubleAt(0), pos.getDoubleAt(1), pos.getDoubleAt(2)));
+                        NBTTagList pos = nbt.getList("Pos", 6);
+                        return bounds.contains(new Vec3d(pos.getDouble(0), pos.getDouble(1), pos.getDouble(2)));
                     })
-                    .map(nbt -> EntityList.createEntityFromNBT(nbt, IvTileEntityHelper.getAnyWorld()))
+                    .map(nbt -> EntityType.create(nbt, IvTileEntityHelper.getAnyWorld()))
                     .filter(predicate)
                     .collect(Collectors.toList());
         }
@@ -303,7 +317,14 @@ public interface MockWorld extends IBlockAccess
         {
             // To make sure we don't have doubles
             removeEntity(entity);
-            return worldData.entities.add(entity.writeToNBT(new NBTTagCompound()));
+
+            NBTTagCompound compound = new NBTTagCompound();
+            if (!entity.writeUnlessRemoved(compound)) {
+                return false;
+            }
+
+            return worldData.entities.add(compound);
+
         }
 
         @Override

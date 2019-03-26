@@ -16,15 +16,15 @@
 
 package ivorius.ivtoolkit.transform;
 
-import com.google.common.collect.ImmutableSet;
+import ivorius.ivtoolkit.blocks.Directions;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
 import ivorius.ivtoolkit.math.MinecraftTransforms;
 import ivorius.ivtoolkit.tools.EntityCreatureAccessor;
 import net.minecraft.block.Block;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.state.IProperty;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
@@ -34,7 +34,6 @@ import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
-import java.util.Map;
 
 /**
  * Created by lukas on 09.05.16.
@@ -78,7 +77,7 @@ public class PosTransformer
 
     public static IBlockState transformBlockState(IBlockState state, AxisAlignedTransform2D transform)
     {
-        return MinecraftTransforms.map(transform, (rotation, mirror) -> state.withMirror(mirror).withRotation(rotation));
+        return MinecraftTransforms.map(transform, (rotation, mirror) -> state.mirror(mirror).rotate(rotation));
     }
 
     @Deprecated
@@ -97,14 +96,12 @@ public class PosTransformer
     {
         IBlockState newState = state;
 
-        ImmutableSet<Map.Entry<IProperty<?>, Comparable<?>>> propertySet = state.getProperties().entrySet();
-        for (Map.Entry<IProperty<?>, Comparable<?>> entry : propertySet)
+        for (IProperty<?> property : state.getProperties())
         {
-            IProperty property = entry.getKey();
-            if (property.getValueClass() == EnumFacing.class && property.getAllowedValues().containsAll(Arrays.asList(EnumFacing.HORIZONTALS)))
+            if (property.getValueClass() == EnumFacing.class && property.getAllowedValues().containsAll(Arrays.asList(Directions.HORIZONTAL)))
             {
-                EnumFacing value = (EnumFacing) entry.getValue();
-                newState = newState.withProperty(property, transform.apply(value));
+                EnumFacing value = (EnumFacing) state.get(property);
+                newState = newState.with((IProperty) property, transform.apply(value));
             }
         }
 

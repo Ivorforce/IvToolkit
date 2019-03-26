@@ -6,51 +6,45 @@
 package ivorius.ivtoolkit.network;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class SchedulingMessageHandler<REQ extends IMessage, REPLY extends IMessage> implements IMessageHandler<REQ, REPLY>
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
+
+public class SchedulingMessageHandler
 {
-    @Override
-    public REPLY onMessage(REQ message, MessageContext ctx)
+    public static <MSG> BiConsumer<MSG, Supplier<NetworkEvent.Context>> wrap(BiConsumer<MSG, NetworkEvent.Context> handler)
     {
-        if (ctx.side.isClient())
-            onMessageClient(message, ctx);
-        else if (ctx.side.isServer())
-            onMessageServer(message, ctx);
-
-        return null;
+        return (msg, contextSupplier) -> {
+            NetworkEvent.Context context = contextSupplier.get();
+            schedule(context, () -> handler.accept(msg, context));
+        };
     }
 
-    private void onMessageServer(REQ message, MessageContext ctx)
+    public static void schedule(NetworkEvent.Context context, Runnable runnable)
     {
-        WorldServer world = getServerWorld(message, ctx);
-        world.addScheduledTask(() -> processServer(message, ctx, world));
+        if (context.getDirection() == NetworkDirection.PLAY_TO_CLIENT) {
+            scheduleClient(runnable);
+        }
+        else {
+            scheduleServer(context, runnable);
+        }
     }
 
-    @SideOnly(Side.CLIENT)
-    private void onMessageClient(REQ message, MessageContext ctx)
+    @OnlyIn(Dist.CLIENT)
+    public static void scheduleClient(Runnable runnable)
     {
-        Minecraft.getMinecraft().addScheduledTask(() -> processClient(message, ctx));
+        Minecraft.getInstance().addScheduledTask(runnable);
     }
 
-    public WorldServer getServerWorld(REQ message, MessageContext ctx)
+    public static void scheduleServer(NetworkEvent.Context context, Runnable runnable)
     {
-        return (WorldServer) ctx.getServerHandler().player.world;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void processClient(REQ message, MessageContext ctx)
-    {
-
-    }
-
-    public void processServer(REQ message, MessageContext ctx, WorldServer world)
-    {
-
+        WorldServer world = context.getSender().getServerWorld();
+        world.addScheduledTask(runnable);
     }
 }

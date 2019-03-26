@@ -25,18 +25,16 @@ public class IvFileHelper
 {
     public static InputStream inputStreamFromResourceLocation(ResourceLocation resourceLocation)
     {
-        return IvFileHelper.class.getResourceAsStream("/assets/" + resourceLocation.getResourceDomain() + "/" + resourceLocation.getResourcePath());
+        return IvFileHelper.class.getResourceAsStream("/assets/" + resourceLocation.getNamespace() + "/" + resourceLocation.getPath());
     }
 
     public static void setContentsOfFile(OutputStream outputStream, byte[] contents)
     {
-        try
-        {
+        try {
             outputStream.write(contents);
             outputStream.close();
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -45,12 +43,10 @@ public class IvFileHelper
     {
         FileOutputStream output = null;
 
-        try
-        {
+        try {
             output = new FileOutputStream(file);
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -62,8 +58,7 @@ public class IvFileHelper
         char[] charArray = contents.toCharArray();
 
         byte[] byteArray = new byte[charArray.length];
-        for (int i = 0; i < byteArray.length; i++)
-        {
+        for (int i = 0; i < byteArray.length; i++) {
             byteArray[i] = (byte) charArray[i];
         }
 
@@ -74,29 +69,23 @@ public class IvFileHelper
     {
         ArrayList<Byte> array = new ArrayList<>();
 
-        try
-        {
-            while (true)
-            {
+        try {
+            while (true) {
                 int i = inputStream.read();
-                if (i >= 0)
-                {
+                if (i >= 0) {
                     array.add((byte) i);
                 }
-                else
-                {
+                else {
                     break;
                 }
             }
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             ex.printStackTrace();
         }
 
         byte[] byteArray = new byte[array.size()];
-        for (int i = 0; i < array.size(); i++)
-        {
+        for (int i = 0; i < array.size(); i++) {
             byteArray[i] = array.get(i);
         }
 
@@ -107,12 +96,10 @@ public class IvFileHelper
     {
         FileInputStream input = null;
 
-        try
-        {
+        try {
             input = new FileInputStream(file);
         }
-        catch (FileNotFoundException e)
-        {
+        catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
@@ -137,8 +124,7 @@ public class IvFileHelper
     public static String getStringFromByteArray(byte[] byteArray)
     {
         char[] charArray = new char[byteArray.length];
-        for (int i = 0; i < charArray.length; i++)
-        {
+        for (int i = 0; i < charArray.length; i++) {
             charArray[i] = (char) byteArray[i];
         }
 
@@ -147,10 +133,8 @@ public class IvFileHelper
 
     public static File getValidatedFolder(File file)
     {
-        if (!file.exists())
-        {
-            if (!file.mkdir())
-            {
+        if (!file.exists()) {
+            if (!file.mkdir()) {
                 System.out.println("Could not create " + file.getName() + " folder");
             }
         }

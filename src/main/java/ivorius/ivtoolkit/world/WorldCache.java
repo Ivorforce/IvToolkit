@@ -18,8 +18,8 @@ package ivorius.ivtoolkit.world;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
 
 /**
  * Created by lukas on 14.04.17.
@@ -28,10 +28,10 @@ public class WorldCache
 {
     public final World world;
 
-    private StructureBoundingBox boundingBox;
+    private MutableBoundingBox boundingBox;
     private IBlockState[] states;
 
-    public WorldCache(World world, StructureBoundingBox boundingBox)
+    public WorldCache(World world, MutableBoundingBox boundingBox)
     {
         this.world = world;
         this.boundingBox = boundingBox;
@@ -64,8 +64,7 @@ public class WorldCache
     {
         boolean b = world.setBlockState(pos, state, flags);
 
-        if (b)
-        {
+        if (b) {
             Integer index = getIndex(pos);
             if (index != null)
                 states[index] = state;

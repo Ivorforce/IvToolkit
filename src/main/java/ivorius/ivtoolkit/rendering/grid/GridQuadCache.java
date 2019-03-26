@@ -17,10 +17,9 @@
 package ivorius.ivtoolkit.rendering.grid;
 
 import com.google.common.base.Function;
-import gnu.trove.TIntCollection;
-import gnu.trove.list.array.TIntArrayList;
-import net.minecraft.util.math.BlockPos;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.BufferUtils;
 
@@ -40,8 +39,7 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
 
     public static int[] getCacheAxes(EnumFacing direction, int... axes)
     {
-        switch (direction)
-        {
+        switch (direction) {
             case DOWN:
             case UP:
                 return new int[]{axes[1], axes[0], axes[2]};
@@ -63,8 +61,7 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
 
     public static float[] getCacheAxes(EnumFacing direction, float... axes)
     {
-        switch (direction)
-        {
+        switch (direction) {
             case DOWN:
             case UP:
                 return new float[]{axes[1], axes[0], axes[2]};
@@ -95,8 +92,7 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
 
         for (int x = 0; x < size[0]; x++)
             for (int y = 0; y < size[1]; y++)
-                for (int z = 0; z < size[2]; z++)
-                {
+                for (int z = 0; z < size[2]; z++) {
                     BlockPos coord = new BlockPos(x, y, z);
                     addToCache(partialCache, mapper, UP, coord);
                     addToCache(partialCache, mapper, DOWN, coord);
@@ -112,8 +108,7 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
         for (int i = 0; i < 3; i++)
             cache.size[i] = size[i] * scale[i];
 
-        for (Map.Entry<QuadContext<T>, CoordGrid> entry : quads)
-        {
+        for (Map.Entry<QuadContext<T>, CoordGrid> entry : quads) {
             QuadContext<T> context = entry.getKey();
 
             int[] sAxes = getCacheAxes(context.direction, size);
@@ -125,8 +120,7 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
             float pxAxis = scAxes[1];
             float pzAxis = scAxes[2];
 
-            for (int i = 0; i < mesh.quadCount(); i++)
-            {
+            for (int i = 0; i < mesh.quadCount(); i++) {
                 cachedQuadCoords.put(mesh.x1(i) * pxAxis)
                         .put(mesh.y1(i) * pzAxis)
                         .put((mesh.x2(i) + 1) * pxAxis)
@@ -135,7 +129,7 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
             cachedQuadCoords.position(0);
 
             float zLevel;
-            zLevel = (context.direction.getFrontOffsetX() + context.direction.getFrontOffsetY() + context.direction.getFrontOffsetZ() > 0
+            zLevel = (context.direction.getXOffset() + context.direction.getYOffset() + context.direction.getZOffset() > 0
                     ? context.layer + 1 : context.layer) * scAxes[0];
 
             cache.cachedQuadLevels.add(new CachedQuadLevel<>(zLevel, context.direction, context.t, cachedQuadCoords));
@@ -147,8 +141,7 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
     protected static <T> void addToCache(Map<QuadContext<T>, CoordGrid> cache, Function<Pair<BlockPos, EnumFacing>, T> mapper, EnumFacing direction, BlockPos coord)
     {
         T t = mapper.apply(Pair.of(coord, direction));
-        if (t != null)
-        {
+        if (t != null) {
             int[] sAxes = getCacheAxes(direction, coord.getX(), coord.getY(), coord.getZ());
             addToCache(cache, new QuadContext<>(sAxes[0], direction, t), sAxes[1], sAxes[2]);
         }
@@ -211,35 +204,10 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
         }
     }
 
-    public static class CoordGrid extends TIntArrayList
+    public static class CoordGrid extends IntArrayList
     {
         public CoordGrid()
         {
-        }
-
-        public CoordGrid(int capacity)
-        {
-            super(capacity);
-        }
-
-        public CoordGrid(int capacity, int no_entry_value)
-        {
-            super(capacity, no_entry_value);
-        }
-
-        public CoordGrid(TIntCollection collection)
-        {
-            super(collection);
-        }
-
-        public CoordGrid(int[] values)
-        {
-            super(values);
-        }
-
-        public CoordGrid(int[] values, int no_entry_value, boolean wrap)
-        {
-            super(values, no_entry_value, wrap);
         }
 
         private static boolean isFree(boolean[][] mask, int lX, int hX, int y)
@@ -281,10 +249,8 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
                 mask[x(c)][y(c)] = true;
 
             for (int x = minX; x < maxX; x++)
-                for (int y = minY; y < maxY; y++)
-                {
-                    if (mask[x][y])
-                    {
+                for (int y = minY; y < maxY; y++) {
+                    if (mask[x][y]) {
                         // Expand X
                         int lX = x, hX = x, lY = y, hY = y;
                         while (lX > minX && mask[lX - 1][y])
@@ -311,35 +277,10 @@ public class GridQuadCache<T> implements Iterable<GridQuadCache.CachedQuadLevel<
         }
     }
 
-    public static class QuadCollection extends TIntArrayList
+    public static class QuadCollection extends IntArrayList
     {
         public QuadCollection()
         {
-        }
-
-        public QuadCollection(int capacity)
-        {
-            super(capacity);
-        }
-
-        public QuadCollection(int capacity, int no_entry_value)
-        {
-            super(capacity, no_entry_value);
-        }
-
-        public QuadCollection(TIntCollection collection)
-        {
-            super(collection);
-        }
-
-        public QuadCollection(int[] values)
-        {
-            super(values);
-        }
-
-        public QuadCollection(int[] values, int no_entry_value, boolean wrap)
-        {
-            super(values, no_entry_value, wrap);
         }
 
         public void addQuad(int x1, int y1, int x2, int y2)

@@ -26,8 +26,8 @@ public class IvRotatableBlockRenderHelper
 {
     public static void transformFor(IvTileEntityRotatable tileEntity, double renderX, double renderY, double renderZ)
     {
-        GlStateManager.translate(renderX + 0.5, renderY + 0.5, renderZ + 0.5);
-        GlStateManager.rotate(getAngleFromSouth(tileEntity.getFacing()), 0.0f, 1.0f, 0.0f);
+        GlStateManager.translated(renderX + 0.5, renderY + 0.5, renderZ + 0.5);
+        GlStateManager.rotatef(getAngleFromSouth(tileEntity.getFacing()), 0.0f, 1.0f, 0.0f);
     }
 
     public static float getAngleFromSouth(EnumFacing facing)

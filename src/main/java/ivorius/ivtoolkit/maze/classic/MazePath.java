@@ -45,7 +45,7 @@ public class MazePath implements MazeCoordinate
     public MazePath(NBTTagCompound compound)
     {
         sourceRoom = new MazeRoom(compound.getIntArray("source"));
-        pathDimension = compound.getInteger("pathDimension");
+        pathDimension = compound.getInt("pathDimension");
     }
 
     public static MazePath fromRoom(int pathDimension, MazeRoom sourceRoom, boolean pathGoesUp)
@@ -140,7 +140,7 @@ public class MazePath implements MazeCoordinate
     {
         NBTTagCompound compound = new NBTTagCompound();
         compound.setIntArray("source", sourceRoom.getCoordinates());
-        compound.setInteger("pathDimension", pathDimension);
+        compound.setInt("pathDimension", pathDimension);
         return compound;
     }
 }

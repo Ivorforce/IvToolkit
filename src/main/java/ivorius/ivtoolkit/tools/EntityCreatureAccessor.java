@@ -17,14 +17,9 @@
 package ivorius.ivtoolkit.tools;
 
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityHanging;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * Created by lukas on 10.03.15.
@@ -37,7 +32,7 @@ public class EntityCreatureAccessor
     {
         return maximumHomeDistance != null
                 ? maximumHomeDistance
-                : (maximumHomeDistance = ReflectionHelper.findField(EntityCreature.class, "maximumHomeDistance", "field_70772_bD"));
+                : (maximumHomeDistance = IvReflection.findField(EntityCreature.class, "field_70772_bD"));
     }
 
     public static void setHomePosition(EntityCreature creature, BlockPos pos)

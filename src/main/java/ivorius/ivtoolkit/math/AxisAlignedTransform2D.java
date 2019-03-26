@@ -16,6 +16,7 @@
 
 package ivorius.ivtoolkit.math;
 
+import ivorius.ivtoolkit.blocks.Directions;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
@@ -146,7 +147,7 @@ public class AxisAlignedTransform2D
         if (mirrorX && facing.getAxis() == EnumFacing.Axis.X)
             facing = facing.getOpposite();
 
-        return EnumFacing.HORIZONTALS[(facing.getHorizontalIndex() + rotation) % EnumFacing.HORIZONTALS.length];
+        return Directions.HORIZONTAL[(facing.getHorizontalIndex() + rotation) % Directions.HORIZONTAL.length];
     }
 
     public BlockPos.MutableBlockPos applyOn(BlockPos.MutableBlockPos position, int[] size)

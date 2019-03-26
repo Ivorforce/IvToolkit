@@ -19,7 +19,8 @@ package ivorius.ivtoolkit.api;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.registries.ForgeRegistries;
 
 /**
  * Created by lukas on 26.01.17.
@@ -40,7 +41,7 @@ public class ModRepresentation
 
     public static ResourceLocation name(Block block)
     {
-        return Block.REGISTRY.getNameForObject(block);
+        return ForgeRegistries.BLOCKS.getKey(block);
     }
 
     public static String id(Item item)
@@ -50,12 +51,12 @@ public class ModRepresentation
 
     public static ResourceLocation name(Item item)
     {
-        return Item.REGISTRY.getNameForObject(item);
+        return ForgeRegistries.ITEMS.getKey(item);
     }
 
     public boolean isLoaded()
     {
-        return Loader.isModLoaded(modID);
+        return ModList.get().isLoaded(modID);
     }
 
     public String getID()
@@ -65,11 +66,11 @@ public class ModRepresentation
 
     public Block block(String id)
     {
-        return Block.REGISTRY.getObject(new ResourceLocation(modID, id));
+        return ForgeRegistries.BLOCKS.getValue(new ResourceLocation(modID, id));
     }
 
     public Item item(String id)
     {
-        return Item.REGISTRY.getObject(new ResourceLocation(modID, id));
+        return ForgeRegistries.ITEMS.getValue(new ResourceLocation(modID, id));
     }
 }

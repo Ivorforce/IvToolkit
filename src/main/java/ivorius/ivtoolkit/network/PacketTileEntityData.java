@@ -19,15 +19,14 @@ package ivorius.ivtoolkit.network;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import ivorius.ivtoolkit.blocks.BlockPositions;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 /**
  * Created by lukas on 01.07.14.
  */
-public class PacketTileEntityData implements IMessage
+public class PacketTileEntityData implements IvPacket
 {
     private BlockPos pos;
     private String context;
@@ -82,18 +81,18 @@ public class PacketTileEntityData implements IMessage
     }
 
     @Override
-    public void fromBytes(ByteBuf buf)
+    public void decode(PacketBuffer buf)
     {
         pos = BlockPositions.readFromBuffer(buf);
-        context = ByteBufUtils.readUTF8String(buf);
+        context = buf.readString(1000);
         payload = IvPacketHelper.readByteBuffer(buf);
     }
 
     @Override
-    public void toBytes(ByteBuf buf)
+    public void encode(PacketBuffer buf)
     {
         BlockPositions.writeToBuffer(pos, buf);
-        ByteBufUtils.writeUTF8String(buf, context);
+        buf.writeString(context);
         IvPacketHelper.writeByteBuffer(buf, payload);
     }
 

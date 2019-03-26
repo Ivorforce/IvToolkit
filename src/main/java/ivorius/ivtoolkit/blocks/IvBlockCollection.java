@@ -17,27 +17,17 @@
 package ivorius.ivtoolkit.blocks;
 
 import com.google.common.collect.ImmutableSet;
-import ivorius.ivtoolkit.raytracing.IvRaytraceableAxisAlignedBox;
-import ivorius.ivtoolkit.raytracing.IvRaytraceableObject;
-import ivorius.ivtoolkit.raytracing.IvRaytracedIntersection;
-import ivorius.ivtoolkit.raytracing.IvRaytracer;
+import com.google.common.collect.Lists;
 import ivorius.ivtoolkit.tools.MCRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.*;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by lukas on 11.02.14.
@@ -67,22 +57,34 @@ public class IvBlockCollection
 
     public IvBlockCollection(NBTTagCompound compound, MCRegistry registry)
     {
-        width = compound.getInteger("width");
-        height = compound.getInteger("height");
-        length = compound.getInteger("length");
+        width = compound.getInt("width");
+        height = compound.getInt("height");
+        length = compound.getInt("length");
 
-        IvBlockMapper mapper = new IvBlockMapper(compound, "mapping", registry);
-        Block[] blocks = mapper.createBlocksFromNBT(compound.getCompoundTag("blocks"));
-        byte[] metas = compound.getByteArray("metadata");
+        if (compound.hasKey("blocks")) {
+            // Legacy
 
-        if (blocks.length != width * height * length)
-            throw new RuntimeException("Block collection length is " + blocks.length + " but should be " + width + " * " + height + " * " + length);
-        if (metas.length != width * height * length)
-            throw new RuntimeException("Block collection length is " + metas.length + " but should be " + width + " * " + height + " * " + length);
+            IvBlockMapper mapper = new IvBlockMapper(compound, "mapping", registry);
+            String[] blocks = mapper.createBlocksFromNBT(compound.getCompound("blocks"));
+            byte[] metas = compound.getByteArray("metadata");
 
-        blockStates = new IBlockState[width * height * length];
-        for (int i = 0; i < blockStates.length; i++)
-            blockStates[i] = BlockStates.fromMetadata(blocks[i], metas[i]);
+            if (blocks.length != width * height * length)
+                throw new RuntimeException("Block collection length is " + blocks.length + " but should be " + width + " * " + height + " * " + length);
+            if (metas.length != width * height * length)
+                throw new RuntimeException("Block collection length is " + metas.length + " but should be " + width + " * " + height + " * " + length);
+
+            blockStates = new IBlockState[width * height * length];
+            for (int i = 0; i < blockStates.length; i++)
+                blockStates[i] = BlockStates.fromLegacyMetadata(blocks[i], metas[i]);
+
+            return;
+        }
+
+        IvBlockStateMapper mapper = new IvBlockStateMapper(compound, "mapping", registry);
+        blockStates = mapper.createStatesFromNBT(compound.getCompound("states"));
+
+        if (blockStates.length != width * height * length)
+            throw new RuntimeException("Block collection length is " + blockStates.length + " but should be " + width + " * " + height + " * " + length);
     }
 
     private static IBlockState[] airArray(int width, int height, int length)
@@ -140,55 +142,55 @@ public class IvBlockCollection
 
     public boolean shouldRenderSide(BlockPos coord, EnumFacing side)
     {
-        BlockPos sideCoord = coord.add(side.getFrontOffsetX(), side.getFrontOffsetY(), side.getFrontOffsetZ());
+        BlockPos sideCoord = coord.add(side.getXOffset(), side.getYOffset(), side.getZOffset());
 
         IBlockState block = getBlockState(sideCoord);
-        return !block.isOpaqueCube();
+        return !block.isSideInvisible(block, side);
     }
 
-    public RayTraceResult rayTrace(Vec3d position, Vec3d direction)
-    {
-        IvRaytraceableAxisAlignedBox containingBox = new IvRaytraceableAxisAlignedBox(null, 0.001, 0.001, 0.001, width - 0.002, height - 0.002, length - 0.002);
-        IvRaytracedIntersection intersection = IvRaytracer.getFirstIntersection(Collections.<IvRaytraceableObject>singletonList(containingBox), position.x, position.y, position.z, direction.x, direction.y, direction.z);
-
-        if (intersection != null)
-        {
-            position = new Vec3d(intersection.getX(), intersection.getY(), intersection.getZ());
-            BlockPos curCoord = new BlockPos(position.x, position.y, position.z);
-            EnumFacing hitSide = ((EnumFacing) intersection.getHitInfo()).getOpposite();
-
-            while (hasCoord(curCoord))
-            {
-                if (getBlockState(curCoord).getMaterial() != Material.AIR)
-                    return new RayTraceResult(position, hitSide.getOpposite(), new BlockPos(curCoord.getX(), curCoord.getY(), curCoord.getZ()));
-
-                hitSide = getExitSide(position, direction);
-
-                if (hitSide.getFrontOffsetX() != 0)
-                {
-                    double offX = hitSide.getFrontOffsetX() > 0 ? 1.0001 : -0.0001;
-                    double dirLength = ((curCoord.getX() + offX) - position.x) / direction.x;
-                    position = new Vec3d(curCoord.getX() + offX, position.y + direction.y * dirLength, position.z + direction.z * dirLength);
-                }
-                else if (hitSide.getFrontOffsetY() != 0)
-                {
-                    double offY = hitSide.getFrontOffsetY() > 0 ? 1.0001 : -0.0001;
-                    double dirLength = ((curCoord.getY() + offY) - position.y) / direction.y;
-                    position = new Vec3d(position.x + direction.x * dirLength, curCoord.getY() + offY, position.z + direction.z * dirLength);
-                }
-                else
-                {
-                    double offZ = hitSide.getFrontOffsetZ() > 0 ? 1.0001 : -0.0001;
-                    double dirLength = ((curCoord.getZ() + offZ) - position.z) / direction.z;
-                    position = new Vec3d(position.x + direction.x * dirLength, position.y + direction.y * dirLength, curCoord.getZ() + offZ);
-                }
-
-                curCoord = curCoord.add(hitSide.getFrontOffsetX(), hitSide.getFrontOffsetY(), hitSide.getFrontOffsetZ());
-            }
-        }
-
-        return null;
-    }
+//    public RayTraceResult rayTrace(Vec3d position, Vec3d direction)
+//    {
+//        IvRaytraceableAxisAlignedBox containingBox = new IvRaytraceableAxisAlignedBox(null, 0.001, 0.001, 0.001, width - 0.002, height - 0.002, length - 0.002);
+//        IvRaytracedIntersection intersection = IvRaytracer.getFirstIntersection(Collections.<IvRaytraceableObject>singletonList(containingBox), position.x, position.y, position.z, direction.x, direction.y, direction.z);
+//
+//        if (intersection != null)
+//        {
+//            position = new Vec3d(intersection.getX(), intersection.getY(), intersection.getZ());
+//            BlockPos curCoord = new BlockPos(position.x, position.y, position.z);
+//            EnumFacing hitSide = ((EnumFacing) intersection.getHitInfo()).getOpposite();
+//
+//            while (hasCoord(curCoord))
+//            {
+//                if (getBlockState(curCoord).getMaterial() != Material.AIR)
+//                    return new RayTraceResult(position, hitSide.getOpposite(), new BlockPos(curCoord.getX(), curCoord.getY(), curCoord.getZ()));
+//
+//                hitSide = getExitSide(position, direction);
+//
+//                if (hitSide.getXOffset() != 0)
+//                {
+//                    double offX = hitSide.getXOffset() > 0 ? 1.0001 : -0.0001;
+//                    double dirLength = ((curCoord.getX() + offX) - position.x) / direction.x;
+//                    position = new Vec3d(curCoord.getX() + offX, position.y + direction.y * dirLength, position.z + direction.z * dirLength);
+//                }
+//                else if (hitSide.getYOffset() != 0)
+//                {
+//                    double offY = hitSide.getYOffset() > 0 ? 1.0001 : -0.0001;
+//                    double dirLength = ((curCoord.getY() + offY) - position.y) / direction.y;
+//                    position = new Vec3d(position.x + direction.x * dirLength, curCoord.getY() + offY, position.z + direction.z * dirLength);
+//                }
+//                else
+//                {
+//                    double offZ = hitSide.getZOffset() > 0 ? 1.0001 : -0.0001;
+//                    double dirLength = ((curCoord.getZ() + offZ) - position.z) / direction.z;
+//                    position = new Vec3d(position.x + direction.x * dirLength, position.y + direction.y * dirLength, curCoord.getZ() + offZ);
+//                }
+//
+//                curCoord = curCoord.add(hitSide.getXOffset(), hitSide.getYOffset(), hitSide.getZOffset());
+//            }
+//        }
+//
+//        return null;
+//    }
 
     private EnumFacing getExitSide(Vec3d position, Vec3d direction)
     {
@@ -213,24 +215,21 @@ public class IvBlockCollection
         return new ImmutableSet.Builder<>().addAll(Arrays.asList(blockStates)).build().size();
     }
 
-    public NBTTagCompound createTagCompound()
+    public NBTTagCompound createTagCompound(MCRegistry registry)
     {
         NBTTagCompound compound = new NBTTagCompound();
-        IvBlockMapper mapper = new IvBlockMapper();
+        IvBlockStateMapper mapper = new IvBlockStateMapper(registry);
 
-        compound.setInteger("width", width);
-        compound.setInteger("height", height);
-        compound.setInteger("length", length);
+        compound.setInt("width", width);
+        compound.setInt("height", height);
+        compound.setInt("length", length);
 
-        byte[] metas = new byte[blockStates.length];
-        for (int i = 0; i < metas.length; i++)
-            metas[i] = (byte) blockStates[i].getBlock().getMetaFromState(blockStates[i]);
-        compound.setByteArray("metadata", metas);
+        ArrayList<IBlockState> states = Lists.newArrayList(blockStates);
 
-        List<Block> blockList = Stream.of(blockStates).map(IBlockState::getBlock).collect(Collectors.toList());
-        mapper.addMapping(blockList);
+        mapper.addMapping(states);
         compound.setTag("mapping", mapper.createTagList());
-        compound.setTag("blocks", mapper.createNBTForBlocks(blockList));
+        compound.setTag("states", mapper.createNBTForStates(states));
+
         return compound;
     }
 

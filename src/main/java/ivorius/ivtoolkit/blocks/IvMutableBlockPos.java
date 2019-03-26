@@ -36,6 +36,6 @@ public class IvMutableBlockPos
 
     public static BlockPos.MutableBlockPos offset(BlockPos pos, BlockPos.MutableBlockPos dest, EnumFacing facing, int amount)
     {
-        return dest.setPos(pos.getX() + facing.getFrontOffsetX() * amount, pos.getY() + facing.getFrontOffsetY() * amount, pos.getZ() + facing.getFrontOffsetZ() * amount);
+        return dest.setPos(pos.getX() + facing.getXOffset() * amount, pos.getY() + facing.getYOffset() * amount, pos.getZ() + facing.getZOffset() * amount);
     }
 }

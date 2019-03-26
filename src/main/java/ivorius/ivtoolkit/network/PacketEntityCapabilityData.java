@@ -19,15 +19,15 @@ package ivorius.ivtoolkit.network;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 /**
  * Created by lukas on 01.07.14.
  */
-public class PacketEntityCapabilityData implements IMessage
+public class PacketEntityCapabilityData implements IvPacket
 {
     private int entityID;
     private String context;
@@ -51,7 +51,7 @@ public class PacketEntityCapabilityData implements IMessage
     public static <T> PacketEntityCapabilityData packetEntityData(Entity entity, String capabilityKey, EnumFacing facing, String context, Object... params)
     {
         Capability<T> capability = CapabilityUpdateRegistry.INSTANCE.capability(capabilityKey);
-        T t = entity.getCapability(capability, facing);
+        T t = entity.getCapability(capability, facing).orElse(null);
 
         if (!(t instanceof PartialUpdateHandler))
             throw new IllegalArgumentException("Capability must implement PartialUpdateHandler to send update packets!");
@@ -113,22 +113,24 @@ public class PacketEntityCapabilityData implements IMessage
     }
 
     @Override
-    public void fromBytes(ByteBuf buf)
+    public void decode(PacketBuffer buf)
     {
         entityID = buf.readInt();
-        context = ByteBufUtils.readUTF8String(buf);
-        capabilityKey = ByteBufUtils.readUTF8String(buf);
-        direction = IvPacketHelper.maybeRead(buf, null, () -> direction = EnumFacing.getFront(buf.readInt()));
+        context = buf.readString(1000);
+        capabilityKey = buf.readString(1000);
+        direction = IvPacketHelper.maybeRead(buf, null,
+                () -> direction = EnumFacing.byIndex(buf.readInt()));
         payload = IvPacketHelper.readByteBuffer(buf);
     }
 
     @Override
-    public void toBytes(ByteBuf buf)
+    public void encode(PacketBuffer buf)
     {
         buf.writeInt(entityID);
-        ByteBufUtils.writeUTF8String(buf, context);
-        ByteBufUtils.writeUTF8String(buf, capabilityKey);
-        IvPacketHelper.maybeWrite(buf, direction, () -> direction.getIndex());
+        buf.writeString(context);
+        buf.writeString(capabilityKey);
+        IvPacketHelper.maybeWrite(buf, direction,
+                () -> buf.writeInt(direction.getIndex()));
         IvPacketHelper.writeByteBuffer(buf, payload);
     }
 

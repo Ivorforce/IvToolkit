@@ -19,20 +19,26 @@ package ivorius.ivtoolkit.network;
 import ivorius.ivtoolkit.tools.IvSideClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 /**
  * Created by lukas on 02.07.14.
  */
-public class PacketEntityDataHandler extends SchedulingMessageHandler<PacketEntityData, IMessage>
+public class PacketEntityDataHandler
 {
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void processClient(PacketEntityData message, MessageContext ctx)
+    public static void handle(PacketEntityCapabilityData packet, Supplier<NetworkEvent.Context> supplier)
+    {
+        NetworkEvent.Context context = supplier.get();
+
+        SchedulingMessageHandler.schedule(context, () -> handleClient(packet, context));
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    protected static <T> void handleClient(PacketEntityCapabilityData message, NetworkEvent.Context context)
     {
         World world = IvSideClient.getClientWorld();
         Entity entity = world.getEntityByID(message.getEntityID());

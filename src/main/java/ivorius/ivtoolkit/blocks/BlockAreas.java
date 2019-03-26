@@ -17,9 +17,9 @@
 package ivorius.ivtoolkit.blocks;
 
 import ivorius.ivtoolkit.gui.IntegerRange;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MutableBoundingBox;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -180,8 +180,8 @@ public class BlockAreas
         return StreamSupport.stream(BlockPos.getAllInBoxMutable(area.getPoint1(), area.getPoint2()).spliterator(), false);
     }
 
-    public static StructureBoundingBox toBoundingBox(BlockArea area)
+    public static MutableBoundingBox toBoundingBox(BlockArea area)
     {
-        return new StructureBoundingBox(area.getLowerCorner(), area.getHigherCorner());
+        return new MutableBoundingBox(area.getLowerCorner(), area.getHigherCorner());
     }
 }

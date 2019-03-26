@@ -19,33 +19,34 @@ package ivorius.ivtoolkit.network;
 import ivorius.ivtoolkit.tools.IvSideClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 /**
  * Created by lukas on 02.07.14.
  */
-public class PacketEntityCapabilityDataHandler extends SchedulingMessageHandler<PacketEntityCapabilityData, IMessage>
+public class PacketEntityCapabilityDataHandler
 {
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void processClient(PacketEntityCapabilityData message, MessageContext ctx)
+    public static void handle(PacketEntityCapabilityData packet, Supplier<NetworkEvent.Context> supplier)
     {
-        processClientC(message);
+        NetworkEvent.Context context = supplier.get();
+
+        SchedulingMessageHandler.schedule(context, () -> handleClient(packet, context));
     }
 
-    private <T> void processClientC(PacketEntityCapabilityData message)
+    @OnlyIn(Dist.CLIENT)
+    protected static <T> void handleClient(PacketEntityCapabilityData message, NetworkEvent.Context context)
     {
         World world = IvSideClient.getClientWorld();
         Entity entity = world.getEntityByID(message.getEntityID());
 
-        if (entity != null)
-        {
+        if (entity != null) {
             Capability<T> capability = CapabilityUpdateRegistry.INSTANCE.capability(message.getCapabilityKey());
-            T t = entity.getCapability(capability, message.getDirection());
+            T t = entity.getCapability(capability, message.getDirection()).orElse(null);
 
             if (t instanceof PartialUpdateHandler)
                 ((PartialUpdateHandler) t).readUpdateData(message.getPayload(), message.getContext());

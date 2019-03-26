@@ -45,22 +45,22 @@ public final class BlockSurfacePositions
 
     public static BlockSurfacePos readWithBase(NBTTagCompound compound, String keyBase)
     {
-        return new BlockSurfacePos(compound.getInteger(keyBase + "_x"), compound.getInteger(keyBase + "_z"));
+        return new BlockSurfacePos(compound.getInt(keyBase + "_x"), compound.getInt(keyBase + "_z"));
     }
 
     public static void writeToNBT(String keyBase, BlockSurfacePos coord, NBTTagCompound compound)
     {
         if (coord != null)
         {
-            compound.setInteger(keyBase + "_x", coord.getX());
-            compound.setInteger(keyBase + "_z", coord.getZ());
+            compound.setInt(keyBase + "_x", coord.getX());
+            compound.setInt(keyBase + "_z", coord.getZ());
         }
     }
 
     public static BlockSurfacePos readFromNBT(String keyBase, NBTTagCompound compound)
     {
         return compound.hasKey(keyBase + "_x") && compound.hasKey(keyBase + "_y") && compound.hasKey(keyBase + "_z")
-                ? new BlockSurfacePos(compound.getInteger(keyBase + "_x"), compound.getInteger(keyBase + "_z"))
+                ? new BlockSurfacePos(compound.getInt(keyBase + "_x"), compound.getInt(keyBase + "_z"))
                 : null;
 
     }

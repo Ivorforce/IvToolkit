@@ -18,19 +18,18 @@ package ivorius.ivtoolkit.rendering.grid;
 
 import ivorius.ivtoolkit.blocks.BlockArea;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
 
 /**
  * Created by lukas on 09.02.15.
  */
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class AreaRenderer
 {
     public static void renderAreaLined(BlockArea area, float sizeP)
@@ -43,7 +42,7 @@ public class AreaRenderer
         drawCuboid(area.getLowerCorner(), area.getHigherCorner().add(1, 1, 1), lined, insides, sizeP);
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     private static void drawCuboid(BlockPos min, BlockPos max, boolean lined, boolean insides, float sizeP)
     {
         float width2 = ((float) max.getX() - (float) min.getX()) * 0.5f;
@@ -57,7 +56,7 @@ public class AreaRenderer
         int sizeCE = insides ? -1 : 1;
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(centerX, centerY, centerZ);
+        GlStateManager.translated(centerX, centerY, centerZ);
         if (lined)
         {
             GlStateManager.disableTexture2D();

@@ -40,13 +40,11 @@ public class IvPathHelper
         URI uri = resource.toURI();
 
         String scheme = uri.getScheme();
-        if (scheme.equals("file"))
-        {
+        if (scheme.equals("file")) {
             return Paths.get(uri);
         }
 
-        if (!scheme.equals("jar"))
-        {
+        if (!scheme.equals("jar")) {
             throw new IllegalArgumentException("Cannot convert to Path: " + uri);
         }
 
@@ -55,13 +53,13 @@ public class IvPathHelper
         String entryName = s.substring(separator + 2);
         URI fileURI = URI.create(s.substring(0, separator));
 
-        try
-        {
+        try {
             FileSystem fs = FileSystems.getFileSystem(fileURI);
             if (fs.isOpen())
                 return fs.getPath(entryName);
         }
-        catch (FileSystemNotFoundException ignored) {}
+        catch (FileSystemNotFoundException ignored) {
+        }
 
         FileSystem fs = FileSystems.newFileSystem(fileURI, Collections.<String, Object>emptyMap());
         return fs.getPath(entryName);
@@ -69,7 +67,7 @@ public class IvPathHelper
 
     public static Path pathFromResourceLocation(ResourceLocation resourceLocation) throws URISyntaxException, IOException
     {
-        URL resource = IvPathHelper.class.getResource("/assets/" + resourceLocation.getResourceDomain() + "/" + resourceLocation.getResourcePath());
+        URL resource = IvPathHelper.class.getResource("/assets/" + resourceLocation.getNamespace() + "/" + resourceLocation.getPath());
         return resource != null ? resourceToPath(resource.toURI().toURL()) : null;
     }
 

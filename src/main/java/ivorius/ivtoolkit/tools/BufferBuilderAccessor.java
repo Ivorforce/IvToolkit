@@ -17,7 +17,6 @@
 package ivorius.ivtoolkit.tools;
 
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import java.lang.reflect.Field;
 
@@ -34,31 +33,29 @@ public class BufferBuilderAccessor
     {
         return xOffset != null
                 ? xOffset
-                : (xOffset = ReflectionHelper.findField(BufferBuilder.class, "xOffset", "field_179004_l"));
+                : (xOffset = IvReflection.findField(BufferBuilder.class, "field_179004_l"));
     }
 
     protected static Field getYOffset()
     {
         return yOffset != null
                 ? yOffset
-                : (yOffset = ReflectionHelper.findField(BufferBuilder.class, "yOffset", "field_179005_m"));
+                : (yOffset = IvReflection.findField(BufferBuilder.class, "field_179005_m"));
     }
 
     protected static Field getZOffset()
     {
         return zOffset != null
                 ? zOffset
-                : (zOffset = ReflectionHelper.findField(BufferBuilder.class, "zOffset", "field_179002_n"));
+                : (zOffset = IvReflection.findField(BufferBuilder.class, "field_179002_n"));
     }
 
     public static void addTranslation(BufferBuilder renderer, double x, double y, double z)
     {
-        try
-        {
+        try {
             renderer.setTranslation(getXOffset().getDouble(renderer) + x, getYOffset().getDouble(renderer) + y, getZOffset().getDouble(renderer) + z);
         }
-        catch (IllegalAccessException e)
-        {
+        catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }

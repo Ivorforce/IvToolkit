@@ -16,7 +16,7 @@
 
 package ivorius.ivtoolkit.blocks;
 
-import net.minecraft.world.gen.structure.StructureBoundingBox;
+import net.minecraft.util.math.MutableBoundingBox;
 
 import java.util.Iterator;
 import java.util.stream.IntStream;
@@ -49,7 +49,7 @@ public class BlockSurfaceArea implements Iterable<BlockSurfacePos>
         return new BlockSurfaceArea(BlockSurfacePos.from(area.getPoint1()), BlockSurfacePos.from(area.getPoint2()));
     }
 
-    public static BlockSurfaceArea from(StructureBoundingBox boundingBox)
+    public static BlockSurfaceArea from(MutableBoundingBox boundingBox)
     {
         return new BlockSurfaceArea(new BlockSurfacePos(boundingBox.minX, boundingBox.minZ), new BlockSurfacePos(boundingBox.maxX, boundingBox.maxZ));
     }
@@ -113,10 +113,10 @@ public class BlockSurfaceArea implements Iterable<BlockSurfacePos>
         return ivorius.ivtoolkit.util.IvStreams.flatMapToObj(IntStream.range(lower.x, higher.x + 1), x -> IntStream.range(lower.z, higher.z + 1).mapToObj(z -> new BlockSurfacePos(x, z)));
     }
 
-    public StructureBoundingBox toStructureBoundingBox(int minY, int maxY)
+    public MutableBoundingBox toMutableBoundingBox(int minY, int maxY)
     {
         BlockSurfacePos lower = getLowerCorner();
         BlockSurfacePos higher = getHigherCorner();
-        return new StructureBoundingBox(lower.getX(), minY, lower.getZ(), higher.getX(), maxY, higher.getZ());
+        return new MutableBoundingBox(lower.getX(), minY, lower.getZ(), higher.getX(), maxY, higher.getZ());
     }
 }

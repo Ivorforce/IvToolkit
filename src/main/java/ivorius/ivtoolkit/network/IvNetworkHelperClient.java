@@ -17,7 +17,7 @@
 package ivorius.ivtoolkit.network;
 
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 /**
  * Created by lukas on 25.09.14.
@@ -25,12 +25,12 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 public class IvNetworkHelperClient
 {
     @Deprecated
-    public static <ETileEntity extends TileEntity & ClientEventHandler> void sendTileEntityUpdatePacket(ETileEntity tileEntity, String context, SimpleNetworkWrapper network, Object... params)
+    public static <ETileEntity extends TileEntity & ClientEventHandler> void sendTileEntityUpdatePacket(ETileEntity tileEntity, String context, SimpleChannel network, Object... params)
     {
         sendTileEntityEventPacket(tileEntity, context, network, params);
     }
 
-    public static <ETileEntity extends TileEntity & ClientEventHandler> void sendTileEntityEventPacket(ETileEntity tileEntity, String context, SimpleNetworkWrapper network, Object... params)
+    public static <ETileEntity extends TileEntity & ClientEventHandler> void sendTileEntityEventPacket(ETileEntity tileEntity, String context, SimpleChannel network, Object... params)
     {
         if (!(tileEntity.getWorld().isRemote))
             throw new UnsupportedOperationException();

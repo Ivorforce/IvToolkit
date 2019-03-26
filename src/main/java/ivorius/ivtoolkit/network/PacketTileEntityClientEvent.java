@@ -19,17 +19,17 @@ package ivorius.ivtoolkit.network;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import ivorius.ivtoolkit.blocks.BlockPositions;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraft.world.dimension.DimensionType;
 
 /**
  * Created by lukas on 01.07.14.
  */
-public class PacketTileEntityClientEvent implements IMessage
+public class PacketTileEntityClientEvent implements IvPacket
 {
-    private int dimension;
+    private DimensionType dimension;
     private BlockPos pos;
     private String context;
     private ByteBuf payload;
@@ -38,7 +38,7 @@ public class PacketTileEntityClientEvent implements IMessage
     {
     }
 
-    public PacketTileEntityClientEvent(int dimension, BlockPos pos, String context, ByteBuf payload)
+    public PacketTileEntityClientEvent(DimensionType dimension, BlockPos pos, String context, ByteBuf payload)
     {
         this.dimension = dimension;
         this.pos = pos;
@@ -50,15 +50,15 @@ public class PacketTileEntityClientEvent implements IMessage
     {
         ByteBuf buf = Unpooled.buffer();
         entity.assembleClientEvent(buf, context, params);
-        return new PacketTileEntityClientEvent(entity.getWorld().provider.getDimension(), entity.getPos(), context, buf);
+        return new PacketTileEntityClientEvent(entity.getWorld().getDimension().getType(), entity.getPos(), context, buf);
     }
 
-    public int getDimension()
+    public DimensionType getDimension()
     {
         return dimension;
     }
 
-    public void setDimension(int dimension)
+    public void setDimension(DimensionType dimension)
     {
         this.dimension = dimension;
     }
@@ -94,20 +94,20 @@ public class PacketTileEntityClientEvent implements IMessage
     }
 
     @Override
-    public void fromBytes(ByteBuf buf)
+    public void decode(PacketBuffer buf)
     {
-        dimension = buf.readInt();
+        dimension = DimensionType.getById(buf.readInt());
         pos = BlockPositions.readFromBuffer(buf);
-        context = ByteBufUtils.readUTF8String(buf);
+        context = buf.readString(1000);
         payload = IvPacketHelper.readByteBuffer(buf);
     }
 
     @Override
-    public void toBytes(ByteBuf buf)
+    public void encode(PacketBuffer buf)
     {
-        buf.writeInt(dimension);
+        buf.writeInt(dimension.getId());
         BlockPositions.writeToBuffer(pos, buf);
-        ByteBufUtils.writeUTF8String(buf, context);
+        buf.writeString(context);
         IvPacketHelper.writeByteBuffer(buf, payload);
     }
 }

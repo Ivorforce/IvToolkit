@@ -66,7 +66,7 @@ public class NBTCompoundObjects
 
     public static <T extends NBTCompoundObject> T readFrom(NBTTagCompound compound, String key, Supplier<? extends T> instantiator)
     {
-        return NBTCompoundObjects.read(compound.getCompoundTag(key), instantiator);
+        return NBTCompoundObjects.read(compound.getCompound(key), instantiator);
     }
 
     @Deprecated
@@ -95,20 +95,20 @@ public class NBTCompoundObjects
         {
             NBTTagCompound compound = new NBTTagCompound();
             object.writeToNBT(compound);
-            tagList.appendTag(compound);
+            tagList.add(compound);
         }
         return tagList;
     }
 
     public static <T extends NBTCompoundObject> List<T> readListFrom(NBTTagCompound compound, String key, Supplier<? extends T> instantiator)
     {
-        return readList(compound.getTagList(key, Constants.NBT.TAG_COMPOUND), instantiator);
+        return readList(compound.getList(key, Constants.NBT.TAG_COMPOUND), instantiator);
     }
 
     @Deprecated
     public static <T extends NBTCompoundObject> List<T> readListFrom(NBTTagCompound compound, String key, Class<T> tClass)
     {
-        return readList(compound.getTagList(key, Constants.NBT.TAG_COMPOUND), tClass);
+        return readList(compound.getList(key, Constants.NBT.TAG_COMPOUND), tClass);
     }
 
     @Deprecated
@@ -119,10 +119,10 @@ public class NBTCompoundObjects
 
     public static <T extends NBTCompoundObject> List<T> readList(NBTTagList list, Supplier<? extends T> instantiator)
     {
-        List<T> rList = new ArrayList<>(list.tagCount());
+        List<T> rList = new ArrayList<>(list.size());
 
-        for (int i = 0; i < list.tagCount(); i++)
-            rList.add(read(list.getCompoundTagAt(i), instantiator));
+        for (int i = 0; i < list.size(); i++)
+            rList.add(read(list.getCompound(i), instantiator));
 
         return rList;
     }
@@ -135,7 +135,7 @@ public class NBTCompoundObjects
 
     public static <K extends NBTCompoundObject, V extends NBTCompoundObject> Map<K, V> readMapFrom(NBTTagCompound compound, String key, Supplier<? extends K> keySupplier, Supplier<? extends V> valueSupplier)
     {
-        return readMap(compound.getTagList(key, Constants.NBT.TAG_COMPOUND), keySupplier, valueSupplier);
+        return readMap(compound.getList(key, Constants.NBT.TAG_COMPOUND), keySupplier, valueSupplier);
     }
 
     @Deprecated
@@ -147,9 +147,9 @@ public class NBTCompoundObjects
     public static <K extends NBTCompoundObject, V extends NBTCompoundObject> Map<K, V> readMap(NBTTagList nbt, Supplier<? extends K> keyInstantiator, Supplier<? extends V> valueInstantiator)
     {
         ImmutableMap.Builder<K, V> map = new ImmutableMap.Builder<>();
-        for (int i = 0; i < nbt.tagCount(); i++)
+        for (int i = 0; i < nbt.size(); i++)
         {
-            NBTTagCompound compound = nbt.getCompoundTagAt(i);
+            NBTTagCompound compound = nbt.getCompound(i);
             map.put(readFrom(compound, "key", keyInstantiator), readFrom(compound, "value", valueInstantiator));
         }
         return map.build();
@@ -168,7 +168,7 @@ public class NBTCompoundObjects
             NBTTagCompound compound = new NBTTagCompound();
             writeTo(compound, "key", entry.getKey());
             writeTo(compound, "value", entry.getValue());
-            nbt.appendTag(compound);
+            nbt.add(compound);
         }
         return nbt;
     }

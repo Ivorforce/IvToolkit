@@ -16,9 +16,9 @@
 
 package ivorius.ivtoolkit.util;
 
-import gnu.trove.TIntCollection;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntArrays;
+import it.unimi.dsi.fastutil.ints.IntCollection;
 import ivorius.ivtoolkit.gui.IntegerRange;
 
 import javax.annotation.Nonnull;
@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 public class LineSelection
 {
     @Nonnull
-    private final TIntList cuts = new TIntArrayList();
+    private final IntArrayList cuts = new IntArrayList();
     private boolean startsAdditive;
 
     public LineSelection(boolean additive)
@@ -40,16 +40,16 @@ public class LineSelection
         this.startsAdditive = additive;
     }
 
-    public LineSelection(boolean startsAdditive, TIntCollection cuts)
+    public LineSelection(boolean startsAdditive, IntCollection cuts)
     {
         this.startsAdditive = startsAdditive;
         this.cuts.addAll(cuts);
-        this.cuts.sort();
+        this.cuts.sort(Integer::compareTo);
     }
 
     public static LineSelection fromRange(IntegerRange range, boolean additive)
     {
-        return new LineSelection(!additive, new TIntArrayList(new int[]{range.getMin(), range.getMax() + 1}));
+        return new LineSelection(!additive, new IntArrayList(new int[]{range.getMin(), range.getMax() + 1}));
     }
 
     public LineSelection copy()
@@ -83,8 +83,7 @@ public class LineSelection
 
     public void setSection(@Nullable IntegerRange range, boolean additive)
     {
-        if (range == null)
-        {
+        if (range == null) {
             cuts.clear();
             startsAdditive = additive;
             return;
@@ -100,7 +99,7 @@ public class LineSelection
         Boolean maxAdditive = max == Integer.MAX_VALUE ? null : isSectionAdditive(sectionForIndex(max + 1));
 
         // Remove cuts in between
-        cuts.remove(minSection, maxSection - minSection);
+        cuts.removeElements(minSection, maxSection);
 
         // Adjust line between before and section
         if (minAdditive != null)
@@ -117,21 +116,19 @@ public class LineSelection
     {
         int leftCutIndex = sectionForIndex(index) - 1;
 
-        if (needsCut)
-        {
+        if (needsCut) {
             if (!hasCutLeft(leftCutIndex, index))
-                cuts.insert(leftCutIndex + 1, index);
+                cuts.add(leftCutIndex + 1, index);
         }
-        else
-        {
+        else {
             if (hasCutLeft(leftCutIndex, index))
-                cuts.remove(leftCutIndex, 1);
+                cuts.removeElements(leftCutIndex, leftCutIndex + 1);
         }
     }
 
     private boolean hasCutLeft(int cutIndex, int index)
     {
-        return cutIndex >= 0 && cuts.get(cutIndex) == index;
+        return cutIndex >= 0 && cuts.getInt(cutIndex) == index;
     }
 
     public IntStream streamElements(@Nullable IntegerRange range, boolean additive)
@@ -156,7 +153,7 @@ public class LineSelection
     public IntegerRange sectionRange(int section)
     {
         assertHasSection(section);
-        return new IntegerRange(section > 0 ? cuts.get(section - 1) : Integer.MIN_VALUE, section < cuts.size() ? cuts.get(section) - 1 : Integer.MAX_VALUE);
+        return new IntegerRange(section > 0 ? cuts.getInt(section - 1) : Integer.MIN_VALUE, section < cuts.size() ? cuts.getInt(section) - 1 : Integer.MAX_VALUE);
     }
 
     public int sectionCount()
@@ -181,7 +178,7 @@ public class LineSelection
         if (index == Integer.MAX_VALUE)
             return sectionCount() - 1;
 
-        int res = cuts.binarySearch(index);
+        int res = IntArrays.binarySearch(cuts.elements(), index);
         // If we find the index, it is in the section after the cut
         // If we don't find it, the value is -(index + 1), so add +1 for both
         return Math.abs(res + 1);
