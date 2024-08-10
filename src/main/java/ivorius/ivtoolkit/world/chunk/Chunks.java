@@ -17,6 +17,7 @@
 package ivorius.ivtoolkit.world.chunk;
 
 import ivorius.ivtoolkit.blocks.BlockSurfacePos;
+import ivorius.ivtoolkit.util.IvStreams;
 import net.minecraft.util.math.ChunkPos;
 
 import java.util.stream.IntStream;
@@ -32,14 +33,23 @@ public class Chunks
         return chunkPos.x == (pos.x >> 4) && chunkPos.z == (pos.z >> 4);
     }
 
-    public static Stream<BlockSurfacePos> repeatIntersections(ChunkPos chunkPos, BlockSurfacePos pos, int repeatX, int repeatZ)
-    {
-        int lowestX = pos.x + (((chunkPos.x << 4) - pos.x) / repeatX) * repeatX;
-        int lowestZ = pos.z + (((chunkPos.z << 4) - pos.z) / repeatZ) * repeatZ;
+    public static IntStream repeatsInChunk(int chunkPos, int shift, int repeatLength) {
+        if (repeatLength == 0) {
+            return shift >> 4 == chunkPos
+                ? IntStream.of(shift)
+                : IntStream.empty();
+        }
 
-        int repeatsX = (15 - (lowestX - (chunkPos.x << 4))) / repeatX;
-        int repeatsZ = (15 - (lowestZ - (chunkPos.z << 4))) / repeatZ;
+        int lowest = shift + ((chunkPos << 4) - shift) / repeatLength * repeatLength;
+        return IntStream.range(0, repeatLength + 1).map(x -> lowest + x * repeatLength);
+    }
 
-        return ivorius.ivtoolkit.util.IvStreams.flatMapToObj(IntStream.range(0, repeatsX + 1), iX -> IntStream.range(0, repeatsZ + 1).mapToObj(iZ -> new BlockSurfacePos(lowestX + iX * repeatX, lowestZ + iZ * repeatZ)));
+    public static Stream<BlockSurfacePos> repeatIntersections(ChunkPos chunkPos, BlockSurfacePos pos, int repeatX, int repeatZ) {
+        IntStream xStream = repeatsInChunk(chunkPos.x, pos.x, repeatX);
+        IntStream zStream = repeatsInChunk(chunkPos.z, pos.z, repeatZ);
+
+        return IvStreams.flatMapToObj(xStream, x ->
+            zStream.mapToObj(z -> new BlockSurfacePos(x, z))
+        );
     }
 }
